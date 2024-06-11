@@ -1,0 +1,8 @@
+NXP Software Content Register
+
+Name: nxp_matter_support
+Outgoing License: Apache-2.0
+License File: LICENSE
+Format: source code, header files, build files, scripts
+Description: Containing additionnal NXP SDK files required to support Matter stack on NXP platforms 
+Release location: https://github.com/NXP/nxp_matter_support
