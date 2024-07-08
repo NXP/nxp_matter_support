@@ -84,17 +84,25 @@ declare_args() {
   # Describe the transceiver detail flags
   nxp_transceiver_interface_detail = "WIFI_IW612_BOARD_MURATA_2EL_USD"
 
-  rt_sdk_root = "${chip_root}/third_party/nxp/github_sdk/${sdk_repo}"
 }
 
-declare_args() {
-  rt_core_sdk_root = "${rt_sdk_root}/core"
+if(rt_platform == "rt1060" || rt_platform == "rt1170"){
+  if (getenv("NXP_RT_SDK_ROOT") == "") {
+    rt_sdk_root = "${chip_root}/third_party/nxp/nxp_matter_support/github_sdk/rt/repo/sdk-2.15/"
+  } else {
+    rt_sdk_root = getenv("NXP_RT_SDK_ROOT")
+  }
 }
 
-if (is_sdk_package || is_sdk_internal) {
-  rt_core_sdk_root = getenv("NXP_SDK_ROOT")
-  rt_sdk_root = getenv("NXP_SDK_ROOT")
+if(rt_platform == "rw61x"){
+  if (getenv("NXP_COMMON_SDK_ROOT") == "") {
+    rt_sdk_root = "${chip_root}/third_party/nxp/nxp_matter_support/github_sdk/rw_k32w1/repo/sdk-2.15/"
+  } else {
+    rt_sdk_root = getenv("NXP_COMMON_SDK_ROOT")
+  }
 }
+
+rt_core_sdk_root = "${rt_sdk_root}/core"
 
 if (!defined(rt_fwk_platform)) {
   rt_fwk_platform = rt_platform
@@ -639,6 +647,18 @@ template("rt_sdk") {
 
     if (!defined(sources)) {
       sources = []
+    }
+    else {
+      # If NVS is enabled, remove the default peripherals.c from sources (file depends on littlefs).
+      if((rt_nvm_component == "nvs")) {
+        # Here we iterate through the invoker's sources list, this ensures that the file
+        # is only being removed if it was present in the list.
+        foreach(file, sources) {
+          if (file == "${chip_root}/third_party/nxp/nxp_matter_support/examples/platform/rt/rw61x/board/peripherals.c") {
+            sources -= ["${chip_root}/third_party/nxp/nxp_matter_support/examples/platform/rt/rw61x/board/peripherals.c"]
+          }
+        }
+      }
     }
 
     sources += [
