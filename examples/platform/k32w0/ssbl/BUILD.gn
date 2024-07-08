@@ -1,0 +1,266 @@
+# Copyright (c) 2024 Project CHIP Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+import("//build_overrides/build.gni")
+import("//build_overrides/chip.gni")
+import("//build_overrides/nxp_sdk.gni")
+
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/k32w0_sdk.gni")
+import("${nxp_sdk_build_root}/${nxp_sdk_name}/nxp_executable.gni")
+
+declare_args() {
+  # Arg to set SSBL version
+  ssbl_version = 0
+
+  # Arg to enable/disable PDM in external flash
+  ssbl_pdm_external_flash = true
+
+  # Arg to enable/disable multi-image OTA feature
+  ssbl_multi_image_support = true
+
+  # Arg to configure custom OTA entry storage type. It has two possbile values:
+  # - OTACustomStorage_ExtFlash (set by default)
+  # - OTACustomStorage_Ram
+  ssbl_ota_entry_storage = "OTACustomStorage_ExtFlash"
+
+  # Arg to enable/disable simple hash verification alternative to secure boot
+  ssbl_simple_hash_verification = false
+
+  # Arg to optimize SPIFI flash driver size
+  ssbl_optimize_spifi_flash = false
+
+  # Arg to enable/disable SPIFI dual mode support
+  ssbl_spifi_dual_mode = false
+
+  # Arg to enable/disable OTA support for application with sections stored in external flash
+  ssbl_ota_data_in_external_flash = false
+
+  # Arg to enable/disable redlib when compiling.
+  # Setting it to false by default, in which case newlib nano will be used.
+  ssbl_use_redlib = false
+}
+
+is_sdk_package = false
+
+# Support both github SDK and package SDK
+if (k32w0_sdk_root == "//third_party/connectedhomeip/third_party/nxp/github_sdk/k32w0/repo") {
+  print("Using github SDK")
+  sdk_CMSIS = "${k32w0_sdk_root}/core/CMSIS"
+  sdk_devices = "${k32w0_sdk_root}/core/devices"
+  sdk_drivers = "${k32w0_sdk_root}/core/drivers"
+  sdk_wireless_examples = "${k32w0_sdk_root}/examples/k32w061dk6/wireless_examples"
+} else {
+  print("Using package SDK")
+  is_sdk_package = true
+  sdk_CMSIS = "${k32w0_sdk_root}/CMSIS"
+  sdk_devices = "${k32w0_sdk_root}/devices"
+  sdk_drivers = "${k32w0_sdk_root}/devices/${device}/drivers"
+  sdk_wireless_examples = "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples"
+}
+
+config("compiler_config") {
+  _cflags = [
+    "-Wall",
+    "-Os",
+    "-std=gnu99",
+    "-ffunction-sections",
+    "-fdata-sections",
+    "-fno-common",
+    "-ffreestanding",
+    "-fno-builtin",
+    "-flto",
+    "-ffat-lto-objects",
+  ]
+
+  cflags_c = _cflags
+  cflags_objc = _cflags
+  cflags_cc = _cflags
+  cflags_objcc = _cflags
+
+  ldscript = "${sdk_wireless_examples}/framework/ssbl/bm/mcux/dk6_ssbl.ld"
+
+  inputs = [ ldscript ]
+
+  ldflags = [
+    "-nostdlib",
+    "-Wl,--gc-sections",
+    "-Wl,--defsym=__app_load_address__=0",
+    "-Wl,--defsym=__ssbl_size__=8192",
+    "-Wl,--defsym=__app_id__=0",
+    "-Wl,--defsym=gUseBootloaderLink_d=0",
+    "-Wl,--defsym=__ram_vector_table__=1",
+    "-Wl,--defsym=gUseNVMLink_d=1",
+    "-Wl,--no-wchar-size-warning",
+    "-Wl,--sort-section=alignment",
+    "-Wl,-print-memory-usage",
+    "-Wl,--cref",
+    "-Wl,-no-warn-rwx-segments",
+    "-T" + rebase_path(ldscript, root_build_dir),
+  ]
+
+  if (!ssbl_use_redlib) {
+    libs = [ "c_nano" ]
+
+    # This part is needed due to the linker script, which assumes
+    # redlib is used. Stub these two static libraries to avoid errors.
+    ldflags += [ "-L" + rebase_path("${chip_root}/examples/platform/nxp/k32w0/ssbl/stubs", root_build_dir) ]
+    libs += [ "cr_c", "cr_eabihelpers" ]
+  }
+}
+
+config("ssbl_config") {
+  print("-------------- SSBL config ---------------")
+  print("- version:                          ", ssbl_version)
+  print("- enable PDM in external flash:     ", ssbl_pdm_external_flash)
+  print("- enable multi-image support:       ", ssbl_multi_image_support)
+  print("- enable simple hash verification:  ", ssbl_simple_hash_verification)
+  print("- optimize SPIFI flash driver size: ", ssbl_optimize_spifi_flash)
+  print("- enable SPIFI dual mode support:   ", ssbl_spifi_dual_mode)
+  print("- OTA data in external flash:       ", ssbl_ota_data_in_external_flash)
+  print("- use redlib:                       ", ssbl_use_redlib)
+
+  defines = [
+    "SSBL_VERSION=${ssbl_version}",
+    "CPU_K32W061HN",
+    "CPU_K32W061HN_cm4",
+    "CPU_K32W061",
+    "FSL_SDK_DISABLE_DRIVER_CLOCK_CONTROL",
+    "FSL_FEATURE_SPIFI_HAS_NO_RESET",
+    "CFG_BLE_PRJ=1",
+    "ENABLE_RAM_VECTOR_TABLE=1",
+    "__APP_DEBUG",
+    "__ASSERT_LL_DEBUG",
+    "__CPU_JN518X_REV=1",
+    "CR_PRINTF_CHAR",
+    "SDK_DEBUGCONSOLE=1",
+    "DK6",
+    "CPU_JN518X",
+    "PRINTF_FLOAT_ENABLE=1",
+    "__USE_CMSIS",
+    "NDEBUG",
+  ]
+
+  # TODO: There is a chance these flags might be used only by MCUXpresso IDE,
+  # so maybe they can be removed.
+  if (ssbl_use_redlib) {
+    defines += [ "__REDLIB__" ]
+  } else {
+    defines += [ "__NEWLIB__" ]
+  }
+
+  # Flags based on gn args
+  if (ssbl_pdm_external_flash) {
+    defines += [ "PDM_EXT_FLASH=1" ]
+  }
+
+  if (ssbl_multi_image_support) {
+    assert(ssbl_ota_entry_storage == "OTACustomStorage_ExtFlash" || ssbl_ota_entry_storage == "OTACustomStorage_Ram")
+    defines += [
+      "gOTAUseCustomOtaEntry=1",
+      "gOTACustomOtaEntryMemory=${ssbl_ota_entry_storage}",
+    ]
+  }
+
+  if (ssbl_simple_hash_verification) {
+    defines += [ "gSimpleHashVerification=1" ]
+  }
+
+  if (ssbl_optimize_spifi_flash) {
+    defines += [ "SPIFI_OPTIM_SIZE=1" ]
+  }
+
+  if (ssbl_spifi_dual_mode) {
+    defines += [ "SPIFI_DUAL_MODE_SUPPORT=1" ]
+  }
+
+  if (ssbl_ota_data_in_external_flash) {
+    defines += [ "EXTERNAL_FLASH_DATA_OTA=1" ]
+  }
+
+  include_dirs = [
+    "${sdk_CMSIS}/Include",
+    "${sdk_devices}/K32W061",
+    "${sdk_devices}/K32W061/drivers",
+    "${sdk_wireless_examples}/framework/ssbl/bm"
+  ]
+
+  if (!is_sdk_package) {
+    include_dirs += [
+      "${sdk_drivers}/aes",
+      "${sdk_drivers}/common",
+      "${sdk_drivers}/jn_flash",
+      "${sdk_drivers}/jn_iocon",
+      "${sdk_drivers}/lpc_gpio",
+      "${sdk_drivers}/sha",
+      "${sdk_drivers}/spifi",
+    ]
+  } else {
+    include_dirs += [ "${sdk_drivers}" ]
+  }
+}
+
+k32w0_executable("ssbl") {
+  output_name = "chip-k32w0x-ssbl"
+
+  configs = [
+    ":ssbl_config",
+    ":compiler_config",
+    "${build_root}/config/compiler:abi_default",
+    "${build_root}/config/compiler:no_exceptions",
+    "${build_root}/config/compiler:specs_default",
+  ]
+
+  sources = [
+    "${sdk_wireless_examples}/framework/ssbl/bm/clock_config.c",
+    "${sdk_wireless_examples}/framework/ssbl/bm/OtaUtils.c",
+    "${sdk_wireless_examples}/framework/ssbl/bm/pin_mux.c",
+    "${sdk_wireless_examples}/framework/ssbl/bm/spifi_flash.c",
+    "${sdk_wireless_examples}/framework/ssbl/bm/ssbl.c"
+  ]
+
+  # Drivers sources
+  sources += [
+    "${sdk_devices}/K32W061/system_K32W061.c",
+    "${sdk_devices}/K32W061/mcuxpresso/startup_k32w061.c",
+    "${sdk_devices}/K32W061/drivers/fsl_clock.c",
+    "${sdk_devices}/K32W061/drivers/fsl_reset.c"
+  ]
+
+  if (!is_sdk_package) {
+    sources += [
+      "${sdk_drivers}/aes/fsl_aes.c",
+      "${sdk_drivers}/common/fsl_common.c",
+      "${sdk_drivers}/jn_flash/fsl_flash.c",
+      "${sdk_drivers}/lpc_gpio/fsl_gpio.c",
+      "${sdk_drivers}/sha/fsl_sha.c",
+      "${sdk_drivers}/spifi/fsl_spifi.c"
+    ]
+  } else {
+    sources += [
+      "${sdk_drivers}/fsl_aes.c",
+      "${sdk_drivers}/fsl_common.c",
+      "${sdk_drivers}/fsl_flash.c",
+      "${sdk_drivers}/fsl_gpio.c",
+      "${sdk_drivers}/fsl_sha.c",
+      "${sdk_drivers}/fsl_spifi.c"
+    ]
+  }
+
+  # Workaround to fix undefined reference to __aeabi_unwind_cpp_pr0
+  sources += [ "stubs/eabi_stub.c" ]
+
+  output_dir = root_out_dir
+}
