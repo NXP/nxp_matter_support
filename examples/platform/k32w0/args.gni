@@ -17,7 +17,7 @@ import("//build_overrides/chip.gni")
 import("${chip_root}/src/platform/nxp/k32w0/args.gni")
 
 openthread_core_config_deps = []
-openthread_core_config_deps = [ "${chip_root}/examples/platform/nxp/k32w0:openthread_core_config_k32w0_chip_examples" ]
+openthread_core_config_deps = [ "${chip_root}/third_party/nxp/nxp_matter_support/examples/platform/k32w0:openthread_core_config_k32w0_chip_examples" ]
 
 chip_ble_project_config_include = "<CHIPProjectConfig.h>"
 chip_device_project_config_include = "<CHIPProjectConfig.h>"

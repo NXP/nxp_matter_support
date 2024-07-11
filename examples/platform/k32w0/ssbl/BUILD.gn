@@ -56,7 +56,7 @@ declare_args() {
 is_sdk_package = false
 
 # Support both github SDK and package SDK
-if (k32w0_sdk_root == "//third_party/connectedhomeip/third_party/nxp/github_sdk/k32w0/repo") {
+if (k32w0_sdk_root == "//third_party/connectedhomeip/third_party/nxp/nxp_matter_support/github_sdk/k32w0/repo") {
   print("Using github SDK")
   sdk_CMSIS = "${k32w0_sdk_root}/core/CMSIS"
   sdk_devices = "${k32w0_sdk_root}/core/devices"
@@ -116,7 +116,7 @@ config("compiler_config") {
 
     # This part is needed due to the linker script, which assumes
     # redlib is used. Stub these two static libraries to avoid errors.
-    ldflags += [ "-L" + rebase_path("${chip_root}/examples/platform/nxp/k32w0/ssbl/stubs", root_build_dir) ]
+    ldflags += [ "-L" + rebase_path("${chip_root}/third_party/nxp/nxp_matter_support/examples/platform/k32w0/ssbl/stubs", root_build_dir) ]
     libs += [ "cr_c", "cr_eabihelpers" ]
   }
 }
