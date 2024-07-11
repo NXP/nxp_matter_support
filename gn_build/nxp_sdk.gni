@@ -59,6 +59,9 @@ declare_args() {
   # Enables to use external sdk. If set to true, this removes the dependency on nxp_sdk
   nxp_external_sdk = false
 
+  # Path to SDK root
+  nxp_sdk_root = ""
+
   # Defines the current software version
   nxp_software_version = 1
 
