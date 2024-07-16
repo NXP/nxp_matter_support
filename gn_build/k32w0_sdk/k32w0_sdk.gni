@@ -104,16 +104,6 @@ template("k32w0_sdk") {
           chip_with_factory_data == 1,
       "Please set chip_with_factory_data=1 if using default factory data processor.")
 
-  assert(
-      chip_enable_ota_factory_data_processor == 0 ||
-          chip_enable_ota_firmware_processor == 1,
-      "Please set chip_enable_ota_firmware_processor=1 if using default factory data processor.")
-
-  assert(
-      chip_enable_ota_factory_data_processor == 0 ||
-          chip_with_factory_data == 1,
-      "Please set chip_with_factory_data=1 if using default factory data processor.")
-
   if (build_for_k32w041am == 1 || build_for_k32w041a == 1 ||
       build_for_k32w041 == 1) {
     build_for_k32w061 = 0
@@ -231,7 +221,7 @@ template("k32w0_sdk") {
     }
 
     _sdk_include_dirs += [
-      "${chip_root}/src/platform/nxp/k32w/k32w0",
+      "${chip_root}/src/platform/nxp/k32w0",
       "${CORE_PATH}/CMSIS/Include",
       "${CORE_PATH}/components/serial_manager",
       "${CORE_PATH}/components/uart",
@@ -402,7 +392,7 @@ template("k32w0_sdk") {
       ]
 
       if (chip_enable_ota_factory_data_processor == 1) {
-        defines += [ "CONFIG_CHIP_K32W0_OTA_FACTORY_DATA_PROCESSOR=1" ]
+        defines += [ "CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR=1" ]
       }
     }
 
@@ -556,6 +546,15 @@ template("k32w0_sdk") {
 
     if (chip_with_factory_data == 1) {
       defines += [ "CONFIG_CHIP_LOAD_REAL_FACTORY_DATA=1" ]
+    }
+
+    if (nxp_software_version != "") {
+      defines +=
+          [ "NXP_CONFIG_DEVICE_SOFTWARE_VERSION=${nxp_software_version}" ]
+    }
+
+    if (nxp_software_version_string != "") {
+      defines += [ "NXP_CONFIG_DEVICE_SOFTWARE_VERSION_STRING=\"${nxp_software_version_string}\"" ]
     }
 
     if (defined(invoker.defines)) {

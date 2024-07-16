@@ -15,7 +15,7 @@
 import("//build_overrides/nxp_sdk.gni")
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
-assert(nxp_platform == "k32w/k32w0", "${nxp_platform} must be k32w/k32w0.")
+assert(nxp_platform == "k32w0", "${nxp_platform} must be k32w0.")
 
 arm_float_abi = "soft"
 arm_cpu = "cortex-m4"

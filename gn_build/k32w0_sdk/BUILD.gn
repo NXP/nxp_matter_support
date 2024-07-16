@@ -36,7 +36,7 @@ group("nxp_sdk") {
 config("mbedtls_k32w0_config") {
   defines = [
     "MBEDTLS_CONFIG_FILE=<third_party/openthread/repo/third_party/mbedtls/mbedtls-config.h>",
-    "MBEDTLS_USER_CONFIG_FILE=<src/platform/nxp/k32w/k32w0/k32w0-chip-mbedtls-config.h>",
+    "MBEDTLS_USER_CONFIG_FILE=<src/platform/nxp/k32w0/k32w0-chip-mbedtls-config.h>",
 
     # These options should really be in the config.h...
     "MBEDTLS_FREESCALE_FREERTOS_CALLOC_ALT=1",
@@ -99,6 +99,6 @@ mbedtls_target("mbedtls") {
 
   public_deps = [
     ":nxp_sdk",
-    "${chip_root}/third_party/openthread/platforms/nxp/k32w/k32w0:openthread_mbedtls_config_k32w0",
+    "${chip_root}/third_party/openthread/platforms/nxp/k32w0:openthread_mbedtls_config_k32w0",
   ]
 }
