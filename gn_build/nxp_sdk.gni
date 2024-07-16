@@ -13,6 +13,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/nxp_sdk.gni")
+
 declare_args() {
   # Indicates the name of the nxp platform targeted
   nxp_platform = ""
@@ -83,6 +85,12 @@ declare_args() {
 
 declare_args() {
   nxp_sdk_name = "${nxp_platform}_sdk"
+}
+
+if (is_sdk_package || getenv("NXP_SDK_ROOT") != "") {
+  nxp_sdk_root = getenv("NXP_SDK_ROOT")
+} else {
+  nxp_sdk_root = "${nxp_sdk_matter_support_root}/github_sdk/common_sdk/repo"
 }
 
 assert(nxp_platform != "", "nxp_platform should be defined")
