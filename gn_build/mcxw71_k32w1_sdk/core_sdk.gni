@@ -47,6 +47,7 @@ core_sdk = {
     DRIVER_PORT_DIR_PATH = "${DRIVER_DIR_PATH}"
     DRIVER_SPC_DIR_PATH = "${DRIVER_DIR_PATH}"
     DRIVER_TPM_DIR_PATH = "${DRIVER_DIR_PATH}"
+    DRIVER_TRDC_DIR_PATH = "${DRIVER_DIR_PATH}"
     DRIVER_WUU_DIR_PATH = "${DRIVER_DIR_PATH}"
     UTILITIES_DIR_PATH = "${nxp_sdk_root}/devices/${nxp_device}/utilities"
     UTILITIES_DIR_PATH_ASSERT = "${UTILITIES_DIR_PATH}"
@@ -54,14 +55,18 @@ core_sdk = {
   else {
     if (nxp_device == "K32W1480") {
       ADDITIONAL_DRIVERS_DIR_PATH = "${nxp_sdk_root}/core/devices/KW45B41Z83/drivers"
-    } else if (nxp_device == "MCXW716C") {
+    } else if (nxp_device == "MCXW716C" || nxp_device == "MCXW727C") {
       ADDITIONAL_DRIVERS_DIR_PATH = "${nxp_sdk_root}/core/devices/${nxp_device}/drivers"
     }
     CMSIS_CORE_DIR_PATH = "${nxp_sdk_root}/core/CMSIS/Core"
     COMPONENT_DIR_PATH = "${nxp_sdk_root}/core/components"
     DEVICES_DIR_PATH = "${nxp_sdk_root}/core/devices/${nxp_device}"
     DRIVER_DIR_PATH = "${nxp_sdk_root}/core/drivers"
-    UTILITIES_DIR_PATH = "${nxp_sdk_root}/core/utilities"
+    if (nxp_device == "MCXW727C") {
+      UTILITIES_DIR_PATH = "${nxp_sdk_root}/core/platform/utilities"
+    } else {
+      UTILITIES_DIR_PATH = "${nxp_sdk_root}/core/utilities"
+    }
 
     DRIVER_CCM32K_DIR_PATH = "${DRIVER_DIR_PATH}/ccm32k"
     DRIVER_CMC_DIR_PATH = "${DRIVER_DIR_PATH}/cmc"
@@ -80,6 +85,7 @@ core_sdk = {
     DRIVER_PORT_DIR_PATH = "${DRIVER_DIR_PATH}/port"
     DRIVER_SPC_DIR_PATH = "${DRIVER_DIR_PATH}/spc"
     DRIVER_TPM_DIR_PATH = "${DRIVER_DIR_PATH}/tpm"
+    DRIVER_TRDC_DIR_PATH = "${DRIVER_DIR_PATH}/trdc"
     DRIVER_WUU_DIR_PATH = "${DRIVER_DIR_PATH}/wuu"
     UTILITIES_DIR_PATH_ASSERT = "${UTILITIES_DIR_PATH}/assert"
   }
@@ -161,10 +167,18 @@ core_sdk = {
     "${UTILITIES_DIR_PATH}/str",
   ]
 
+  if (nxp_device == "MCXW727C") {
+    core_include_dirs += [
+      "${nxp_sdk_root}/core/devices/MCXW727C/drivers/",
+      "${COMPONENT_POWER_MGR_DIR_PATH}/devices/KW47B42ZB7/",
+      "${DRIVER_TRDC_DIR_PATH}"
+    ]
+  }
+
   if (chip_key_storage != "fwk_nvm") {
     core_include_dirs += [
       "${COMPONENT_FLASH_DIR_PATH}/mflash",
-      "${COMPONENT_FLASH_DIR_PATH}/mflash/k32w1"
+      "${COMPONENT_FLASH_DIR_PATH}/mflash/k4w1"
     ]
   }
 
@@ -184,7 +198,6 @@ core_sdk = {
     "SDK_DEBUGCONSOLE=1",
     "USE_RTOS=1",
     "FSL_RTOS_FREE_RTOS=1",
-    "MinimalHeapSize_c=0x8A00",
     "gMemManagerLightExtendHeapAreaUsage=0",
     "ENABLE_RAM_VECTOR_TABLE=1",
 
@@ -202,9 +215,17 @@ core_sdk = {
       "CPU_MCXW716CMFTA",
       "K32W1480_SERIES"
     ]
+  } else if (nxp_device == "MCXW727C") {
+    core_defines += [
+      "CPU_MCXW727CMFTA_cm33_core0",
+      "gDebugConsoleEnable_d=1",
+      "DEBUG_CONSOLE_TRANSFER_NON_BLOCKING",
+      "DebugConsole_c=1",
+      "DEFAULT_APP_UART=0",
+    ]
   }
 
-  if (chip_enable_matter_cli) {
+  if (chip_enable_matter_cli && nxp_device != "MCXW727C") {
     core_defines += [
       "gDebugConsoleEnable_d=1",
       "DebugConsole_c=0",
@@ -213,12 +234,39 @@ core_sdk = {
     ]
   }
 
-  core_sources = [
-    # Devices files
-    "${DEVICES_DIR_PATH}/gcc/startup_${nxp_device}.S",
-    "${DEVICES_DIR_PATH}/system_${nxp_device}.c",
-    "${ADDITIONAL_DRIVERS_DIR_PATH}/fsl_clock.c",
-    
+  if (nxp_device == "MCXW727C") {
+    core_defines += [
+      # For now, allocate more heap for kw47
+      "MinimalHeapSize_c=0xAC00",
+    ]
+  } else {
+    core_defines += [
+      "MinimalHeapSize_c=0x8A00",
+    ]
+  }
+
+  if (nxp_device == "MCXW727C") {
+    core_sources = [
+      # Devices files
+      # Use this startup file for now. Will switch to an SDK startup file in the future.
+      "${nxp_sdk_matter_support_root}/examples/platform/mcxw72/app/startup.S",
+      "${DEVICES_DIR_PATH}/system_${nxp_device}_cm33_core0.c",
+      "${nxp_sdk_root}/devices/MCXW727C/drivers/fsl_clock.c",
+      "${COMPONENT_POWER_MGR_DIR_PATH}/devices/KW47B42ZB7/fsl_pm_device.c",
+      # Drivers
+      "${DRIVER_TRDC_DIR_PATH}/fsl_trdc.c"
+    ]
+  } else {
+    core_sources = [
+      # Devices files
+      "${DEVICES_DIR_PATH}/gcc/startup_${nxp_device}.S",
+      "${DEVICES_DIR_PATH}/system_${nxp_device}.c",
+      "${ADDITIONAL_DRIVERS_DIR_PATH}/fsl_clock.c",
+      "${COMPONENT_POWER_MGR_DIR_PATH}/devices/${nxp_device}/fsl_pm_device.c",
+    ]
+  }
+
+  core_sources += [
     # Drivers files
     "${DRIVER_CCM32K_DIR_PATH}/fsl_ccm32k.c",
     "${DRIVER_CMC_DIR_PATH}/fsl_cmc.c",
@@ -249,7 +297,6 @@ core_sdk = {
     "${COMPONENT_OSA_DIR_PATH}/fsl_os_abstraction_free_rtos.c",
     "${COMPONENT_PANIC_DIR_PATH}/fsl_component_panic.c",
     "${COMPONENT_POWER_MGR_DIR_PATH}/core/fsl_pm_core.c",
-    "${COMPONENT_POWER_MGR_DIR_PATH}/devices/${nxp_device}/fsl_pm_device.c",
     "${COMPONENT_RESET_DIR_PATH}/fsl_adapter_reset.c",
     "${COMPONENT_SERIAL_MGR_DIR_PATH}/fsl_component_serial_manager.c",
     "${COMPONENT_SERIAL_MGR_DIR_PATH}/fsl_component_serial_port_uart.c",
@@ -266,7 +313,7 @@ core_sdk = {
 
   if (chip_key_storage != "fwk_nvm") {
     core_sources += [
-      "${COMPONENT_FLASH_DIR_PATH}/mflash/k32w1/mflash_drv.c"
+      "${COMPONENT_FLASH_DIR_PATH}/mflash/k4w1/mflash_drv.c"
     ]
   }
 }

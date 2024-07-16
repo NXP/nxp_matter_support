@@ -16,7 +16,8 @@
 import("//build_overrides/nxp_sdk.gni")
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
-assert(nxp_platform == "mcxw71_k32w1", "${nxp_platform} must be mcxw71_k32w1.")
+assert(nxp_platform == "mcxw71_k32w1" || nxp_platform == "mcxw72",
+       "${nxp_platform} must be mcxw71_k32w1 or mcxw72.")
 
 arm_arch = "armv8-m.main+dsp+fp"
 arm_cpu = "cortex-m33"

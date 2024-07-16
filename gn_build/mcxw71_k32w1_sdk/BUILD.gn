@@ -37,9 +37,15 @@ group("nxp_mbedtls") {
 }
 
 config("mbedtls_k32w1_config") {
-  defines = [
+  # Temporary solution until platform rework
+  if (nxp_device == "MCXW727C") {
+    defines = [ "MBEDTLS_USER_CONFIG_FILE=<src/platform/nxp/${nxp_platform}/mcxw72-chip-mbedtls-config.h>" ]
+  } else {
+    defines = [ "MBEDTLS_USER_CONFIG_FILE=<src/platform/nxp/${nxp_platform}/k32w1-chip-mbedtls-config.h>" ]
+  }
+
+  defines += [
     "MBEDTLS_CONFIG_FILE=<third_party/openthread/repo/third_party/mbedtls/mbedtls-config.h>",
-    "MBEDTLS_USER_CONFIG_FILE=<src/platform/nxp/mcxw71_k32w1/k32w1-chip-mbedtls-config.h>",
 
     # These options should really be in the config.h...
     "MBEDTLS_FREESCALE_FREERTOS_CALLOC_ALT=1",
@@ -70,9 +76,10 @@ config("mbedtls_k32w1_config") {
     ]
   }
 
-  if (chip_crypto == "platform") {
+  # Temporary solution to avoid backwards compatibility issues with other platforms
+  if (chip_crypto == "platform" && nxp_device == "MCXW727C") {
     defines += [
-      # "MBEDTLS_CCM_ALT",
+      "MBEDTLS_CCM_ALT",
     ]
   }
 
@@ -81,9 +88,15 @@ config("mbedtls_k32w1_config") {
 
 mbedtls_target("mbedtls") {
   sources = [
-    "${nxp_sdk_root}/middleware/mbedtls/port/sssapi/ccm_alt.c",
     "${nxp_sdk_root}/middleware/mbedtls/port/sssapi/entropy_poll_alt.c",
   ]
+
+  # Temporary solution to avoid backwards compatibility issues with other platforms
+  if (chip_crypto == "platform" && nxp_device == "MCXW727C") {
+    sources += [
+      "${nxp_sdk_root}/middleware/mbedtls/port/sssapi/ccm_alt.c",
+    ]
+  }
 
   public_configs = [ ":mbedtls_k32w1_config" ]
 

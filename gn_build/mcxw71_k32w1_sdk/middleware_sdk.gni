@@ -16,6 +16,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nxp_sdk.gni")
 
+import("${chip_root}/src/crypto/crypto.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
 
@@ -78,7 +79,6 @@ middleware_sdk = {
     "${MBEDTLS_DIR_PATH}/include",
     "${MBEDTLS_DIR_PATH}/include/mbedtls",
     "${MBEDTLS_DIR_PATH}/library",
-    "${MBEDTLS_DIR_PATH}/port/ksdk",
     "${MBEDTLS_DIR_PATH}/port/sssapi",
 
     # Multicore / Rpmsg directories
@@ -99,6 +99,11 @@ middleware_sdk = {
   } else if (nxp_device == "MCXW716C") {
     middleware_include_dirs += [
       "${MULTICORE_RPMSG_DIR_PATH}/lib/include/platform/kw45b41",
+    ]
+  } else if (nxp_device == "MCXW727C") {
+    middleware_include_dirs += [
+      "${MULTICORE_RPMSG_DIR_PATH}/lib/include/platform/mcxw72x",
+      "${nxp_sdk_root}/boards/mcxw72evk/wireless_examples/bluetooth/w_uart/freertos/"
     ]
   }
 
@@ -136,7 +141,6 @@ middleware_sdk = {
     "gSerialManagerMaxInterfaces_c=1",
     "gAppHighSystemClockFrequency_d=1",
     "USE_NBU=1",
-    "KW45_A0_SUPPORT=0",
     "gAspCapability_d=1",
     "gNvStorageIncluded_d=1",
     "gUnmirroredFeatureSet_d=1",
@@ -145,10 +149,6 @@ middleware_sdk = {
     "gAppLowpowerEnabled_d=1",
     "SSS_CONFIG_FILE=\"fsl_sss_config_elemu.h\"",
     "SSCP_CONFIG_FILE=\"fsl_sscp_config_elemu.h\"",
-    "APP_SERIAL_INTERFACE_INSTANCE=1",
-    "configFRTOS_MEMORY_SCHEME=4",
-    "osCustomStartup=1",
-    "CHIP_ENABLE_OPENTHREAD=1",
     "gUseHciTransportDownward_d=1",
     "gL2caMaxLeCbChannels_c=2",
     "gGapSimultaneousEAChainedReports_c=0",
@@ -169,6 +169,24 @@ middleware_sdk = {
     "gConnectPowerLeveldBm_c=0",
     "MULTICORE_APP=1",
   ]
+
+  if (nxp_device == "MCXW727C") {
+    middleware_defines += [
+      # Needed by sss_init
+      "MBEDTLS_NXP_SSSAPI",
+      "MBEDTLS_THREADING_C",
+      "MBEDTLS_THREADING_ALT",
+    ]
+  } else {
+    middleware_defines += [
+      "KW45_A0_SUPPORT=0",
+      "APP_SERIAL_INTERFACE_INSTANCE=1",
+      # Not sure if these flags are actually used or needed
+      "osCustomStartup=1",
+      "CHIP_ENABLE_OPENTHREAD=1",
+      "configFRTOS_MEMORY_SCHEME=4",
+    ]
+  }
 
   if (chip_key_storage == "littlefs") {
     middleware_defines += [
@@ -199,7 +217,6 @@ middleware_sdk = {
     "${FRAMEWORK_DIR_PATH}/OtaSupport/Source/OtaExternalFlash.c",
     "${FRAMEWORK_DIR_PATH}/OtaSupport/Source/OtaSupport.c",
     "${FRAMEWORK_DIR_PATH}/RNG/RNG.c",
-    "${FRAMEWORK_DIR_PATH}/SecLib/SecLib_sss.c",
     "${FRAMEWORK_DIR_PATH}/Sensors/sensors.c",
     "${FRAMEWORK_PLATFORM_DIR_PATH}/fwk_platform_ble.c",
     "${FRAMEWORK_PLATFORM_DIR_PATH}/fwk_platform.c",
@@ -216,7 +233,6 @@ middleware_sdk = {
     "${BLE_HOST_DIR_PATH}/application/common/ble_conn_manager.c",
 
     "${BLE_HOST_DIR_PATH}/application/common/gatt_db/gatt_database.c",
-    "${BLE_HOST_DIR_PATH}/application/common/matter/ble_init.c",
     "${BLE_HOST_DIR_PATH}/hci_transport/source/hcit_generic_adapter_interface.c",
     "${BLE_HOST_DIR_PATH}/host/config/ble_globals.c",
     "${BLE_HOST_DIR_PATH}/port/fwk_generic_list.c",
@@ -264,7 +280,8 @@ middleware_sdk = {
       "${MULTICORE_DIR_PATH}/mcmgr/src/mcmgr_internal_core_api_k32w1.c",
       "${MULTICORE_DIR_PATH}/mcmgr/src/mcmgr_internal_core_api_k32w1_ext.c",
       "${MULTICORE_RPMSG_DIR_PATH}/lib/rpmsg_lite/porting/platform/k32w1/rpmsg_platform.c",
-      "${MULTICORE_RPMSG_DIR_PATH}/lib/rpmsg_lite/porting/platform/k32w1/rpmsg_platform_ext.c"
+      "${MULTICORE_RPMSG_DIR_PATH}/lib/rpmsg_lite/porting/platform/k32w1/rpmsg_platform_ext.c",
+      "${BLE_HOST_DIR_PATH}/application/common/matter/ble_init.c",
     ]
   } else if (nxp_device == "MCXW716C") {
     middleware_sources += [
@@ -272,6 +289,27 @@ middleware_sdk = {
       "${MULTICORE_DIR_PATH}/mcmgr/src/mcmgr_internal_core_api_mcxw716_ext.c",
       "${MULTICORE_RPMSG_DIR_PATH}/lib/rpmsg_lite/porting/platform/kw45b41/rpmsg_platform.c",
       "${MULTICORE_RPMSG_DIR_PATH}/lib/rpmsg_lite/porting/platform/kw45b41/rpmsg_platform_ext.c",
+      "${BLE_HOST_DIR_PATH}/application/common/matter/ble_init.c",
+    ]
+  } else if (nxp_device == "MCXW727C") {
+    middleware_sources += [
+      "${MULTICORE_DIR_PATH}/mcmgr/src/mcmgr_internal_core_api_mcxw727.c",
+      "${MULTICORE_DIR_PATH}/mcmgr/src/mcmgr_internal_core_api_mcxw727_ext.c",
+      "${MULTICORE_RPMSG_DIR_PATH}/lib/rpmsg_lite/porting/platform/mcxw72x/rpmsg_platform.c",
+      "${MULTICORE_RPMSG_DIR_PATH}/lib/rpmsg_lite/porting/platform/mcxw72x/rpmsg_platform_ext.c",
+      "${FRAMEWORK_PLATFORM_DIR_PATH}/fwk_platform_crypto.c",
+      #"${BLE_HOST_DIR_PATH}/application/common/ble_init.c",
+      "${nxp_sdk_root}/boards/mcxw72evk/wireless_examples/bluetooth/w_uart/freertos/ble_init.c",
+    ]
+  }
+
+  if (chip_crypto == "platform") {
+    middleware_sources += [
+      "${FRAMEWORK_DIR_PATH}/SecLib/SecLib_sss.c",
+    ]
+  } else if (chip_crypto == "mbedtls") {
+    middleware_sources += [
+      "${FRAMEWORK_DIR_PATH}/SecLib/SecLib_mbedTLS.c",
     ]
   }
 

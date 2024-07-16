@@ -84,6 +84,16 @@ template("${nxp_platform}_sdk") {
       "${openthread_nxp_root}/third_party/k32w1_sdk",
     ]
 
+    if (nxp_device == "MCXW727C") {
+      _sdk_include_dirs += [
+        "${openthread_nxp_root}/third_party/mcxw72_sdk",
+      ]
+    } else {
+      _sdk_include_dirs += [
+        "${openthread_nxp_root}/third_party/k32w1_sdk",
+      ]
+    }
+
     if (chip_config_dimmable_led) {
         _sdk_include_dirs += [
           "${COMPONENT_PWM_DIR_PATH}",
@@ -109,6 +119,14 @@ template("${nxp_platform}_sdk") {
       "NXP_IDLE_MODE_DURATION_SEC=${nxp_idle_mode_duration_s}",
       "NXP_ICD_SUPPORTED_CLIENTS_PER_FABRIC=${nxp_icd_supported_clients_per_fabric}",
     ]
+
+    if (chip_enable_openthread) {
+      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_THREAD=1" ]
+    }
+
+    if (chip_enable_ble) {
+      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=1" ]
+    }
 
     if (chip_enable_pw_rpc) {
       defines += [ "SERIAL_PORT_TYPE_UART_DMA=1" ]
