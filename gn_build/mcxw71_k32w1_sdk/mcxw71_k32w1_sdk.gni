@@ -43,7 +43,7 @@ declare_args() {
 
 openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
 
-assert(mcxw71_k32w1_sdk_root != "", "mcxw71_k32w1_sdk_root must be specified")
+assert(nxp_sdk_root != "", "nxp_sdk_root must be specified")
 
 assert(!((use_smu2_static && !chip_openthread_ftd) ||
              (use_smu2_dynamic && !chip_openthread_ftd)),
@@ -55,7 +55,7 @@ forward_variables_from(middleware_sdk, "*")
 # Defines an k32w1 SDK build target.
 #
 # Parameters:
-#   mcxw71_k32w1_sdk_root - The location of the k32w1 SDK.
+#   nxp_sdk_root - The location of the k32w1 SDK.
 #   sources - Extra source files to build.
 template("${nxp_platform}_sdk") {
 

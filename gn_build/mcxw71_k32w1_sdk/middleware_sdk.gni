@@ -20,21 +20,21 @@ import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
 
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
-assert(mcxw71_k32w1_sdk_root != "", "mcxw71_k32w1_sdk_root must be specified")
+assert(nxp_sdk_root != "", "nxp_sdk_root must be specified")
 
 middleware_sdk = {
-  BLE_CONTROLLER_DIR_PATH = "${mcxw71_k32w1_sdk_root}/middleware/wireless/ble_controller"
-  BLE_HOST_DIR_PATH = "${mcxw71_k32w1_sdk_root}/middleware/wireless/bluetooth"
-  FRAMEWORK_DIR_PATH = "${mcxw71_k32w1_sdk_root}/middleware/wireless/framework"
-  FREERTOS_DIR_PATH = "${mcxw71_k32w1_sdk_root}/rtos/freertos"
+  BLE_CONTROLLER_DIR_PATH = "${nxp_sdk_root}/middleware/wireless/ble_controller"
+  BLE_HOST_DIR_PATH = "${nxp_sdk_root}/middleware/wireless/bluetooth"
+  FRAMEWORK_DIR_PATH = "${nxp_sdk_root}/middleware/wireless/framework"
+  FREERTOS_DIR_PATH = "${nxp_sdk_root}/rtos/freertos"
   FRAMEWORK_PLATFORM_DIR_PATH = "${FRAMEWORK_DIR_PATH}/platform/connected_mcu"
   FREERTOS_KERNEL_DIR_PATH = "${FREERTOS_DIR_PATH}/freertos-kernel"
-  IEEE_802_15_4_DIR_PATH = "${mcxw71_k32w1_sdk_root}/middleware/wireless/ieee-802.15.4"
-  MBEDTLS_DIR_PATH = "${mcxw71_k32w1_sdk_root}/middleware/mbedtls"
-  MULTICORE_DIR_PATH = "${mcxw71_k32w1_sdk_root}/middleware/multicore"
-  MULTICORE_RPMSG_DIR_PATH = "${mcxw71_k32w1_sdk_root}/middleware/multicore/rpmsg_lite"
-  SECURE_SUBSYSTEM_DIR_PATH = "${mcxw71_k32w1_sdk_root}/middleware/secure-subsystem"
-  LITTLEFS_DIR_PATH = "${mcxw71_k32w1_sdk_root}/middleware/littlefs"
+  IEEE_802_15_4_DIR_PATH = "${nxp_sdk_root}/middleware/wireless/ieee-802.15.4"
+  MBEDTLS_DIR_PATH = "${nxp_sdk_root}/middleware/mbedtls"
+  MULTICORE_DIR_PATH = "${nxp_sdk_root}/middleware/multicore"
+  MULTICORE_RPMSG_DIR_PATH = "${nxp_sdk_root}/middleware/multicore/rpmsg_lite"
+  SECURE_SUBSYSTEM_DIR_PATH = "${nxp_sdk_root}/middleware/secure-subsystem"
+  LITTLEFS_DIR_PATH = "${nxp_sdk_root}/middleware/littlefs"
 
   middleware_include_dirs = [
     # BLE HOST / BLE CONTROLLER directories

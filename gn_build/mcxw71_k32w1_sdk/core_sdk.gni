@@ -20,14 +20,14 @@ import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
 
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
-assert(mcxw71_k32w1_sdk_root != "", "mcxw71_k32w1_sdk_root must be specified")
+assert(nxp_sdk_root != "", "nxp_sdk_root must be specified")
 
 core_sdk = {
-  if (sdk_release) {
-    ADDITIONAL_DRIVERS_DIR_PATH = "${mcxw71_k32w1_sdk_root}/devices/${nxp_device}/drivers"
-    CMSIS_CORE_DIR_PATH = "${mcxw71_k32w1_sdk_root}/CMSIS/Core"
-    COMPONENT_DIR_PATH = "${mcxw71_k32w1_sdk_root}/components"
-    DEVICES_DIR_PATH = "${mcxw71_k32w1_sdk_root}/devices/${nxp_device}"
+  if (is_sdk_package) {
+    ADDITIONAL_DRIVERS_DIR_PATH = "${nxp_sdk_root}/devices/${nxp_device}/drivers"
+    CMSIS_CORE_DIR_PATH = "${nxp_sdk_root}/CMSIS/Core"
+    COMPONENT_DIR_PATH = "${nxp_sdk_root}/components"
+    DEVICES_DIR_PATH = "${nxp_sdk_root}/devices/${nxp_device}"
     DRIVER_DIR_PATH = "${ADDITIONAL_DRIVERS_DIR_PATH}"
     DRIVER_CCM32K_DIR_PATH = "${DRIVER_DIR_PATH}"
     DRIVER_CMC_DIR_PATH = "${DRIVER_DIR_PATH}"
@@ -47,20 +47,20 @@ core_sdk = {
     DRIVER_SPC_DIR_PATH = "${DRIVER_DIR_PATH}"
     DRIVER_TPM_DIR_PATH = "${DRIVER_DIR_PATH}"
     DRIVER_WUU_DIR_PATH = "${DRIVER_DIR_PATH}"
-    UTILITIES_DIR_PATH = "${mcxw71_k32w1_sdk_root}/devices/${nxp_device}/utilities"
+    UTILITIES_DIR_PATH = "${nxp_sdk_root}/devices/${nxp_device}/utilities"
     UTILITIES_DIR_PATH_ASSERT = "${UTILITIES_DIR_PATH}"
   }
   else {
     if (nxp_device == "K32W1480") {
-      ADDITIONAL_DRIVERS_DIR_PATH = "${mcxw71_k32w1_sdk_root}/core/devices/KW45B41Z83/drivers"
+      ADDITIONAL_DRIVERS_DIR_PATH = "${nxp_sdk_root}/core/devices/KW45B41Z83/drivers"
     } else if (nxp_device == "MCXW716C") {
-      ADDITIONAL_DRIVERS_DIR_PATH = "${mcxw71_k32w1_sdk_root}/core/devices/${nxp_device}/drivers"
+      ADDITIONAL_DRIVERS_DIR_PATH = "${nxp_sdk_root}/core/devices/${nxp_device}/drivers"
     }
-    CMSIS_CORE_DIR_PATH = "${mcxw71_k32w1_sdk_root}/core/CMSIS/Core"
-    COMPONENT_DIR_PATH = "${mcxw71_k32w1_sdk_root}/core/components"
-    DEVICES_DIR_PATH = "${mcxw71_k32w1_sdk_root}/core/devices/${nxp_device}"
-    DRIVER_DIR_PATH = "${mcxw71_k32w1_sdk_root}/core/drivers"
-    UTILITIES_DIR_PATH = "${mcxw71_k32w1_sdk_root}/core/utilities"
+    CMSIS_CORE_DIR_PATH = "${nxp_sdk_root}/core/CMSIS/Core"
+    COMPONENT_DIR_PATH = "${nxp_sdk_root}/core/components"
+    DEVICES_DIR_PATH = "${nxp_sdk_root}/core/devices/${nxp_device}"
+    DRIVER_DIR_PATH = "${nxp_sdk_root}/core/drivers"
+    UTILITIES_DIR_PATH = "${nxp_sdk_root}/core/utilities"
 
     DRIVER_CCM32K_DIR_PATH = "${DRIVER_DIR_PATH}/ccm32k"
     DRIVER_CMC_DIR_PATH = "${DRIVER_DIR_PATH}/cmc"

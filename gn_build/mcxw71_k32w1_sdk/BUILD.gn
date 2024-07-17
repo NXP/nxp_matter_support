@@ -80,8 +80,8 @@ config("mbedtls_k32w1_config") {
 
 mbedtls_target("mbedtls") {
   sources = [
-    "${mcxw71_k32w1_sdk_root}/middleware/mbedtls/port/sssapi/ccm_alt.c",
-    "${mcxw71_k32w1_sdk_root}/middleware/mbedtls/port/sssapi/entropy_poll_alt.c",
+    "${nxp_sdk_root}/middleware/mbedtls/port/sssapi/ccm_alt.c",
+    "${nxp_sdk_root}/middleware/mbedtls/port/sssapi/entropy_poll_alt.c",
   ]
 
   public_configs = [ ":mbedtls_k32w1_config" ]
