@@ -25,6 +25,10 @@
 #ifndef __LWIPOPTS_H__
 #define __LWIPOPTS_H__
 
+#ifdef LWIP_USER_CONFIG_FILE
+#include LWIP_USER_CONFIG_FILE
+#endif /* LWIP_USER_CONFIG_FILE */
+
 #define CONFIG_NETWORK_HIGH_PERF 0
 
 #define LWIP_DNS 0

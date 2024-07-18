@@ -193,25 +193,25 @@ SECTIONS
     . = ALIGN(4);
     *(EXCLUDE_FILE(
         /* Exclude flash and frequently executed functions from XIP */
-        *fsl_adapter_flexspi_nor_flash.c.o
-        *mflash_drv.c.o
-        *fsl_flexspi.c.o
-        *queue.c.o
-        *tcp_out.c.o
-        *mlan_11n_rxreorder.c.o
-        *lib_a-memcpy-stub.o
-        *tcp_in.c.o
-        *inet_chksum.c.o
-        *timers.c.o
-        *fsl_usdhc.c.o
-        *port.c.o
-        *wifi-sdio.c.o
-        *fsl_sdio.c.o
-        *pbuf.c.o
-        *tasks.c.o
-        *lib_a-memset.o
-        *fsl_cache.c.o
-        *wifi.c.o
+        *fsl_adapter_flexspi_nor_flash.c.o*
+        *mflash_drv.c.o*
+        *fsl_flexspi.c.o*
+        *queue.c.o*
+        *tcp_out.c.o*
+        *mlan_11n_rxreorder.c.o*
+        *lib_a-memcpy-stub.o*
+        *tcp_in.c.o*
+        *inet_chksum.c.o*
+        *timers.c.o*
+        *fsl_usdhc.c.o*
+        *port.c.o*
+        *wifi-sdio.c.o*
+        *fsl_sdio.c.o*
+        *pbuf.c.o*
+        *tasks.c.o*
+        *lib_a-memset.o*
+        *fsl_cache.c.o*
+        *wifi.c.o*
       ) .text*)              /* .text* sections (code) */
     *(.rodata .rodata.* .constdata .constdata.*)
     *(.glue_7)               /* glue arm to thumb code */
@@ -394,25 +394,25 @@ SECTIONS
     __ram_function_start__ = .;
     *(CodeQuickAccess)
     /* Explicit placement of flash and frequently executed functions in RAM */
-    *fsl_adapter_flexspi_nor_flash.c.o(.text*)
-    *mflash_drv.c.o(.text*)
-    *fsl_flexspi.c.o(.text*)
-    *queue.c.o(.text*)
-    *tcp_out.c.o(.text*)
-    *mlan_11n_rxreorder.c.o(.text*)
-    *lib_a-memcpy-stub.o(.text*)
-    *tcp_in.c.o(.text*)
-    *inet_chksum.c.o(.text*)
-    *timers.c.o(.text*)
-    *fsl_usdhc.c.o(.text*)
-    *port.c.o(.text*)
-    *wifi-sdio.c.o(.text*)
-    *fsl_sdio.c.o(.text*)
-    *pbuf.c.o(.text*)
-    *tasks.c.o(.text*)
-    *lib_a-memset.o(.text*)
-    *fsl_cache.c.o(.text*)
-    *wifi.c.o(.text*)
+    *fsl_adapter_flexspi_nor_flash.c.o*(.text*)
+    *mflash_drv.c.o*(.text*)
+    *fsl_flexspi.c.o*(.text*)
+    *queue.c.o*(.text*)
+    *tcp_out.c.o*(.text*)
+    *mlan_11n_rxreorder.c.o*(.text*)
+    *lib_a-memcpy-stub.o*(.text*)
+    *tcp_in.c.o*(.text*)
+    *inet_chksum.c.o*(.text*)
+    *timers.c.o*(.text*)
+    *fsl_usdhc.c.o*(.text*)
+    *port.c.o*(.text*)
+    *wifi-sdio.c.o*(.text*)
+    *fsl_sdio.c.o*(.text*)
+    *pbuf.c.o*(.text*)
+    *tasks.c.o*(.text*)
+    *lib_a-memset.o*(.text*)
+    *fsl_cache.c.o*(.text*)
+    *wifi.c.o*(.text*)
     . = ALIGN(128);
     __ram_function_end__ = .;
   } > m_qacode

@@ -41,6 +41,9 @@ declare_args() {
   # Indicates if the nxp SDK used has the nxp SDK internal format
   is_sdk_internal = false
 
+  # Enables to use external sdk. If set to true, this removes the dependency on nxp_sdk
+  nxp_external_sdk = false
+
   # Defines the current software version
   nxp_software_version = 1
 
@@ -55,6 +58,9 @@ declare_args() {
   nxp_active_mode_duration_ms = 10000  # 10s Active Mode Interval
   nxp_active_mode_threshold_ms = 5000  # 5s Active Mode Threshold
   nxp_icd_supported_clients_per_fabric = 2  # 2 registration slots per fabric
+
+  # Build Matter as a standalone lib (without gn dependencies on OT)
+  nxp_build_matter_standalone_lib = false
 }
 
 declare_args() {

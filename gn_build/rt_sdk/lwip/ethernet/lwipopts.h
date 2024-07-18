@@ -24,6 +24,10 @@
 #ifndef __LWIPOPTS_H__
 #define __LWIPOPTS_H__
 
+#ifdef LWIP_USER_CONFIG_FILE
+#include LWIP_USER_CONFIG_FILE
+#endif /* LWIP_USER_CONFIG_FILE */
+
 #define LWIP_DISABLE_PBUF_POOL_SIZE_SANITY_CHECKS 1
 #define PBUF_POOL_SIZE 15
 #define TCP_MSS (1500 - 40)   /* TCP_MSS = (Ethernet MTU - IP header size - TCP header size) */

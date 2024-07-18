@@ -108,7 +108,6 @@ template("rt1060_sdk_drivers") {
       # XIP
       "${rt_sdk_root}/core/boards/${evkname}/xip",
       "${rt_sdk_root}/core/components/flash/mflash",
-      "${rt_sdk_root}/core/components/flash/mflash/mimxrt1062",
       "${rt_sdk_root}/core/components/internal_flash",
 
       # mdio
@@ -120,6 +119,13 @@ template("rt1060_sdk_drivers") {
       # Framework
       "${rt_sdk_root}/middleware/wireless/framework/boards/${rt_fwk_platform}",
     ]
+
+    if (evkname == "evkcmimxrt1060") {
+      _rt1060_sdk_drivers_include_dirs += [ "${rt_sdk_root}/core/components/flash/mflash/evkcmimxrt1060" ]
+    } else {
+      _rt1060_sdk_drivers_include_dirs += [ "${rt_sdk_root}/core/components/flash/mflash/mimxrt1062" ]
+    }
+
 
     if (chip_enable_wifi || iwx12_transceiver) {
       _rt1060_sdk_drivers_include_dirs += [ "${WIRELESS_CONFIG_TEMPLATE_PATH}" ]
@@ -180,8 +186,14 @@ template("rt1060_sdk_drivers") {
     }
 
     if (chip_enable_matter_cli) {
-      #When the CLI is enabled the debug console should be moved in UART2 for RT1060
-      defines += [ "DEBUG_CONSOLE_UART_INDEX=2" ]
+      if (evkname == "evkcmimxrt1060") {
+        #When the CLI is enabled the debug console should be moved in UART8 for RT1060_EVKC
+        defines += [ "DEBUG_CONSOLE_UART_INDEX=8" ]
+      }
+      else {
+        #When the CLI is enabled the debug console should be moved in UART2 for RT1060_EVKB
+        defines += [ "DEBUG_CONSOLE_UART_INDEX=2" ]
+      }
     }
 
     cflags = []
@@ -246,7 +258,6 @@ template("rt1060_sdk_drivers") {
       "${rt_sdk_freertos_kernel}/portable/GCC/ARM_CM4F/port.c",
       "${rt_sdk_freertos_kernel}/portable/MemMang/heap_4.c",
       "${rt_sdk_root}/core/boards/${evkname}/xip/${evkname}_flexspi_nor_config.c",
-      "${rt_sdk_root}/core/components/flash/mflash/mimxrt1062/mflash_drv.c",
 
       #startup files
       "${rt_sdk_root}/core/devices/${deviceBoardName}/gcc/startup_${deviceBoardName}.S",
@@ -258,6 +269,12 @@ template("rt1060_sdk_drivers") {
       "${rt_sdk_root}/middleware/wireless/framework/boards/${rt_fwk_platform}/board_comp.c",
       "${rt_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform.c",
     ]
+
+    if (evkname == "evkcmimxrt1060") {
+      sources += [ "${rt_sdk_root}/core/components/flash/mflash/evkcmimxrt1060/mflash_drv.c" ]
+    } else {
+      sources += [ "${rt_sdk_root}/core/components/flash/mflash/mimxrt1062/mflash_drv.c" ]
+    }
 
     if (sdk_fsl_assert_support) {
       sources += [ "${UTILITIES_FILES_PATH}/assert/fsl_assert.c" ]

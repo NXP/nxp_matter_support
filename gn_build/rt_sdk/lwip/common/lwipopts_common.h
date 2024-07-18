@@ -403,7 +403,10 @@ Some MCU allow computing and verifying the IP, UDP, TCP and ICMP checksums by ha
 #define IP_REASSEMBLY 0
 #define MEMP_NUM_REASSDATA 0
 
+#ifndef SO_REUSE
 #define SO_REUSE (0)
+#endif
+
 #define LWIP_RANDOMIZE_INITIAL_LOCAL_PORTS (0)
 
 #define TCP_QUEUE_OOSEQ 0

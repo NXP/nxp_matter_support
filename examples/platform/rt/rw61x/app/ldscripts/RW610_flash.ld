@@ -268,28 +268,28 @@ SECTIONS
     . = ALIGN(4);
     *(.rcs.*)    
     *(EXCLUDE_FILE(
-        *port.c.obj
-        *portasm.c.obj
-        *queue.c.obj
-        *timers.c.obj
-        *tasks.c.obj
-        *inet_chksum.c.obj
-        *ip4.c.obj
-        *pbuf.c.obj
-        *sys_arch.c.obj
-        *tcp_out.c.obj
-        *tcp_in.c.obj
-        *mlan_11n_rxreorder.c.obj
-        *mlan_wmm.c.obj
-        *wifi.c.obj
-        *wifi-imu.c.obj
-        *fsl_adapter_rfimu.c.obj
-        *fsl_cache.c.obj
-        *fsl_os_abstraction_free_rtos.c.obj
+        *port.c.o*
+        *portasm.c.o*
+        *queue.c.o*
+        *timers.c.o*
+        *tasks.c.o*
+        *inet_chksum.c.o*
+        *ip4.c.o*
+        *pbuf.c.o*
+        *sys_arch.c.o*
+        *tcp_out.c.o*
+        *tcp_in.c.o*
+        *mlan_11n_rxreorder.c.o*
+        *mlan_wmm.c.o*
+        *wifi.c.o*
+        *wifi-imu.c.o*
+        *fsl_adapter_rfimu.c.o*
+        *fsl_cache.c.o*
+        *fsl_os_abstraction_free_rtos.c.o*
 	/* Exclude flash and frequently executed functions from XIP */
-        *fsl_adapter_flexspi_nor_flash.c.o
-        *mflash_drv.c.o
-        *fsl_flexspi.c.o
+        *fsl_adapter_flexspi_nor_flash.c.o*
+        *mflash_drv.c.o*
+        *fsl_flexspi.c.o*
       ) .text*)              /* .text* sections (code) */
     /*(EXCLUDE_FILE(
         /* Exclude flash and frequently executed functions from XIP *
@@ -456,28 +456,28 @@ SECTIONS
     *(DataQuickAccess)       /* DataQuickAccess sections */
     *(.data)                 /* .data sections */
     *(.data*)                /* .data* sections */
-    *port.c.obj(.text*)
-    *portasm.c.obj(.text*)
-    *queue.c.obj(.text*)
-    *timers.c.obj(.text*)
-    *tasks.c.obj(.text*)
-    *inet_chksum.c.obj(.text*)
-    *ip4.c.obj(.text*)
-    *pbuf.c.obj(.text*)
-    *sys_arch.c.obj(.text*)
-    *tcp_out.c.obj(.text*)
-    *tcp_in.c.obj(.text*)
-    *mlan_11n_rxreorder.c.obj(.text*)
-    *mlan_wmm.c.obj(.text*)
-    *wifi.c.obj(.text*)
-    *wifi-imu.c.obj(.text*)
-    *fsl_adapter_rfimu.c.obj(.text*)
-    *fsl_cache.c.obj(.text*)
-    *fsl_os_abstraction_free_rtos.c.obj(.text*)
+    *port.c.o*(.text*)
+    *portasm.c.o*(.text*)
+    *queue.c.o*(.text*)
+    *timers.c.o*(.text*)
+    *tasks.c.o*(.text*)
+    *inet_chksum.c.o*(.text*)
+    *ip4.c.o*(.text*)
+    *pbuf.c.o*(.text*)
+    *sys_arch.c.o*(.text*)
+    *tcp_out.c.o*(.text*)
+    *tcp_in.c.o*(.text*)
+    *mlan_11n_rxreorder.c.o*(.text*)
+    *mlan_wmm.c.o*(.text*)
+    *wifi.c.o*(.text*)
+    *wifi-imu.c.o*(.text*)
+    *fsl_adapter_rfimu.c.o*(.text*)
+    *fsl_cache.c.o*(.text*)
+    *fsl_os_abstraction_free_rtos.c.o*(.text*)
     /* Explicit placement of flash and frequently executed functions in RAM */
-    *fsl_adapter_flexspi_nor_flash.c.o(.text .text* .rodata .rodata*)
-    *mflash_drv.c.o(.text* .text* .rodata .rodata*)
-    *fsl_flexspi.c.o(.text .text* .rodata .rodata*)
+    *fsl_adapter_flexspi_nor_flash.c.o*(.text .text* .rodata .rodata*)
+    *mflash_drv.c.o*(.text* .text* .rodata .rodata*)
+    *fsl_flexspi.c.o*(.text .text* .rodata .rodata*)
     KEEP(*(.jcr*))
     . = ALIGN(4);
     _k_mem_slab_list_start = .;

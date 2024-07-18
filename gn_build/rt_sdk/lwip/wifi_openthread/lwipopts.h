@@ -24,6 +24,10 @@
 #ifndef __LWIPOPTS_H__
 #define __LWIPOPTS_H__
 
+#ifdef LWIP_USER_CONFIG_FILE
+#include LWIP_USER_CONFIG_FILE
+#endif /* LWIP_USER_CONFIG_FILE */
+
 #define LWIP_IPV4 1
 #define MEMP_NUM_NETCONN (4)
 #define NETIF_MAX_HWADDR_LEN 8U
