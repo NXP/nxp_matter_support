@@ -14,10 +14,13 @@
 
 import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
+import("//build_overrides/nxp_sdk.gni")
 
 import("${build_root}/toolchain/flashable_executable.gni")
 
-template("k32w1_executable") {
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+
+template("${nxp_platform}_executable") {
   output_base_name = get_path_info(invoker.output_name, "name")
   objcopy_image_name = output_base_name + ".srec"
   objcopy_image_format = "srec"

@@ -18,35 +18,31 @@ import("//build_overrides/nxp_sdk.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
 
-assert(k32w1_sdk_root != "", "k32w1_sdk_root must be specified")
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+
+assert(mcxw71_k32w1_sdk_root != "", "mcxw71_k32w1_sdk_root must be specified")
 
 middleware_sdk = {
-  BLE_CONTROLLER_DIR_PATH = "${k32w1_sdk_root}/middleware/wireless/ble_controller"
-  BLE_HOST_DIR_PATH = "${k32w1_sdk_root}/middleware/wireless/bluetooth"
-  FRAMEWORK_DIR_PATH = "${k32w1_sdk_root}/middleware/wireless/framework"
-  FREERTOS_DIR_PATH = "${k32w1_sdk_root}/rtos/freertos"
-  IEEE_802_15_4_DIR_PATH = "${k32w1_sdk_root}/middleware/wireless/ieee-802.15.4"
-  MBEDTLS_DIR_PATH = "${k32w1_sdk_root}/middleware/mbedtls"
-  MULTICORE_DIR_PATH = "${k32w1_sdk_root}/middleware/multicore"
-  MULTICORE_RPMSG_DIR_PATH = "${k32w1_sdk_root}/middleware/multicore/rpmsg_lite"
-  SECURE_SUBSYSTEM_DIR_PATH = "${k32w1_sdk_root}/middleware/secure-subsystem"
-  LITTLEFS_DIR_PATH = "${k32w1_sdk_root}/middleware/littlefs"
-
-  if(is_sdk_2_15) {
-    FRAMEWORK_PLATFORM_DIR_PATH = "${FRAMEWORK_DIR_PATH}/platform/connected_mcu"
-    FREERTOS_KERNEL_DIR_PATH = "${FREERTOS_DIR_PATH}/freertos-kernel"
-  } else {
-    FRAMEWORK_PLATFORM_DIR_PATH = "${FRAMEWORK_DIR_PATH}/platform/kw45_k32w1"
-    FREERTOS_KERNEL_DIR_PATH = "${FREERTOS_DIR_PATH}/freertos_kernel"
-  }
+  BLE_CONTROLLER_DIR_PATH = "${mcxw71_k32w1_sdk_root}/middleware/wireless/ble_controller"
+  BLE_HOST_DIR_PATH = "${mcxw71_k32w1_sdk_root}/middleware/wireless/bluetooth"
+  FRAMEWORK_DIR_PATH = "${mcxw71_k32w1_sdk_root}/middleware/wireless/framework"
+  FREERTOS_DIR_PATH = "${mcxw71_k32w1_sdk_root}/rtos/freertos"
+  FRAMEWORK_PLATFORM_DIR_PATH = "${FRAMEWORK_DIR_PATH}/platform/connected_mcu"
+  FREERTOS_KERNEL_DIR_PATH = "${FREERTOS_DIR_PATH}/freertos-kernel"
+  IEEE_802_15_4_DIR_PATH = "${mcxw71_k32w1_sdk_root}/middleware/wireless/ieee-802.15.4"
+  MBEDTLS_DIR_PATH = "${mcxw71_k32w1_sdk_root}/middleware/mbedtls"
+  MULTICORE_DIR_PATH = "${mcxw71_k32w1_sdk_root}/middleware/multicore"
+  MULTICORE_RPMSG_DIR_PATH = "${mcxw71_k32w1_sdk_root}/middleware/multicore/rpmsg_lite"
+  SECURE_SUBSYSTEM_DIR_PATH = "${mcxw71_k32w1_sdk_root}/middleware/secure-subsystem"
+  LITTLEFS_DIR_PATH = "${mcxw71_k32w1_sdk_root}/middleware/littlefs"
 
   middleware_include_dirs = [
     # BLE HOST / BLE CONTROLLER directories
     "${BLE_CONTROLLER_DIR_PATH}/interface",
     "${BLE_HOST_DIR_PATH}/application/common",
-    "${BLE_HOST_DIR_PATH}/application/common/matter",
     "${BLE_HOST_DIR_PATH}/application/common/gatt_db",
     "${BLE_HOST_DIR_PATH}/application/common/gatt_db/macros",
+    "${BLE_HOST_DIR_PATH}/application/common/matter",
     "${BLE_HOST_DIR_PATH}/hci_transport/interface",
     "${BLE_HOST_DIR_PATH}/host/config",
     "${BLE_HOST_DIR_PATH}/host/interface",
@@ -88,13 +84,22 @@ middleware_sdk = {
     "${MULTICORE_DIR_PATH}/mcmgr/src",
     "${MULTICORE_RPMSG_DIR_PATH}/lib/include",
     "${MULTICORE_RPMSG_DIR_PATH}/lib/include/environment/freertos",
-    "${MULTICORE_RPMSG_DIR_PATH}/lib/include/platform/k32w1",
 
     # Secure subsystem directories
     "${SECURE_SUBSYSTEM_DIR_PATH}/inc",
     "${SECURE_SUBSYSTEM_DIR_PATH}/inc/elemu",
     "${SECURE_SUBSYSTEM_DIR_PATH}/port/kw45_k4w1",
   ]
+
+  if (nxp_device == "K32W1480") {
+    middleware_include_dirs += [
+      "${MULTICORE_RPMSG_DIR_PATH}/lib/include/platform/k32w1",
+    ]
+  } else if (nxp_device == "MCXW716C") {
+    middleware_include_dirs += [
+      "${MULTICORE_RPMSG_DIR_PATH}/lib/include/platform/kw45b41",
+    ]
+  }
 
   if (chip_key_storage == "fwk_nvm") {
     middleware_include_dirs += [
@@ -155,11 +160,8 @@ middleware_sdk = {
     "BLE_HIGH_TX_POWER=0",            # when enabled overwrite default tx power with following values gAdvertisingPowerLeveldBm_c and gConnectPowerLeveldBm_c
     "gAdvertisingPowerLeveldBm_c=0",
     "gConnectPowerLeveldBm_c=0",
+    "MULTICORE_APP=1",
   ]
-
-  if(is_sdk_2_15) {
-    middleware_defines += [ "MULTICORE_APP=1" ]
-  }
 
   if (chip_key_storage == "littlefs") {
     middleware_defines += [
@@ -173,13 +175,11 @@ middleware_sdk = {
       "gAppNvsExternalFlash_c=0",
       "gAppNvsInternalFlash_c=1",
       "CONFIG_NVS_LOOKUP_CACHE=1",
-      "CONFIG_NVS_LOOKUP_CACHE_SIZE=32",
+      "CONFIG_NVS_LOOKUP_CACHE_SIZE=1024",
       "CONFIG_SETTINGS_DYNAMIC_HANDLERS=1",
-      "CONFIG_SETTINGS_RUNTIME=1"
+      "CONFIG_SETTINGS_RUNTIME=1",
+      "CONFIG_NVS_STATS=1"
     ]
-
-    # Temporary fix for NVS power loss resilience issue
-    middleware_defines += [ "NO_FLASH_CONTROLLER_BLANK_CHECK=1" ]
   }
 
   middleware_sources = [
@@ -202,10 +202,12 @@ middleware_sdk = {
     "${FRAMEWORK_PLATFORM_DIR_PATH}/fwk_platform_lowpower_timer.c",
     "${FRAMEWORK_PLATFORM_DIR_PATH}/fwk_platform_ota.c",
     "${FRAMEWORK_PLATFORM_DIR_PATH}/fwk_platform_ot.c",
+    "${FRAMEWORK_PLATFORM_DIR_PATH}/fwk_platform_rng.c",
 
     # BLE HOST / BLE CONTROLLER files
     "${BLE_CONTROLLER_DIR_PATH}/src/controller_api.c",
     "${BLE_HOST_DIR_PATH}/application/common/ble_conn_manager.c",
+
     "${BLE_HOST_DIR_PATH}/application/common/gatt_db/gatt_database.c",
     "${BLE_HOST_DIR_PATH}/application/common/matter/ble_init.c",
     "${BLE_HOST_DIR_PATH}/hci_transport/source/hcit_generic_adapter_interface.c",
@@ -232,10 +234,8 @@ middleware_sdk = {
     # Multicore / Rpmsg files
     "${MULTICORE_DIR_PATH}/mcmgr/src/mcmgr.c",
     "${MULTICORE_DIR_PATH}/mcmgr/src/mcmgr_imu_internal.c",
-    "${MULTICORE_DIR_PATH}/mcmgr/src/mcmgr_internal_core_api_k32w1.c",
     "${MULTICORE_RPMSG_DIR_PATH}/lib/common/llist.c",
     "${MULTICORE_RPMSG_DIR_PATH}/lib/rpmsg_lite/porting/environment/rpmsg_env_freertos.c",
-    "${MULTICORE_RPMSG_DIR_PATH}/lib/rpmsg_lite/porting/platform/k32w1/rpmsg_platform.c",
     "${MULTICORE_RPMSG_DIR_PATH}/lib/rpmsg_lite/rpmsg_lite.c",
     "${MULTICORE_RPMSG_DIR_PATH}/lib/virtio/virtqueue.c",
 
@@ -252,9 +252,19 @@ middleware_sdk = {
     "${SECURE_SUBSYSTEM_DIR_PATH}/src/sscp/fsl_sss_sscp.c",
   ]
 
-  if(is_sdk_2_15) {
+  if (nxp_device == "K32W1480") {
     middleware_sources += [
+      "${MULTICORE_DIR_PATH}/mcmgr/src/mcmgr_internal_core_api_k32w1.c",
+      "${MULTICORE_DIR_PATH}/mcmgr/src/mcmgr_internal_core_api_k32w1_ext.c",
+      "${MULTICORE_RPMSG_DIR_PATH}/lib/rpmsg_lite/porting/platform/k32w1/rpmsg_platform.c",
       "${MULTICORE_RPMSG_DIR_PATH}/lib/rpmsg_lite/porting/platform/k32w1/rpmsg_platform_ext.c"
+    ]
+  } else if (nxp_device == "MCXW716C") {
+    middleware_sources += [
+      "${MULTICORE_DIR_PATH}/mcmgr/src/mcmgr_internal_core_api_mcxw716.c",
+      "${MULTICORE_DIR_PATH}/mcmgr/src/mcmgr_internal_core_api_mcxw716_ext.c",
+      "${MULTICORE_RPMSG_DIR_PATH}/lib/rpmsg_lite/porting/platform/kw45b41/rpmsg_platform.c",
+      "${MULTICORE_RPMSG_DIR_PATH}/lib/rpmsg_lite/porting/platform/kw45b41/rpmsg_platform_ext.c",
     ]
   }
 
@@ -275,6 +285,7 @@ middleware_sdk = {
       "${FRAMEWORK_DIR_PATH}/NVS/Source/crc8.c",
       "${FRAMEWORK_DIR_PATH}/NVS/Source/fwk_nvs_flash.c",
       "${FRAMEWORK_DIR_PATH}/NVS/Source/fwk_nvs_InternalFlash.c",
+      "${FRAMEWORK_DIR_PATH}/NVS/Source/fwk_nvs_stats.c",
       "${FRAMEWORK_DIR_PATH}/Settings/Source/settings_init.c",
       "${FRAMEWORK_DIR_PATH}/Settings/Source/settings.c",
       "${FRAMEWORK_DIR_PATH}/Settings/Source/settings_store.c",

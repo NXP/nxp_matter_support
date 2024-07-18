@@ -22,21 +22,23 @@ import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
 
 import("${mbedtls_root}/mbedtls.gni")
 
-declare_args() {
-  # Build target to use for k32w1 SDK. Use this to set global SDK defines.
-  k32w1_sdk_target = ""
-}
-
-assert(k32w1_sdk_target != "", "k32w1_sdk_target must be specified")
+assert(nxp_sdk_target != "", "nxp_sdk_target must be specified")
 
 group("nxp_sdk") {
-  public_deps = [ k32w1_sdk_target ]
+  public_deps = [
+    nxp_sdk_target,
+    ":nxp_mbedtls"
+  ]
+}
+
+group("nxp_mbedtls") {
+  public_deps = [ ":mbedtls" ]
 }
 
 config("mbedtls_k32w1_config") {
   defines = [
     "MBEDTLS_CONFIG_FILE=<third_party/openthread/repo/third_party/mbedtls/mbedtls-config.h>",
-    "MBEDTLS_USER_CONFIG_FILE=<src/platform/nxp/k32w/k32w1/k32w1-chip-mbedtls-config.h>",
+    "MBEDTLS_USER_CONFIG_FILE=<src/platform/nxp/mcxw71_k32w1/k32w1-chip-mbedtls-config.h>",
 
     # These options should really be in the config.h...
     "MBEDTLS_FREESCALE_FREERTOS_CALLOC_ALT=1",
@@ -78,14 +80,13 @@ config("mbedtls_k32w1_config") {
 
 mbedtls_target("mbedtls") {
   sources = [
-    "${k32w1_sdk_root}/middleware/mbedtls/port/sssapi/ccm_alt.c",
-    "${k32w1_sdk_root}/middleware/mbedtls/port/sssapi/entropy_poll_alt.c",
+    "${mcxw71_k32w1_sdk_root}/middleware/mbedtls/port/sssapi/ccm_alt.c",
+    "${mcxw71_k32w1_sdk_root}/middleware/mbedtls/port/sssapi/entropy_poll_alt.c",
   ]
 
   public_configs = [ ":mbedtls_k32w1_config" ]
 
   public_deps = [
-    ":nxp_sdk",
-    "${chip_root}/third_party/openthread/platforms/nxp/k32w/k32w1:openthread_mbedtls_config_k32w1",
+    "${openthread_root}/src/core:libopenthread_core_headers"
   ]
 }

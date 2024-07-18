@@ -109,6 +109,9 @@ template("rt1170_sdk_drivers") {
       "${rt_sdk_root}/middleware/wireless/framework/boards/${rt_fwk_platform}",
       "${rt_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/configs",
       "${rt_sdk_root}/middleware/wireless/framework/FactoryDataProvider",
+
+      # wifi/bt config
+      "${WIRELESS_CONFIG_TEMPLATE_PATH}", 
     ]
 
     libs = []

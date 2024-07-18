@@ -76,9 +76,6 @@ template("bt_ble_target") {
       "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/private/protocols/hci_1.2",
       "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/private/utils/aes_cmac",
 
-      # Common edgeFast config file
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/output/templates/config",
-
       # Transceiver
       "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/controller",
 
@@ -110,14 +107,10 @@ template("bt_ble_target") {
           [ "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux" ]
     }
 
-    if (is_sdk_2_15) {
-      bt_ble_include_dirs += [
-        #sdk hook for fatfs config file required for ethermind include files
-        "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/fatfs/config",
-      ]
-    } else {
-      bt_ble_include_dirs += [ "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/platform/configs" ]
-    }
+    bt_ble_include_dirs += [
+      #sdk hook for fatfs config file required for ethermind include files
+      "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/fatfs/config",
+    ]    
 
     defines += [
       #BT config,
@@ -137,12 +130,22 @@ template("bt_ble_target") {
       #BT_L2CAP_TX_MTU = CONFIG_BT_L2CAP_TX_MTU
       # so define CONFIG_BT_L2CAP_TX_MTU to 247
       "CONFIG_BT_L2CAP_TX_MTU=247",
+
+      "USB_HOST_CONFIG_EHCI=2",
+      # CONTROLLER_ID define as kUSB_ControllerEhci0 (= 2U)
+      "CONTROLLER_ID=2U",
+      "CONFIG_BT_DEVICE_NAME=\"NXP BLE test\"",
     ]
 
     # Now add our "system-header" include dirs
     foreach(include_dir, bt_ble_include_dirs) {
       cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
     }
+
+    #Adding pre-include files
+    cflags += [ "-include" + rebase_path(
+                    "${rt_sdk_root}/middleware/edgefast_bluetooth/output/templates/config/edgefast_bluetooth_config.h",
+                    root_build_dir) ]
   }
 
   source_set(bt_ble_target_name) {
@@ -202,10 +205,8 @@ template("bt_ble_target") {
       #"${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/ethal/ethal_fops.c",
       "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/ethal/ethal_os.c",
     ]
-
-    if (is_sdk_2_15) {
-      sources += [ "${rt_sdk_root}/middleware/edgefast_bluetooth/source/porting/fifo/fifo.c" ]
-    }
+    
+    sources += [ "${rt_sdk_root}/middleware/edgefast_bluetooth/source/porting/fifo/fifo.c" ]
 
     if (!defined(configs)) {
       configs = []
@@ -226,7 +227,7 @@ template("bt_ble_target") {
       deps = []
     }
 
-    defines =
+    defines = 
         [ "vApplicationMallocFailedHook=vApplicationMallocFailedHookBTBLE" ]
 
     if (!defined(public_configs)) {

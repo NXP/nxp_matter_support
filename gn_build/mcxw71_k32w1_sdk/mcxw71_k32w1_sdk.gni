@@ -38,11 +38,12 @@ declare_args() {
   use_hw_sha256 = false
   use_hw_aes = false
   chip_config_dimmable_led = false
+  chip_enable_ota_factory_data_processor = 0
 }
 
 openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
 
-assert(k32w1_sdk_root != "", "k32w1_sdk_root must be specified")
+assert(mcxw71_k32w1_sdk_root != "", "mcxw71_k32w1_sdk_root must be specified")
 
 assert(!((use_smu2_static && !chip_openthread_ftd) ||
              (use_smu2_dynamic && !chip_openthread_ftd)),
@@ -54,13 +55,14 @@ forward_variables_from(middleware_sdk, "*")
 # Defines an k32w1 SDK build target.
 #
 # Parameters:
-#   k32w1_sdk_root - The location of the k32w1 SDK.
+#   mcxw71_k32w1_sdk_root - The location of the k32w1 SDK.
 #   sources - Extra source files to build.
-template("k32w1_sdk") {
+template("${nxp_platform}_sdk") {
 
-  assert(chip_with_low_power == 0 ||
-             (chip_with_low_power == 1 && chip_with_ot_cli == 0),
-         "Please disable low power if openthread CLI is needed!")
+  assert(
+      chip_enable_ota_factory_data_processor == 0 ||
+          chip_with_factory_data == 1,
+      "Please set chip_with_factory_data=1 if using default factory data processor.")
 
   sdk_target_name = target_name
 
@@ -79,7 +81,7 @@ template("k32w1_sdk") {
 
     _sdk_include_dirs += [
       "${openthread_nxp_root}/third_party/k32w1_sdk",
-      "${chip_root}/src/platform/nxp/k32w/k32w1",
+      "${chip_root}/src/platform/nxp/${nxp_platform}",
     ]
 
     if (chip_config_dimmable_led) {
@@ -108,10 +110,6 @@ template("k32w1_sdk") {
       "NXP_ICD_SUPPORTED_CLIENTS_PER_FABRIC=${nxp_icd_supported_clients_per_fabric}",
     ]
 
-    if (!is_sdk_2_15) {
-      defines += [ "K32W1_SDK_2_12=1" ]
-    }
-
     if (chip_enable_pw_rpc) {
       defines += [ "SERIAL_PORT_TYPE_UART_DMA=1" ]
     } else {
@@ -122,19 +120,6 @@ template("k32w1_sdk") {
       print(
           "WARNING: enabling logs in low power might break the LP timings. Use at your own risk!")
       print("WARNING: set chip_logging=false to disable logging.")
-    }
-
-    if (chip_mdns == "platform") {
-      defines += [
-        "OPENTHREAD_CONFIG_SRP_CLIENT_ENABLE=1",
-        "OPENTHREAD_CONFIG_ECDSA_ENABLE=1",
-        "OPENTHREAD_CONFIG_DNS_CLIENT_SERVICE_DISCOVERY_ENABLE=1",
-        "OPENTHREAD_CONFIG_DNS_CLIENT_ENABLE=1",
-      ]
-    }
-
-    if (chip_with_ot_cli == 1) {
-      defines += [ "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI=1" ]
     }
 
     if (use_smu2_static) {
@@ -153,7 +138,16 @@ template("k32w1_sdk") {
     }
 
     if (chip_with_factory_data == 1) {
-      defines += [ "CONFIG_CHIP_LOAD_REAL_FACTORY_DATA=1" ]
+      defines += [
+        "CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA=1",
+        # This should be deprecated and replaced with the above one
+        "CONFIG_CHIP_LOAD_REAL_FACTORY_DATA=1",
+        "gHwParamsAppFactoryDataExtension_d=1",
+      ]
+    }
+
+    if (chip_enable_ota_factory_data_processor == 1) {
+        defines += [ "CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR=1" ]
     }
 
     if (chip_with_low_power == 1) {
@@ -203,8 +197,13 @@ template("k32w1_sdk") {
     if (defined(invoker.defines)) {
       defines += invoker.defines
     }
+    cflags = []
 
-    cflags = [
+    if (defined(invoker.cflags)) {
+      cflags += invoker.cflags
+    }
+
+    cflags += [
       "-Wno-unused-function",
       "-Wno-conversion",
       "-Wno-sign-compare",
@@ -256,12 +255,6 @@ template("k32w1_sdk") {
     if (chip_with_low_power == 1) {
       sources += []
     }
-
-    if (!defined(public_deps)) {
-      public_deps = []
-    }
-
-    public_deps += [ "${openthread_root}/src/core:libopenthread_core_headers" ]
 
     if (!defined(public_configs)) {
       public_configs = []

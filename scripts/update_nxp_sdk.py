@@ -66,18 +66,12 @@ def NxpSdk_k32w0():
     return sdk
 
 def NxpSdk_common():
-    sdk = NxpSdk('common', 'github_sdk/rw_k32w1')
-    return sdk
-
-def NxpSdk_rt():
-    rel_path_rt = 'github_sdk/rt'
-    sdk = NxpSdk('rt', 'github_sdk/rt')
+    sdk = NxpSdk('common', 'github_sdk/common_sdk')
     return sdk
 
 ALL_PLATFORM_SDK = [
     NxpSdk_k32w0(),
     NxpSdk_common(),
-    NxpSdk_rt(),
 ]
 
 ALL_PLATFORM_NAME = [p.sdk_name for p in ALL_PLATFORM_SDK]

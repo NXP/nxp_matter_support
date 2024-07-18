@@ -1,5 +1,5 @@
 /*
- * Copyright 2021-2023 NXP
+ * Copyright 2021-2024 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -8,7 +8,6 @@
 #ifndef _BOARD_H_
 #define _BOARD_H_
 
-#include "clock_config.h"
 #include "fsl_common.h"
 #include "fsl_gpio.h"
 
@@ -16,11 +15,7 @@
  * Definitions
  ******************************************************************************/
 /*! @brief The board name */
-#define BOARD_NAME "RD-RW61X-BGA"
-
-#ifndef DEBUG_CONSOLE_UART_INDEX
-#define DEBUG_CONSOLE_UART_INDEX 3
-#endif
+#define BOARD_NAME "FRDM-RW612"
 
 /*! @brief Macro to judge XIP */
 #define BOARD_IS_XIP()                                                                                                             \
@@ -78,8 +73,8 @@
 #define BOARD_CODEC_I2C_SCL_PIN 17
 
 /* Board led color mapping */
-#define LOGIC_LED_ON 1U
-#define LOGIC_LED_OFF 0U
+#define LOGIC_LED_ON 0U
+#define LOGIC_LED_OFF 1U
 
 /* A fake led on GPIO header */
 #ifndef BOARD_LED_BLUE_GPIO
@@ -87,7 +82,7 @@
 #endif
 #define BOARD_LED_BLUE_GPIO_PORT 0U
 #ifndef BOARD_LED_BLUE_GPIO_PIN
-#define BOARD_LED_BLUE_GPIO_PIN 2U
+#define BOARD_LED_BLUE_GPIO_PIN 0U
 #endif
 
 #define LED_BLUE_INIT(output)                                                                                                      \
@@ -102,36 +97,12 @@
                                                                                                    */
 
 /* Board SW PIN */
-#ifndef BOARD_SW1_GPIO
-#define BOARD_SW1_GPIO GPIO
-#endif
-#define BOARD_SW1_GPIO_PORT 0U
-#ifndef BOARD_SW1_GPIO_PIN
-#define BOARD_SW1_GPIO_PIN 13U
-#endif
-
 #ifndef BOARD_SW2_GPIO
 #define BOARD_SW2_GPIO GPIO
 #endif
 #define BOARD_SW2_GPIO_PORT 0U
 #ifndef BOARD_SW2_GPIO_PIN
-#define BOARD_SW2_GPIO_PIN 14U
-#endif
-
-#ifndef BOARD_SW3_GPIO
-#define BOARD_SW3_GPIO GPIO
-#endif
-#define BOARD_SW3_GPIO_PORT 0U
-#ifndef BOARD_SW3_GPIO_PIN
-#define BOARD_SW3_GPIO_PIN 24U
-#endif
-
-#ifndef BOARD_SW4_GPIO
-#define BOARD_SW4_GPIO GPIO
-#endif
-#define BOARD_SW4_GPIO_PORT 0U
-#ifndef BOARD_SW4_GPIO_PIN
-#define BOARD_SW4_GPIO_PIN 25U
+#define BOARD_SW2_GPIO_PIN 25U
 #endif
 
 #define BOARD_ENET0_PHY_ADDRESS (0x02U)
@@ -160,7 +131,8 @@ extern "C" {
 void BOARD_InitDebugConsole(void);
 status_t BOARD_InitPsRam(void);
 void BOARD_InitSleepPinConfig(void);
-void BOARD_FlexspiClockSafeConfig(void);
+void BOARD_ClockPreConfig(void);
+void BOARD_ClockPostConfig(void);
 void BOARD_CLIAttachClk(void);
 AT_QUICKACCESS_SECTION_CODE(void BOARD_SetFlexspiClock(FLEXSPI_Type * base, uint32_t src, uint32_t divider));
 AT_QUICKACCESS_SECTION_CODE(void BOARD_DeinitFlash(FLEXSPI_Type * base));

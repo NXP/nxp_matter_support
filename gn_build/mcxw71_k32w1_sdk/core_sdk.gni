@@ -18,13 +18,17 @@ import("//build_overrides/nxp_sdk.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
 
-assert(k32w1_sdk_root != "", "k32w1_sdk_root must be specified")
+import("${nxp_sdk_build_root}/nxp_sdk.gni")
+
+assert(mcxw71_k32w1_sdk_root != "", "mcxw71_k32w1_sdk_root must be specified")
 
 core_sdk = {
   if (sdk_release) {
-    CMSIS_CORE_DIR_PATH = "${k32w1_sdk_root}/CMSIS/Core"
-    COMPONENT_DIR_PATH = "${k32w1_sdk_root}/components"
-    DRIVER_DIR_PATH = "${k32w1_sdk_root}/devices/K32W1480/drivers"
+    ADDITIONAL_DRIVERS_DIR_PATH = "${mcxw71_k32w1_sdk_root}/devices/${nxp_device}/drivers"
+    CMSIS_CORE_DIR_PATH = "${mcxw71_k32w1_sdk_root}/CMSIS/Core"
+    COMPONENT_DIR_PATH = "${mcxw71_k32w1_sdk_root}/components"
+    DEVICES_DIR_PATH = "${mcxw71_k32w1_sdk_root}/devices/${nxp_device}"
+    DRIVER_DIR_PATH = "${ADDITIONAL_DRIVERS_DIR_PATH}"
     DRIVER_CCM32K_DIR_PATH = "${DRIVER_DIR_PATH}"
     DRIVER_CMC_DIR_PATH = "${DRIVER_DIR_PATH}"
     DRIVER_COMMON_DIR_PATH = "${DRIVER_DIR_PATH}"
@@ -43,28 +47,20 @@ core_sdk = {
     DRIVER_SPC_DIR_PATH = "${DRIVER_DIR_PATH}"
     DRIVER_TPM_DIR_PATH = "${DRIVER_DIR_PATH}"
     DRIVER_WUU_DIR_PATH = "${DRIVER_DIR_PATH}"
-    DEVICES_K32W1480_DIR_PATH = "${k32w1_sdk_root}/devices/K32W1480"
-    DEVICES_KW45B41Z83_DIR_PATH = "${DRIVER_DIR_PATH}"
-    UTILITIES_DIR_PATH = "${k32w1_sdk_root}/devices/K32W1480/utilities"
+    UTILITIES_DIR_PATH = "${mcxw71_k32w1_sdk_root}/devices/${nxp_device}/utilities"
     UTILITIES_DIR_PATH_ASSERT = "${UTILITIES_DIR_PATH}"
   }
   else {
-    if(is_sdk_2_15){
-      CMSIS_CORE_DIR_PATH = "${k32w1_sdk_root}/core/CMSIS/Core"
-      COMPONENT_DIR_PATH = "${k32w1_sdk_root}/core/components"
-      DRIVER_DIR_PATH = "${k32w1_sdk_root}/core/drivers"
-      DEVICES_K32W1480_DIR_PATH = "${k32w1_sdk_root}/core/devices/K32W1480"
-      DEVICES_KW45B41Z83_DIR_PATH = "${k32w1_sdk_root}/core/devices/KW45B41Z83/drivers"
-      UTILITIES_DIR_PATH = "${k32w1_sdk_root}/core/utilities"
+    if (nxp_device == "K32W1480") {
+      ADDITIONAL_DRIVERS_DIR_PATH = "${mcxw71_k32w1_sdk_root}/core/devices/KW45B41Z83/drivers"
+    } else if (nxp_device == "MCXW716C") {
+      ADDITIONAL_DRIVERS_DIR_PATH = "${mcxw71_k32w1_sdk_root}/core/devices/${nxp_device}/drivers"
     }
-    else {
-      CMSIS_CORE_DIR_PATH = "${k32w1_sdk_root}/CMSIS/Core"
-      COMPONENT_DIR_PATH = "${k32w1_sdk_root}/components"
-      DRIVER_DIR_PATH = "${k32w1_sdk_root}/platform/drivers"
-      DEVICES_K32W1480_DIR_PATH = "${k32w1_sdk_root}/devices/K32W1480"
-      DEVICES_KW45B41Z83_DIR_PATH = "${k32w1_sdk_root}/devices/KW45B41Z83/drivers"
-      UTILITIES_DIR_PATH = "${k32w1_sdk_root}/platform/utilities"
-    }
+    CMSIS_CORE_DIR_PATH = "${mcxw71_k32w1_sdk_root}/core/CMSIS/Core"
+    COMPONENT_DIR_PATH = "${mcxw71_k32w1_sdk_root}/core/components"
+    DEVICES_DIR_PATH = "${mcxw71_k32w1_sdk_root}/core/devices/${nxp_device}"
+    DRIVER_DIR_PATH = "${mcxw71_k32w1_sdk_root}/core/drivers"
+    UTILITIES_DIR_PATH = "${mcxw71_k32w1_sdk_root}/core/utilities"
 
     DRIVER_CCM32K_DIR_PATH = "${DRIVER_DIR_PATH}/ccm32k"
     DRIVER_CMC_DIR_PATH = "${DRIVER_DIR_PATH}/cmc"
@@ -112,8 +108,8 @@ core_sdk = {
     "${CMSIS_CORE_DIR_PATH}/Include",
 
     # Devices directories
-    "${DEVICES_K32W1480_DIR_PATH}",
-    "${DEVICES_KW45B41Z83_DIR_PATH}",
+    "${ADDITIONAL_DRIVERS_DIR_PATH}",
+    "${DEVICES_DIR_PATH}",
 
     # Drivers directories
     "${DRIVER_CCM32K_DIR_PATH}",
@@ -148,6 +144,7 @@ core_sdk = {
     "${COMPONENT_OSA_DIR_PATH}",
     "${COMPONENT_PANIC_DIR_PATH}",
     "${COMPONENT_POWER_MGR_DIR_PATH}/core",
+    "${COMPONENT_POWER_MGR_DIR_PATH}/devices/${nxp_device}",
     "${COMPONENT_RESET_DIR_PATH}",
     "${COMPONENT_RPMSG_DIR_PATH}",
     "${COMPONENT_SERIAL_MGR_DIR_PATH}",
@@ -163,12 +160,6 @@ core_sdk = {
     "${UTILITIES_DIR_PATH}/str",
   ]
 
-  if(is_sdk_2_15) {
-    core_include_dirs += [ "${COMPONENT_POWER_MGR_DIR_PATH}/devices/K32W1480" ]
-  } else {
-    core_include_dirs += [ "${COMPONENT_POWER_MGR_DIR_PATH}/boards/K32W148-EVK" ]
-  }
-
   if (chip_key_storage != "fwk_nvm") {
     core_include_dirs += [
       "${COMPONENT_FLASH_DIR_PATH}/mflash",
@@ -177,7 +168,6 @@ core_sdk = {
   }
 
   core_defines = [
-    "CPU_K32W1480VFTA",
     "__STARTUP_CLEAR_BSS",
     "SERIAL_MANAGER_NON_BLOCKING_MODE=1",
     "SERIAL_USE_CONFIGURE_STRUCTURE=1",
@@ -186,6 +176,7 @@ core_sdk = {
     "TM_ENABLE_TIME_STAMP=1",
     "FSL_OSA_TASK_ENABLE=1",
     "FSL_OSA_MAIN_FUNC_ENABLE=1",
+    "FSL_OSA_ALLOCATED_HEAP=0",
 
     "BUTTON_SHORT_PRESS_THRESHOLD=1500",
     "BUTTON_LONG_PRESS_THRESHOLD=2500",
@@ -203,15 +194,20 @@ core_sdk = {
     "gLogRingPlacementOffset_c=0xF000",
   ]
 
-  if(is_sdk_2_15) {
-    core_defines += [ "gAppUseSerialManager_c=1" ]
+  if (nxp_device == "K32W1480") {
+    core_defines += [ "CPU_K32W1480VFTA" ]
+  } else if (nxp_device == "MCXW716C") {
+    core_defines += [
+      "CPU_MCXW716CMFTA",
+      "K32W1480_SERIES"
+    ]
   }
 
   core_sources = [
     # Devices files
-    "${DEVICES_K32W1480_DIR_PATH}/gcc/startup_K32W1480.S",
-    "${DEVICES_K32W1480_DIR_PATH}/system_K32W1480.c",
-    "${DEVICES_KW45B41Z83_DIR_PATH}/fsl_clock.c",
+    "${DEVICES_DIR_PATH}/gcc/startup_${nxp_device}.S",
+    "${DEVICES_DIR_PATH}/system_${nxp_device}.c",
+    "${ADDITIONAL_DRIVERS_DIR_PATH}/fsl_clock.c",
     
     # Drivers files
     "${DRIVER_CCM32K_DIR_PATH}/fsl_ccm32k.c",
@@ -243,6 +239,7 @@ core_sdk = {
     "${COMPONENT_OSA_DIR_PATH}/fsl_os_abstraction_free_rtos.c",
     "${COMPONENT_PANIC_DIR_PATH}/fsl_component_panic.c",
     "${COMPONENT_POWER_MGR_DIR_PATH}/core/fsl_pm_core.c",
+    "${COMPONENT_POWER_MGR_DIR_PATH}/devices/${nxp_device}/fsl_pm_device.c",
     "${COMPONENT_RESET_DIR_PATH}/fsl_adapter_reset.c",
     "${COMPONENT_SERIAL_MGR_DIR_PATH}/fsl_component_serial_manager.c",
     "${COMPONENT_SERIAL_MGR_DIR_PATH}/fsl_component_serial_port_uart.c",
@@ -256,12 +253,6 @@ core_sdk = {
     "${UTILITIES_DIR_PATH}/str/fsl_str.c",
     "${UTILITIES_DIR_PATH_ASSERT}/fsl_assert.c",
   ]
-
-  if(is_sdk_2_15) {
-    core_sources += [ "${COMPONENT_POWER_MGR_DIR_PATH}/devices/K32W1480/fsl_pm_device.c" ]
-  } else {
-    core_sources += [ "${COMPONENT_POWER_MGR_DIR_PATH}/boards/K32W148-EVK/fsl_pm_board.c" ]
-  }
 
   if (chip_key_storage != "fwk_nvm") {
     core_sources += [

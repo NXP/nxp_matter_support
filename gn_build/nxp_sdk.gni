@@ -17,8 +17,14 @@ declare_args() {
   # Indicates the name of the nxp platform targeted
   nxp_platform = ""
 
+  # Indicates the name of the device targeted
+  nxp_device = ""
+
   # Specifies the CHIP_DEVICE_LAYER_TARGET in src/platform/BUILD.gn
   nxp_device_layer = "nxp/common"
+
+  # Defines the name of the nxp SDK target instance
+  nxp_sdk_target = ""
 
   # Enables target nxp_lwip. Used by RT platforms.
   nxp_use_lwip = true
@@ -31,6 +37,15 @@ declare_args() {
 
   # Enables the support of factory data
   chip_with_factory_data = 0
+
+  # Enable DAC private key secure usage, chip_with_factory_data must be set to 1
+  chip_enable_secure_dac_private_key_storage = false
+
+  # This mode allows to protect the matter factory dataset with a AES key protected in the secure element
+  chip_enable_secure_whole_factory_data = false
+
+  # Defines the NVM component supported
+  nxp_nvm_component = "littlefs"
 
   # Enables the auto pairing advertisement at boot
   chip_enable_pairing_autostart = 1
