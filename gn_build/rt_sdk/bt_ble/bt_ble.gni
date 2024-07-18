@@ -48,6 +48,8 @@ template("bt_ble_target") {
       #edgefast_bluetooth
       "${rt_sdk_root}/middleware/edgefast_bluetooth/include",
       "${rt_sdk_root}/middleware/edgefast_bluetooth/source/porting",
+      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/porting/fifo",
+      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/crypto",
       "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host",
       "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/platform",
 
@@ -137,9 +139,6 @@ template("bt_ble_target") {
       "CONFIG_BT_L2CAP_TX_MTU=247",
     ]
 
-    #Define ZEPHYR to 1 to have the function MapErrorZephyr linked
-    defines += [ "__ZEPHYR__=1" ]
-
     # Now add our "system-header" include dirs
     foreach(include_dir, bt_ble_include_dirs) {
       cflags += [ "-isystem" + rebase_path(include_dir, root_build_dir) ]
@@ -152,7 +151,6 @@ template("bt_ble_target") {
       # SDK hook for ethermind
       #"${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/btsnoop_pl.c",
       #edgefast_bluetooth
-      "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/littlefs_pl.c",
       "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/bt_db_gen.c",
       "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/common/addr.c",
       "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_addr.c",
@@ -204,6 +202,10 @@ template("bt_ble_target") {
       #"${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/ethal/ethal_fops.c",
       "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/ethal/ethal_os.c",
     ]
+
+    if (is_sdk_2_15) {
+      sources += [ "${rt_sdk_root}/middleware/edgefast_bluetooth/source/porting/fifo/fifo.c" ]
+    }
 
     if (!defined(configs)) {
       configs = []

@@ -23,9 +23,6 @@ import("${nxp_sdk_build_root}/nxp_sdk.gni")  # declares some sdk args such as
                                              # chip_with_ot_cli
 
 declare_args() {
-  # Location of the rt SDK.
-  rt_sdk_root = "${chip_root}/third_party/nxp/rt_sdk/repo/sdk-2.15"
-
   # Enables Matter over Ethernet support
   chip_enable_ethernet = false
 
@@ -49,8 +46,14 @@ declare_args() {
   # firmware download logs for K32W0 transceiver
   otw_logs_enabled = false
 
-  # Defines the RT NVM component supported
-  rt_nvm_component = "littlefs"
+  # NVS enable by default only for RW61x
+  if(nxp_platform == "rt/rw61x"){
+    rt_nvm_component = "nvs"
+  }
+  else{
+    # Defines the RTs NVM component supported
+    rt_nvm_component = "littlefs"
+  }
 
   # KeyStorage enable only for RW61x
   #if(nxp_platform == "rt/rw61x"){
@@ -80,6 +83,8 @@ declare_args() {
 
   # Describe the transceiver detail flags
   nxp_transceiver_interface_detail = "WIFI_IW612_BOARD_MURATA_2EL_USD"
+
+  rt_sdk_root = "${chip_root}/third_party/nxp/github_sdk/${sdk_repo}"
 }
 
 declare_args() {
@@ -220,8 +225,6 @@ template("rt_wifi") {
 
     _wifi_include_dirs = [
       # Wi-Fi
-      "${rt_sdk_root}/middleware/wifi_nxp/incl/port/lwip",
-      "${rt_sdk_root}/middleware/wifi_nxp/port/lwip",
       "${rt_sdk_root}/middleware/wifi_nxp/incl",
       "${rt_sdk_root}/middleware/wifi_nxp/incl/port/os",
       "${rt_sdk_root}/middleware/wifi_nxp/incl/wifidriver",
@@ -230,6 +233,18 @@ template("rt_wifi") {
       "${rt_sdk_root}/middleware/wifi_nxp/wifidriver",
       "${rt_sdk_root}/middleware/wifi_nxp/wifidriver/incl",
     ]
+
+    if (is_sdk_2_15) {
+      _wifi_include_dirs += [
+        "${rt_sdk_root}/middleware/wifi_nxp/incl/port/net",
+        "${rt_sdk_root}/middleware/wifi_nxp/port/net",
+      ]
+    } else {
+      _wifi_include_dirs += [
+        "${rt_sdk_root}/middleware/wifi_nxp/incl/port/lwip",
+        "${rt_sdk_root}/middleware/wifi_nxp/port/lwip",
+      ]
+    }
 
     libs = []
 
@@ -371,8 +386,6 @@ template("rt_sdk") {
 
       #"${rt_sdk_root}/middleware/wireless/framework/DBG",
 
-      #littlefs
-      "${rt_sdk_root}/middleware/littlefs",
     ]
 
     #OtaSupport
@@ -383,9 +396,36 @@ template("rt_sdk") {
       ]
     }
 
+    if (rt_nvm_component != "nvs"){
+      _sdk_include_dirs += [
+        #littlefs
+        "${rt_sdk_root}/middleware/littlefs",
+      ]
+    }
+
     if (rt_nvm_component == "nvm_fwk") {
       _sdk_include_dirs +=
           [ "${rt_sdk_root}/middleware/wireless/framework/NVM/Interface" ]
+    }
+
+    else if (rt_nvm_component == "nvs"){  
+      # Settings    
+      _sdk_include_dirs += [
+       "${rt_sdk_root}/middleware/wireless/framework/Settings/Source",
+        "${rt_sdk_root}/middleware/wireless/framework/Settings",
+       "${rt_sdk_root}/middleware/wireless/framework",
+       "${rt_sdk_root}/middleware/wireless/framework/Settings/Interface",
+      ]
+      # NVS
+      _sdk_include_dirs += [
+      "${rt_sdk_root}/middleware/wireless/framework/NVS/Interface/port",
+      "${rt_sdk_root}/middleware/wireless/framework/NVS/Interface",
+      "${rt_sdk_root}/middleware/wireless/framework/NVS/Source",
+
+      ]
+       _sdk_include_dirs += [
+          "${rt_sdk_root}/middleware/wireless/framework/platform/Common",
+       ]
     }
 
     libs = []
@@ -432,6 +472,15 @@ template("rt_sdk") {
       #Multithread tests
       "PRINTF_ADVANCED_ENABLE=1",
     ]
+
+    if (rt_nvm_component == "nvs"){ 
+      # define gAppNvsInternalFlash_c = 0 to be sure it will not be define as 1 in the framework (NVS/Interface/port/nvs_port.h)
+      defines += [ "gAppNvsExternalFlash_c = 1", "gNvsExternalFlash_d = 1", "gAppNvsInternalFlash_c = 0", "CONFIG_NVS_LOOKUP_CACHE = 1",
+        "CONFIG_NVS_LOOKUP_CACHE_SIZE = 512"]
+      
+      # Temporary fix for power loss NVS resilience issue
+      defines += [ "NO_FLASH_CONTROLLER_BLANK_CHECK = 1"]
+    }
 
     if (use_watchdog != 0) {
       defines += [ "WATCHDOG_ALLOWED" ]
@@ -562,7 +611,11 @@ template("rt_sdk") {
     }
 
     if (chip_enable_wifi) {
-      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION=1" ]
+      if (!w8801_transceiver) {
+        defines += [ "CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION=1" ]
+      } else {
+        defines += [ "CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION=0" ]
+      }
     }
 
     # Now add our "system-header" include dirs
@@ -620,8 +673,12 @@ template("rt_sdk") {
         "${rt_sdk_root}/middleware/wireless/framework/OtaSupport/Source/OtaExternalFlash.c",
         "${rt_sdk_root}/middleware/wireless/framework/OtaSupport/Source/OtaPrivate.h",
         "${rt_sdk_root}/middleware/wireless/framework/OtaSupport/Source/OtaSupport.c",
-        "${rt_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform_extflash.c",
         "${rt_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform_ota.c",
+        ]
+    }
+    if (chip_enable_ota_requestor || rt_nvm_component == "nvs"){
+      sources += [ 
+        "${rt_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform_extflash.c",
       ]
     }
 
@@ -656,6 +713,22 @@ template("rt_sdk") {
         #littlefs
         "${rt_sdk_root}/middleware/littlefs/lfs.c",
         "${rt_sdk_root}/middleware/littlefs/lfs_util.c",
+      ]
+    }
+
+    if (rt_nvm_component == "nvs") {   
+      sources += [
+        "${rt_sdk_root}/middleware/wireless/framework/Settings/Source/settings.c",
+        "${rt_sdk_root}/middleware/wireless/framework/Settings/Source/settings_store.c",
+        "${rt_sdk_root}/middleware/wireless/framework/Settings/Source/settings_runtime.c",
+        "${rt_sdk_root}/middleware/wireless/framework/Settings/Source/settings_nvs.c",
+        "${rt_sdk_root}/middleware/wireless/framework/Settings/Source/settings_init.c",
+      ]
+      sources += [
+        "${rt_sdk_root}/middleware/wireless/framework/NVS/Source/fwk_nvs_ExternalFlash.c",
+        "${rt_sdk_root}/middleware/wireless/framework/NVS/Source/fwk_nvs_flash.c",
+        "${rt_sdk_root}/middleware/wireless/framework/NVS/Source/nvs.c",
+        "${rt_sdk_root}/middleware/wireless/framework/NVS/Source/crc8.c",
       ]
     }
 
