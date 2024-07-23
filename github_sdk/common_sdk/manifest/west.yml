@@ -6,10 +6,10 @@
 manifest:
   projects:
     - name: sdk-release
-      url: ssh://git@bitbucket.sw.nxp.com/mcucore/mcu-sdk-github-release.git
-      revision: release/2.16.000_major_rfp
+      url: https://github.com/nxp-mcuxpresso/mcux-sdk.git
+      revision: MCUX_2.16.000
+      path: core
       import:
-        file: west.yml
         name-allowlist:
           - mcux-sdk
           - FreeRTOS-Kernel
@@ -31,5 +31,5 @@ manifest:
           - mcux-sdk-middleware-multicore
           - mcux-sdk-middleware-usb
           - rpmsg-lite
-          - secure-subsystem
+          - mcux-secure-subsystem
         path-prefix: repo
