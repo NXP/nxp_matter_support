@@ -128,10 +128,25 @@ template("rw61x_sdk_drivers") {
     rebase_path(fw_bin_path, root_build_dir),
   ]
 
-  print(exec_script(
+  assert(board_version!="A1", "A1 boards are no more supported.")
+
+  if(exec_script(
             "${COMPONENT_FILES_PATH}/conn_fwloader/script/fw_bin2c_conv.py",
             fw_args,
-            "list lines"))
+            "list lines") != 0)
+  {
+        fw_args_sb = [
+          "-t",
+          "sb",
+          rebase_path(fw_bin_path, root_build_dir),
+        ]
+        #In case of generation issue always re-try using and "sb" cpu1_cpu2_fw_type
+        exec_script(
+          "${COMPONENT_FILES_PATH}/conn_fwloader/script/fw_bin2c_conv.py",
+          fw_args_sb,
+          "list lines")
+  }
+
 
   config("${target_name}_config") {
     include_dirs = []
