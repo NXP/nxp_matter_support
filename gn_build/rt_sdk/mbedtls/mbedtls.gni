@@ -14,12 +14,12 @@
 # limitations under the License.
 
 template("mbedtls_target") {
-  if (defined(invoker.rt_sdk_root)) {
-    rt_sdk_root = invoker.rt_sdk_root
+  if (defined(invoker.nxp_sdk_root)) {
+    nxp_sdk_root = invoker.nxp_sdk_root
   }
 
-  assert(rt_sdk_root != "", "rt_sdk_root must be specified")
-  mbedtls_sdk_root = rt_sdk_root
+  assert(nxp_sdk_root != "", "nxp_sdk_root must be specified")
+  mbedtls_sdk_root = nxp_sdk_root
   mbedtls_target_name = target_name
   _mbedtls_root = "${mbedtls_sdk_root}/middleware/mbedtls"
 
@@ -33,7 +33,7 @@ template("mbedtls_target") {
   config("${mbedtls_target_name}_config") {
     include_dirs = [
       "${_mbedtls_root}/include",
-      "${rt_sdk_root}/middleware/mbedtls/library",
+      "${nxp_sdk_root}/middleware/mbedtls/library",
     ]
   }
 

@@ -58,8 +58,8 @@ group("nxp_mbedtls") {
 
 config("lwip_rt_config") {
   include_dirs = [
-    "${rt_sdk_root}/middleware/lwip/src/include",
-    "${rt_sdk_root}/middleware/lwip/port",
+    "${nxp_sdk_root}/middleware/lwip/src/include",
+    "${nxp_sdk_root}/middleware/lwip/port",
     "lwip/common",
   ]
   if (chip_enable_ethernet) {
@@ -70,7 +70,7 @@ config("lwip_rt_config") {
     include_dirs += [ "lwip/openthread" ]
   } else if (chip_enable_wifi) {
     include_dirs += [ "lwip/wifi",
-                      "${rt_sdk_root}/middleware/wifi_nxp/port/net",
+                      "${nxp_sdk_root}/middleware/wifi_nxp/port/net",
                     ]
   }
 }
@@ -79,31 +79,31 @@ lwip_target("nxp_lwip") {
   public = []
   sources = [
     #lwip port file
-    "${rt_sdk_root}/middleware/lwip/port/sys_arch.c",
+    "${nxp_sdk_root}/middleware/lwip/port/sys_arch.c",
   ]
   if (chip_enable_ethernet) {
     sources += [
-      "${rt_sdk_root}/middleware/lwip/port/enet_ethernetif.c",
-      "${rt_sdk_root}/middleware/lwip/port/enet_ethernetif_kinetis.c",
+      "${nxp_sdk_root}/middleware/lwip/port/enet_ethernetif.c",
+      "${nxp_sdk_root}/middleware/lwip/port/enet_ethernetif_kinetis.c",
     ]
   }
 
   if (chip_enable_wifi) {
       sources += [
-        "${rt_sdk_root}/middleware/wifi_nxp/port/net/net.c",
-        "${rt_sdk_root}/middleware/wifi_nxp/port/net/wifi_netif.c",
+        "${nxp_sdk_root}/middleware/wifi_nxp/port/net/net.c",
+        "${nxp_sdk_root}/middleware/wifi_nxp/port/net/wifi_netif.c",
       ]
   }
 
   public_configs = [ ":lwip_rt_config" ]
 
   public_deps = [ ":nxp_sdk" ]
-  rt_sdk_root = rt_sdk_root
+  nxp_sdk_root = nxp_sdk_root
 }
 
 bt_ble_target("nxp_bt_ble") {
   public_deps = [ nxp_sdk_target ]
-  rt_sdk_root = rt_sdk_root
+  nxp_sdk_root = nxp_sdk_root
 }
 
 rt_transceiver("nxp_transceiver") {

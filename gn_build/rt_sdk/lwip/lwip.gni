@@ -18,7 +18,7 @@
 # lwIP depends on external header files to compile. This template defines
 # a combined build of the lwIP sources plus target configuration.
 template("lwip_target") {
-  lwip_sdk_root = invoker.rt_sdk_root
+  lwip_sdk_root = invoker.nxp_sdk_root
 
   _lwip_root = "${lwip_sdk_root}/middleware/lwip"
 

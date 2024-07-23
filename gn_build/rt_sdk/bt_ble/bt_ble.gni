@@ -20,11 +20,11 @@ import("${nxp_sdk_build_root}/nxp_sdk.gni")
 # Allows to get various RT gn options
 import("${nxp_sdk_build_root}/${nxp_sdk_name}/rt_sdk.gni")
 template("bt_ble_target") {
-  if (defined(invoker.rt_sdk_root)) {
-    rt_sdk_root = invoker.rt_sdk_root
+  if (defined(invoker.nxp_sdk_root)) {
+    nxp_sdk_root = invoker.nxp_sdk_root
   }
 
-  assert(rt_sdk_root != "", "rt_sdk_root must be specified")
+  assert(nxp_sdk_root != "", "nxp_sdk_root must be specified")
   bt_ble_target_name = target_name
 
   config("${bt_ble_target_name}_warnings") {
@@ -43,41 +43,41 @@ template("bt_ble_target") {
 
     bt_ble_include_dirs = [
       #fatfs required for ethermind
-      "${rt_sdk_root}/middleware/fatfs/source",
+      "${nxp_sdk_root}/middleware/fatfs/source",
 
       #edgefast_bluetooth
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/include",
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/porting",
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/porting/fifo",
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/crypto",
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host",
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/platform",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/include",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/porting",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/porting/fifo",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/crypto",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/platform",
 
       #ethermind
-      "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/export/include",
-      "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/export/eOSAL",
-      "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/export/extension",
-      "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth",
-      "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/controller",
-      "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/ethal",
-      "${rt_sdk_root}/middleware/wireless/ethermind/port/osal/src/freertos",
-      "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/private/lib/mcux/default/config",
-      "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/private/protocols/sm",
-      "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/private/protocols/sdp",
-      "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/private/protocols/dbase",
-      "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/private/protocols/rfcomm",
-      "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/private/protocols/bnep",
-      "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/private/protocols/avdtp",
-      "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/private/protocols/avctp",
-      "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/private/protocols/smp",
-      "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/private/protocols/obex",
-      "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/private/protocols/mcap",
-      "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/private/protocols/att",
-      "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/private/protocols/hci_1.2",
-      "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/private/utils/aes_cmac",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/export/include",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/export/eOSAL",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/export/extension",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/controller",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/ethal",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/port/osal/src/freertos",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/private/lib/mcux/default/config",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/private/protocols/sm",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/private/protocols/sdp",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/private/protocols/dbase",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/private/protocols/rfcomm",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/private/protocols/bnep",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/private/protocols/avdtp",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/private/protocols/avctp",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/private/protocols/smp",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/private/protocols/obex",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/private/protocols/mcap",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/private/protocols/att",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/private/protocols/hci_1.2",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/private/utils/aes_cmac",
 
       # Transceiver
-      "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/controller",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/controller",
 
       # SDK hook requires to build the BLEManagerImpl.cpp from Zephyr
       "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook",
@@ -95,7 +95,7 @@ template("bt_ble_target") {
         "-Wl,--wrap=hci_uart_init",
       ]
       bt_ble_include_dirs += [
-        "${rt_sdk_root}/middleware/wireless/ethermind/port/pal",
+        "${nxp_sdk_root}/middleware/wireless/ethermind/port/pal",
 
         # SDK hook to be able to undef the value of EM_HAVE_STATIC_DECL
         # so that we can do an extern of the hci_uart_state variable
@@ -104,7 +104,7 @@ template("bt_ble_target") {
     } else {
       defines += [ "HAL_UART_DMA_ENABLE=1" ]
       bt_ble_include_dirs +=
-          [ "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux" ]
+          [ "${nxp_sdk_root}/middleware/wireless/ethermind/port/pal/mcux" ]
     }
 
     bt_ble_include_dirs += [
@@ -144,7 +144,7 @@ template("bt_ble_target") {
 
     #Adding pre-include files
     cflags += [ "-include" + rebase_path(
-                    "${rt_sdk_root}/middleware/edgefast_bluetooth/output/templates/config/edgefast_bluetooth_config.h",
+                    "${nxp_sdk_root}/middleware/edgefast_bluetooth/output/templates/config/edgefast_bluetooth_config.h",
                     root_build_dir) ]
   }
 
@@ -154,59 +154,59 @@ template("bt_ble_target") {
       # SDK hook for ethermind
       #"${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/btsnoop_pl.c",
       #edgefast_bluetooth
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/bt_db_gen.c",
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/common/addr.c",
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_addr.c",
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_adv.c",
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_att.c",
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_buf.c",
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_conn.c",
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_crypto.c",
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_gatt.c",
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_hci_core.c",
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_id.c",
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_l2cap.c",
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_settings.c",
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_smp.c",
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_smp_null.c",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/bt_db_gen.c",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/common/addr.c",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_addr.c",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_adv.c",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_att.c",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_buf.c",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_conn.c",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_crypto.c",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_gatt.c",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_hci_core.c",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_id.c",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_l2cap.c",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_settings.c",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_smp.c",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_smp_null.c",
 
-      #"${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_ecc.c",
-      #"${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_keys.c",
-      #"${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_keys_br.c",
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_uuid.c",
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/platform/bt_ble_platform.c",
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/platform/bt_ble_settings.c",
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/porting/atomic_c.c",
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/porting/buf.c",
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/porting/porting.c",
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/porting/slist.c",
-      "${rt_sdk_root}/middleware/edgefast_bluetooth/source/porting/work_queue.c",
-      "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/export/extension/BT_common_pl.c",
-      "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/export/extension/aes_cmac_pl.c",
-      "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/export/extension/device_queue_pl.c",
-      "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/export/extension/sm_pl.c",
-      "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/export/extension/sm_ssp_pl.c",
-      "${rt_sdk_root}/middleware/wireless/ethermind/bluetooth/export/extension/smp_pl.c",
-      "${rt_sdk_root}/middleware/wireless/ethermind/port/osal/src/freertos/EM_serial.c",
-      "${rt_sdk_root}/middleware/wireless/ethermind/port/osal/src/freertos/EM_timer.c",
-      "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/BT_status_pl.c",
-      "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/BT_storage_pl.c",
-      "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/btsnoop_pl.c",
-      "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/ht_read_task_pl.c",
+      #"${nxp_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_ecc.c",
+      #"${nxp_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_keys.c",
+      #"${nxp_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_keys_br.c",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host/bt_pal_uuid.c",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/platform/bt_ble_platform.c",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/platform/bt_ble_settings.c",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/porting/atomic_c.c",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/porting/buf.c",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/porting/porting.c",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/porting/slist.c",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/porting/work_queue.c",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/export/extension/BT_common_pl.c",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/export/extension/aes_cmac_pl.c",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/export/extension/device_queue_pl.c",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/export/extension/sm_pl.c",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/export/extension/sm_ssp_pl.c",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/export/extension/smp_pl.c",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/port/osal/src/freertos/EM_serial.c",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/port/osal/src/freertos/EM_timer.c",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/BT_status_pl.c",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/BT_storage_pl.c",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/btsnoop_pl.c",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/ht_read_task_pl.c",
 
       #ethermind files
-      "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/sco_audio_pl.c",
-      "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/write_task_pl.c",
-      "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/ethal/ethal_config.c",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/sco_audio_pl.c",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/write_task_pl.c",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/ethal/ethal_config.c",
 
-      #"${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/littlefs_pl.c",
-      "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/ethal/ethal_debug.c",
+      #"${nxp_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/bluetooth/littlefs_pl.c",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/ethal/ethal_debug.c",
 
-      #"${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/ethal/ethal_fops.c",
-      "${rt_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/ethal/ethal_os.c",
+      #"${nxp_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/ethal/ethal_fops.c",
+      "${nxp_sdk_root}/middleware/wireless/ethermind/port/pal/mcux/ethal/ethal_os.c",
     ]
     
-    sources += [ "${rt_sdk_root}/middleware/edgefast_bluetooth/source/porting/fifo/fifo.c" ]
+    sources += [ "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/porting/fifo/fifo.c" ]
 
     if (!defined(configs)) {
       configs = []

@@ -23,7 +23,7 @@ import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
 
 import("${nxp_sdk_build_root}/${nxp_sdk_name}/mbedtls/mbedtls.gni")
 
-rt_mbedtls_root = "${rt_sdk_root}/middleware/mbedtls"
+rt_mbedtls_root = "${nxp_sdk_root}/middleware/mbedtls"
 
 config("mbedtls_ksdk_config") {
   include_dirs = [ "${rt_mbedtls_root}/port/ksdk" ]
