@@ -6,7 +6,7 @@
  */
 
 /*
- * Copyright 2022 NXP
+ * Copyright 2022,2024 NXP
  * All rights reserved.
  *
  *

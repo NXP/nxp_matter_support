@@ -3,7 +3,7 @@
 /-----------------------------------------------------------------------------/
 /
 / Copyright (C) 2021, ChaN, all right reserved.
-/ Copyright 2023 NXP
+/ Copyright 2023,2024 NXP
 /
 /
 / FatFs module is an open source software. Redistribution and use of FatFs in

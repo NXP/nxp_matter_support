@@ -1,7 +1,7 @@
 /*
  *
  *    Copyright (c) 2020 Nest Labs, Inc.
- *    Copyright 2023 NXP
+ *    Copyright 2023,2024 NXP
  *    All rights reserved.
  *
  *    Licensed under the Apache License, Version 2.0 (the "License");
