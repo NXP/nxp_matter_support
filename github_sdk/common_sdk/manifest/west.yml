@@ -15,7 +15,6 @@ manifest:
           - FreeRTOS-Kernel
           - CMSIS_5
           - mcux-sdk-middleware-sdmmc
-          - mcux-sdk-middleware-connectivity-framework
           - fatfs
           - mcux-sdk-middleware-edgefast-bluetooth
           - mcux-sdk-middleware-ethermind
@@ -33,3 +32,7 @@ manifest:
           - rpmsg-lite
           - mcux-secure-subsystem
         path-prefix: repo
+    - name: mcux-sdk-middleware-connectivity-framework
+      url: https://github.com/nxp-mcuxpresso/mcux-sdk-middleware-connectivity-framework.git
+      revision: MCUX_2.16.000_UpdRev0
+      path: repo/middleware/wireless/framework
