@@ -66,6 +66,9 @@ mbedtls_target("nxp_els_pkc_mbedtls") {
     "${rt_mbedtls_root}/port/pkc/ecdsa_alt.c",
     "${rt_mbedtls_root}/port/pkc/els_pkc_mbedtls.c",
     "${rt_mbedtls_root}/port/pkc/rsa_alt.c",
+
+    # els_pkc SDK hook
+    "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/els_pkc/ELSFactoryData.c",
   ]
   if (chip_enable_openthread) {
     public_deps += [ "${openthread_root}/src/core:libopenthread_core_headers" ]
