@@ -204,6 +204,15 @@ core_sdk = {
     ]
   }
 
+  if (chip_enable_matter_cli) {
+    core_defines += [
+      "gDebugConsoleEnable_d=1",
+      "DebugConsole_c=0",
+      "DEFAULT_APP_UART=0",
+      "BOARD_APP_UART_CLK_FREQ=6000000U",
+    ]
+  }
+
   core_sources = [
     # Devices files
     "${DEVICES_DIR_PATH}/gcc/startup_${nxp_device}.S",
