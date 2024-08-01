@@ -6,3 +6,4 @@ License File: LICENSE
 Format: source code, header files, build files, scripts
 Description: Containing additionnal NXP SDK files required to support Matter stack on NXP platforms 
 Release location: https://github.com/NXP/nxp_matter_support
+Origin: NXP SDK board support (BSD-3-Clause) / Matter template port files (Apache-2.0)
