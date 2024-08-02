@@ -184,7 +184,7 @@ core_sdk = {
     "SDK_DEBUGCONSOLE=1",
     "USE_RTOS=1",
     "FSL_RTOS_FREE_RTOS=1",
-    "MinimalHeapSize_c=0x7C00",
+    "MinimalHeapSize_c=0x8A00",
     "gMemManagerLightExtendHeapAreaUsage=0",
     "ENABLE_RAM_VECTOR_TABLE=1",
 
