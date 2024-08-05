@@ -63,6 +63,12 @@ if (k32w0_sdk_root == "//third_party/connectedhomeip/third_party/nxp/nxp_matter_
   sdk_devices = "${k32w0_sdk_root}/core/devices"
   sdk_drivers = "${k32w0_sdk_root}/core/drivers"
   sdk_wireless_examples = "${k32w0_sdk_root}/examples/k32w061dk6/wireless_examples"
+} else if (k32w0_sdk_root == "/opt/sdk/core") {
+  print("Using docker image SDK")
+  sdk_CMSIS = "${k32w0_sdk_root}/CMSIS"
+  sdk_devices = "${k32w0_sdk_root}/devices"
+  sdk_drivers = "${k32w0_sdk_root}/drivers"
+  sdk_wireless_examples = "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples"
 } else {
   print("Using package SDK")
   is_sdk_package = true
