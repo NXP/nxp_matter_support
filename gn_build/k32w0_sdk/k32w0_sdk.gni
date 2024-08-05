@@ -143,11 +143,14 @@ template("k32w0_sdk") {
     chip_with_ntag = 0
   }
 
-  if (k32w0_sdk_root == "${chip_root}/third_party/nxp/nxp_matter_support/github_sdk/k32w0/repo" ||
-      k32w0_sdk_root == "/opt/sdk/core") {
+  if (k32w0_sdk_root == "${chip_root}/third_party/nxp/nxp_matter_support/github_sdk/k32w0/repo") {
     chip_with_sdk_package = 0
     CORE_PATH = "${k32w0_sdk_root}/core"
     EXAMPLES_PATH = "${k32w0_sdk_root}/examples"
+  } else if (k32w0_sdk_root == "/opt/sdk/core") {
+    chip_with_sdk_package = 0
+    CORE_PATH = "${k32w0_sdk_root}"
+    EXAMPLES_PATH = "${k32w0_sdk_root}/boards"
   } else {
     chip_with_sdk_package = 1
     CORE_PATH = "${k32w0_sdk_root}"
