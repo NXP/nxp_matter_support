@@ -28,7 +28,7 @@ def sign_cmd(tool, image, identifer):
 def windows_sign_cmd(tool_path):
     # sign_images is a Linux wrapper over dk6_image_tool.py.
     # On Windows, use the Python script directly.
-    tool = f"{tool_path}\..\dk6_image_tool.py"
+    tool = f"{tool_path}/../dk6_image_tool.py"
 
     image = [f for f in os.listdir(os.getcwd()) if f.startswith('chip-') and f.endswith('-example')][0]
     cmd = sign_cmd(tool, image, 1)
