@@ -89,6 +89,11 @@ declare_args() {
 
 if (is_sdk_package || getenv("NXP_SDK_ROOT") != "") {
   nxp_sdk_root = getenv("NXP_SDK_ROOT")
+} else if (host_os == "win") {
+  # On Windows, the bootstrap script creates a symbolic link to the
+  # actual github SDK path using mklink. This is mandatory in order to
+  # build reference applications, because of the long paths limitation.
+  nxp_sdk_root = "C:/NXP/sdk/common_sdk/repo"
 } else {
   nxp_sdk_root = "${nxp_sdk_matter_support_root}/github_sdk/common_sdk/repo"
 }
