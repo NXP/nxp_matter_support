@@ -57,7 +57,8 @@ declare_args() {
 is_sdk_package = false
 
 # Support both github SDK and package SDK
-if (k32w0_sdk_root == "//third_party/connectedhomeip/third_party/nxp/nxp_matter_support/github_sdk/k32w0/repo") {
+if (k32w0_sdk_root == "//third_party/connectedhomeip/third_party/nxp/nxp_matter_support/github_sdk/k32w0/repo"||
+    k32w0_sdk_root == "C:/NXP/sdk/k32w0/repo") {
   print("Using github SDK")
   sdk_CMSIS = "${k32w0_sdk_root}/core/CMSIS"
   sdk_devices = "${k32w0_sdk_root}/core/devices"

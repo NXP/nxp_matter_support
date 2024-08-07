@@ -55,6 +55,17 @@ declare_args() {
   chip_with_sdk_package = 1
 }
 
+if (k32w0_sdk_root == "") {
+  if (host_os == "win") {
+    # On Windows, the bootstrap script creates a symbolic link to the
+    # actual github SDK path using mklink. This is mandatory in order to
+    # build reference applications, because of the long paths limitation.
+    k32w0_sdk_root = "C:/NXP/sdk/k32w0/repo"
+  } else {
+    k32w0_sdk_root = "${nxp_sdk_matter_support_root}/github_sdk/k32w0/repo"
+  }
+}
+
 # Local variables used when defining SDK paths.
 # These are set based on the SDK type: github or package.
 CORE_PATH = ""
@@ -143,7 +154,9 @@ template("k32w0_sdk") {
     chip_with_ntag = 0
   }
 
-  if (k32w0_sdk_root == "${chip_root}/third_party/nxp/nxp_matter_support/github_sdk/k32w0/repo") {
+  if (k32w0_sdk_root ==
+      "${chip_root}/third_party/nxp/nxp_matter_support/github_sdk/k32w0/repo" ||
+      k32w0_sdk_root == "C:/NXP/sdk/k32w0/repo") {
     chip_with_sdk_package = 0
     CORE_PATH = "${k32w0_sdk_root}/core"
     EXAMPLES_PATH = "${k32w0_sdk_root}/examples"
@@ -205,9 +218,11 @@ template("k32w0_sdk") {
 
     if (chip_with_DK6) {
       if (chip_with_low_power != 0) {
-        _sdk_include_dirs += [ "${EXAMPLES_PATH}/${board}/wireless_examples/openthread/lped/bm" ]
+        _sdk_include_dirs +=
+            [ "${EXAMPLES_PATH}/${board}/wireless_examples/openthread/lped/bm" ]
       } else {
-        _sdk_include_dirs += [ "${EXAMPLES_PATH}/${board}/wireless_examples/openthread/reed/bm" ]
+        _sdk_include_dirs +=
+            [ "${EXAMPLES_PATH}/${board}/wireless_examples/openthread/reed/bm" ]
       }
     }
 
@@ -682,27 +697,27 @@ template("k32w0_sdk") {
       ]
     } else {
       sources += [
-        "${CORE_PATH}/drivers/lpc_adc/fsl_adc.c",
-        "${CORE_PATH}/drivers/aes/fsl_aes.c",
         "${CORE_PATH}/devices/K32W061/drivers/fsl_clock.c",
-        "${CORE_PATH}/drivers/common/fsl_common.c",
-        "${CORE_PATH}/drivers/ctimer/fsl_ctimer.c",
-        "${CORE_PATH}/drivers/jn_flash/fsl_flash.c",
-        "${CORE_PATH}/drivers/flexcomm/fsl_flexcomm.c",
-        "${CORE_PATH}/drivers/fmeas/fsl_fmeas.c",
-        "${CORE_PATH}/drivers/lpc_gpio/fsl_gpio.c",
-        "${CORE_PATH}/drivers/flexcomm/fsl_i2c.c",
-        "${CORE_PATH}/drivers/flexcomm/fsl_i2c_freertos.c",
-        "${CORE_PATH}/drivers/inputmux/fsl_inputmux.c",
-        "${CORE_PATH}/drivers/pint/fsl_pint.c",
         "${CORE_PATH}/devices/K32W061/drivers/fsl_power.c",
         "${CORE_PATH}/devices/K32W061/drivers/fsl_reset.c",
+        "${CORE_PATH}/devices/K32W061/drivers/fsl_wtimer.c",
+        "${CORE_PATH}/drivers/aes/fsl_aes.c",
+        "${CORE_PATH}/drivers/common/fsl_common.c",
+        "${CORE_PATH}/drivers/ctimer/fsl_ctimer.c",
+        "${CORE_PATH}/drivers/flexcomm/fsl_flexcomm.c",
+        "${CORE_PATH}/drivers/flexcomm/fsl_i2c.c",
+        "${CORE_PATH}/drivers/flexcomm/fsl_i2c_freertos.c",
+        "${CORE_PATH}/drivers/flexcomm/fsl_usart.c",
+        "${CORE_PATH}/drivers/fmeas/fsl_fmeas.c",
+        "${CORE_PATH}/drivers/inputmux/fsl_inputmux.c",
+        "${CORE_PATH}/drivers/jn_flash/fsl_flash.c",
         "${CORE_PATH}/drivers/jn_rng/fsl_rng.c",
         "${CORE_PATH}/drivers/jn_rtc/fsl_rtc.c",
+        "${CORE_PATH}/drivers/lpc_adc/fsl_adc.c",
+        "${CORE_PATH}/drivers/lpc_gpio/fsl_gpio.c",
+        "${CORE_PATH}/drivers/pint/fsl_pint.c",
         "${CORE_PATH}/drivers/sha/fsl_sha.c",
         "${CORE_PATH}/drivers/spifi/fsl_spifi.c",
-        "${CORE_PATH}/drivers/flexcomm/fsl_usart.c",
-        "${CORE_PATH}/devices/K32W061/drivers/fsl_wtimer.c",
         "${CORE_PATH}/utilities/debug_console/fsl_debug_console.c",
         "${CORE_PATH}/utilities/debug_console/str/fsl_str.c",
       ]
