@@ -66,9 +66,6 @@ declare_args() {
   # Support or not assert component from the SDK
   sdk_fsl_assert_support = true
 
-  # Defines the name of the nxp SDK target instance
-  nxp_sdk_target = ""
-
   # Defines the name of the nxp SDK driver target instance
   nxp_sdk_driver_target = ""
 
