@@ -1,5 +1,5 @@
 # Copyright (c) 2022 Project CHIP Authors
-# Copyright 2023 NXP
+# Copyright 2023,2024 NXP
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -13,12 +13,20 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/nxp_sdk.gni")
+
 declare_args() {
   # Indicates the name of the nxp platform targeted
   nxp_platform = ""
 
+  # Indicates the name of the device targeted
+  nxp_device = ""
+
   # Specifies the CHIP_DEVICE_LAYER_TARGET in src/platform/BUILD.gn
   nxp_device_layer = "nxp/common"
+
+  # Defines the name of the nxp SDK target instance
+  nxp_sdk_target = ""
 
   # Enables target nxp_lwip. Used by RT platforms.
   nxp_use_lwip = true
@@ -32,6 +40,12 @@ declare_args() {
   # Enables the support of factory data
   chip_with_factory_data = 0
 
+  # This mode allows to protect the matter factory dataset with a AES key protected in the secure element
+  chip_enable_secure_whole_factory_data = false
+
+  # Defines the NVM component supported
+  nxp_nvm_component = "littlefs"
+
   # Enables the auto pairing advertisement at boot
   chip_enable_pairing_autostart = 1
 
@@ -40,6 +54,12 @@ declare_args() {
 
   # Indicates if the nxp SDK used has the nxp SDK internal format
   is_sdk_internal = false
+
+  # Enables to use external sdk. If set to true, this removes the dependency on nxp_sdk
+  nxp_external_sdk = false
+
+  # Path to SDK root
+  nxp_sdk_root = ""
 
   # Defines the current software version
   nxp_software_version = 1
@@ -55,10 +75,19 @@ declare_args() {
   nxp_active_mode_duration_ms = 10000  # 10s Active Mode Interval
   nxp_active_mode_threshold_ms = 5000  # 5s Active Mode Threshold
   nxp_icd_supported_clients_per_fabric = 2  # 2 registration slots per fabric
+
+  # Build Matter as a standalone lib (without gn dependencies on OT)
+  nxp_build_matter_standalone_lib = false
 }
 
 declare_args() {
   nxp_sdk_name = "${nxp_platform}_sdk"
+}
+
+if (is_sdk_package || getenv("NXP_SDK_ROOT") != "") {
+  nxp_sdk_root = getenv("NXP_SDK_ROOT")
+} else {
+  nxp_sdk_root = "${nxp_sdk_matter_support_root}/github_sdk/common_sdk/repo"
 }
 
 assert(nxp_platform != "", "nxp_platform should be defined")

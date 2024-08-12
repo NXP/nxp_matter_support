@@ -1,4 +1,5 @@
 # Copyright (c) 2023 Project CHIP Authors
+# Copyright 2024 NXP
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -15,7 +16,7 @@
 import("//build_overrides/nxp_sdk.gni")
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
-assert(nxp_platform == "k32w/k32w1", "${nxp_platform} must be k32w/k32w1.")
+assert(nxp_platform == "k32w1", "${nxp_platform} must be k32w1.")
 
 arm_arch = "armv8-m.main+dsp+fp"
 arm_cpu = "cortex-m33"
