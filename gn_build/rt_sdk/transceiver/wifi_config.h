@@ -18,6 +18,8 @@
 #define CONFIG_MAX_IPV6_ADDRESSES 5
 #endif /* CONFIG_MAX_IPV6_ADDRESSES */
 
+#define CONFIG_WIFI_GET_LOG 1 /* missing in wifi_config_default.h for rt1060 and rt1170 */
+
 /*
  * Wifi extra debug options
  */
