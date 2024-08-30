@@ -60,6 +60,7 @@ config("lwip_rt_config") {
   include_dirs = [
     "${nxp_sdk_root}/middleware/lwip/src/include",
     "${nxp_sdk_root}/middleware/lwip/port",
+    "${nxp_sdk_root}/middleware/lwip/port/sys_arch/dynamic",
     "lwip/common",
   ]
   if (chip_enable_ethernet) {
@@ -79,7 +80,7 @@ lwip_target("nxp_lwip") {
   public = []
   sources = [
     #lwip port file
-    "${nxp_sdk_root}/middleware/lwip/port/sys_arch.c",
+    "${nxp_sdk_root}/middleware/lwip/port/sys_arch/dynamic/sys_arch.c",
   ]
   if (chip_enable_ethernet) {
     sources += [
