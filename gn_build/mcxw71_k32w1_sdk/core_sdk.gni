@@ -46,6 +46,7 @@ core_sdk = {
     DRIVER_MCM_DIR_PATH = "${DRIVER_DIR_PATH}"
     DRIVER_PORT_DIR_PATH = "${DRIVER_DIR_PATH}"
     DRIVER_SPC_DIR_PATH = "${DRIVER_DIR_PATH}"
+    DRIVER_TRDC_DIR_PATH = "${DRIVER_DIR_PATH}"
     DRIVER_TPM_DIR_PATH = "${DRIVER_DIR_PATH}"
     DRIVER_TRDC_DIR_PATH = "${DRIVER_DIR_PATH}"
     DRIVER_WUU_DIR_PATH = "${DRIVER_DIR_PATH}"
@@ -136,6 +137,7 @@ core_sdk = {
     "${DRIVER_PORT_DIR_PATH}",
     "${DRIVER_SPC_DIR_PATH}",
     "${DRIVER_TPM_DIR_PATH}",
+    "${DRIVER_TRDC_DIR_PATH}",
     "${DRIVER_WUU_DIR_PATH}",
 
     # Components directories
@@ -280,6 +282,7 @@ core_sdk = {
     "${DRIVER_LPTMR_DIR_PATH}/fsl_lptmr.c",
     "${DRIVER_LPUART_DIR_PATH}/fsl_lpuart.c",
     "${DRIVER_LTC_DIR_PATH}/fsl_ltc.c",
+    "${DRIVER_TRDC_DIR_PATH}/fsl_trdc.c",
     "${DRIVER_SPC_DIR_PATH}/fsl_spc.c",
     "${DRIVER_WUU_DIR_PATH}/fsl_wuu.c",
 
