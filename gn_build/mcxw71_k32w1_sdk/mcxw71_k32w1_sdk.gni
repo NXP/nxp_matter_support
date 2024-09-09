@@ -92,7 +92,7 @@ template("${nxp_platform}_sdk") {
     }
 
     libs = [
-      "${BLE_HOST_DIR_PATH}/host/lib/lib_ble_host_matter_cm33_gcc.a",
+      "${BLE_HOST_DIR_PATH}/host/lib/lib_ble_host_peripheral_cm33_gcc.a",
       "${FRAMEWORK_DIR_PATH}/SecLib/lib_crypto_m33.a",
     ]
 
@@ -121,6 +121,13 @@ template("${nxp_platform}_sdk") {
       print(
           "WARNING: enabling logs in low power might break the LP timings. Use at your own risk!")
       print("WARNING: set chip_logging=false to disable logging.")
+    }
+
+    if (nxp_multiple_ble_connections)
+    {
+      defines += [
+        "USE_MULTIPLE_BLE_CONNECTIONS=1",
+      ]
     }
 
     if (use_smu2_static) {

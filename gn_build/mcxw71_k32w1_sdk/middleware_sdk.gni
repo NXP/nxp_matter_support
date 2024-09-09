@@ -123,7 +123,14 @@ middleware_sdk = {
     ]
   }
 
-  middleware_defines = [
+  if(nxp_multiple_ble_connections) {
+    middleware_defines = [ "gAppMaxConnections_c=3" ]
+  }
+  else {
+    middleware_defines = [ "gAppMaxConnections_c=1" ]
+  }
+
+  middleware_defines += [
     "gMainThreadPriority_c=5",
     "SDK_COMPONENT_INTEGRATION=1",
     "gSerialManagerMaxInterfaces_c=1",
@@ -143,7 +150,6 @@ middleware_sdk = {
     "osCustomStartup=1",
     "CHIP_ENABLE_OPENTHREAD=1",
     "gUseHciTransportDownward_d=1",
-    "gAppMaxConnections_c=1",
     "gL2caMaxLeCbChannels_c=2",
     "gGapSimultaneousEAChainedReports_c=0",
     "gTmrStackTimers_c= 3 + gAppMaxConnections_c * 2 + gL2caMaxLeCbChannels_c + gGapSimultaneousEAChainedReports_c",
