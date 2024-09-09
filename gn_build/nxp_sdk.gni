@@ -81,6 +81,10 @@ declare_args() {
 
   # Build Matter as a standalone lib (without gn dependencies on OT)
   nxp_build_matter_standalone_lib = false
+
+  # Enable multiple BLE connections after commissioning feature.
+  # This feature is platform specific and not standardized by Matter.
+  nxp_multiple_ble_connections = false
 }
 
 declare_args() {
