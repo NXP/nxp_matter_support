@@ -82,7 +82,6 @@ template("${nxp_platform}_sdk") {
 
     _sdk_include_dirs += [
       "${openthread_nxp_root}/third_party/k32w1_sdk",
-      "${chip_root}/src/platform/nxp/${nxp_platform}",
     ]
 
     if (chip_config_dimmable_led) {
