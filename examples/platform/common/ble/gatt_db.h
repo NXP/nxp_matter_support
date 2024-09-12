@@ -5,6 +5,11 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+/* This solution is temporary until we switch to using dynamic gatt_db api. */
+#ifdef EXTRA_GATT_DB_HEADER
+#include EXTRA_GATT_DB_HEADER
+#endif
+
 PRIMARY_SERVICE(service_gatt, gBleSig_GenericAttributeProfile_d)
 CHARACTERISTIC(char_service_changed, gBleSig_GattServiceChanged_d, (gGattCharPropRead_c | gGattCharPropNotify_c))
 VALUE(value_service_changed, gBleSig_GattServiceChanged_d, (gPermissionNone_c), 4, 0x00, 0x00, 0x00, 0x00)
