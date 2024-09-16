@@ -74,6 +74,7 @@ function(nxp_build_app_with_gn)
     
     add_custom_command(
         OUTPUT          ${gn_build}/build.ninja
+        COMMAND         export NXP_SDK_ROOT=${NXP_SDK_ROOT}
         COMMAND         ${Python3_EXECUTABLE} ${CHIP_ROOT}/config/common/cmake/make_gn_args.py 
                         @${CMAKE_CURRENT_BINARY_DIR}/chip/args.tmp > ${gn_build}/args.gn
         COMMAND         gn gen ${gn_build}
