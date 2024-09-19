@@ -237,7 +237,7 @@ core_sdk = {
   if (nxp_device == "MCXW727C") {
     core_defines += [
       # For now, allocate more heap for kw47
-      "MinimalHeapSize_c=0xAC00",
+      "MinimalHeapSize_c=0xC000",
     ]
   } else {
     core_defines += [
