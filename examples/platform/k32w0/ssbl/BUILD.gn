@@ -57,19 +57,12 @@ declare_args() {
 is_sdk_package = false
 
 # Support both github SDK and package SDK
-if (k32w0_sdk_root == "//third_party/connectedhomeip/third_party/nxp/nxp_matter_support/github_sdk/k32w0/repo"||
-    k32w0_sdk_root == "C:/NXP/sdk/k32w0/repo") {
+if (get_path_info(k32w0_sdk_root, "name") == "repo") {
   print("Using github SDK")
   sdk_CMSIS = "${k32w0_sdk_root}/core/CMSIS"
   sdk_devices = "${k32w0_sdk_root}/core/devices"
   sdk_drivers = "${k32w0_sdk_root}/core/drivers"
   sdk_wireless_examples = "${k32w0_sdk_root}/examples/k32w061dk6/wireless_examples"
-} else if (k32w0_sdk_root == "/opt/sdk/core") {
-  print("Using docker image SDK")
-  sdk_CMSIS = "${k32w0_sdk_root}/CMSIS"
-  sdk_devices = "${k32w0_sdk_root}/devices"
-  sdk_drivers = "${k32w0_sdk_root}/drivers"
-  sdk_wireless_examples = "${k32w0_sdk_root}/boards/k32w061dk6/wireless_examples"
 } else {
   print("Using package SDK")
   is_sdk_package = true
