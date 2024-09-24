@@ -19,13 +19,19 @@ if not "%PW_BOOTSTRAP_PYTHON%" == "" (
 
 setlocal EnableDelayedExpansion
 :: Detect python installation.
+:: In order to avoid opening Microsoft Store app, bypass the entries that
+:: contain WindowsApps string in their path. This ensures that a proper
+:: Python executable is used. If no Python is detected, log a message.
 for /f %%p in ('where python') do (
-    %%p --version >NUL 2>&1
-    if !ERRORLEVEL! EQU 0 (
-        endlocal
-        echo Python is found at: %%p
-        set "python=%%p"
-        goto check_curl
+    echo.%%p | findstr WindowsApps >NUL 2>&1
+    if !ERRORLEVEL! NEQ 0 (
+        %%p --version >NUL 2>&1
+        if !ERRORLEVEL! EQU 0 (
+            endlocal
+            echo Python is found at: %%p
+            set "python=%%p"
+            goto check_curl
+        )
     )
 )
 
