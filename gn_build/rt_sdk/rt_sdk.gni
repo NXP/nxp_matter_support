@@ -190,6 +190,7 @@ template("rt_wifi") {
       "${nxp_sdk_root}/middleware/wifi_nxp/wifi_bt_firmware",
       "${nxp_sdk_root}/middleware/wifi_nxp/wifidriver",
       "${nxp_sdk_root}/middleware/wifi_nxp/wifidriver/incl",
+      "${nxp_sdk_root}/middleware/wifi_nxp/wifidriver/wpa_supp_if/incl",
       "${nxp_sdk_root}/middleware/wifi_nxp/incl/port/net",
       "${nxp_sdk_root}/middleware/wifi_nxp/port/net",
       "${nxp_sdk_root}/middleware/wifi_nxp/port/osa",
