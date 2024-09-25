@@ -256,7 +256,6 @@ core_sdk = {
       "${nxp_sdk_root}/devices/MCXW727C/drivers/fsl_clock.c",
       "${COMPONENT_POWER_MGR_DIR_PATH}/devices/KW47B42ZB7/fsl_pm_device.c",
       # Drivers
-      "${DRIVER_TRDC_DIR_PATH}/fsl_trdc.c"
     ]
   } else {
     core_sources = [
