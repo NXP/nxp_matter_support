@@ -21,11 +21,12 @@ setlocal EnableDelayedExpansion
 :: Detect python installation.
 :: In order to avoid opening Microsoft Store app, bypass the entries that
 :: contain WindowsApps string in their path. This ensures that a proper
-:: Python executable is used. If no Python is detected, log a message.
+:: Python3 executable is used. If no Python is detected, log a message.
 for /f %%p in ('where python') do (
     echo.%%p | findstr WindowsApps >NUL 2>&1
     if !ERRORLEVEL! NEQ 0 (
-        %%p --version >NUL 2>&1
+        %%p --version >python_version.tmp 2>&1
+        findstr /C:"Python 3" python_version.tmp >NUL 2>&1
         if !ERRORLEVEL! EQU 0 (
             endlocal
             echo Python is found at: %%p
@@ -36,10 +37,10 @@ for /f %%p in ('where python') do (
 )
 
 echo.
-echo Error: no system Python present
+echo Error: no system Python3 present
 echo.
-echo   Pigweed's bootstrap process requires a local system Python.
-echo   Please install Python on your system, add it to your PATH
+echo   Pigweed's bootstrap process requires a local system Python3.
+echo   Please install Python3 on your system, add it to your PATH
 echo   and re-try running bootstrap.
 goto finish
 
@@ -195,4 +196,4 @@ set PW_CIPD_INSTALL_DIR=
 set _PW_TEXT=
 set PW_DOCTOR_SKIP_CIPD_CHECKS=
 if exist setup_pigweed_prerequisites.bat del setup_pigweed_prerequisites.bat
-exit /B 0
+if exist python_version.tmp del python_version.tmp
