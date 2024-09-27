@@ -9,7 +9,7 @@ manifest:
       url: ssh://git@bitbucket.sw.nxp.com/mcucore/mcu-sdk-github-release.git
       revision: release/2.16.100_minor_rfp
       import:
-        file: west.yml
+        file: MCUX_2.16.000_RC2.2_internal.yml
         name-allowlist:
           - mcux-sdk
           - FreeRTOS-Kernel
@@ -18,18 +18,27 @@ manifest:
           - fatfs
           - mcux-sdk-middleware-edgefast-bluetooth
           - mcux-sdk-middleware-ethermind
-          - mcux-sdk-middleware-connectivity-framework
           - mbedtls
           - lwip
           - littlefs
           - mcuboot
           - mcux-sdk-examples
-          - wifi_nxp
           - mcux-sdk-middleware-bluetooth-controller
           - mcux-sdk-middleware-bluetooth-host
-          - mcux-sdk-middleware-ieee_802.15.4
           - mcux-sdk-middleware-multicore
           - mcux-sdk-middleware-usb
           - rpmsg-lite
           - mcux-secure-subsystem
         path-prefix: repo
+    - name: mcux-sdk-middleware-connectivity-framework
+      url: ssh://git@bitbucket.sw.nxp.com/mcucore/mcux-sdk-middleware-connectivity-framework.git
+      revision: 6822bfbe045a9552add4b41df46417d5fb943107
+      path: repo/middleware/wireless/framework
+    - name: wifi_nxp
+      url: ssh://git@bitbucket.sw.nxp.com/mcucore/mcux-sdk-wifi-nxp.git
+      revision: 030ea66bb97f6cfe0c66f507901eb255eeacbf67
+      path: repo/middleware/wifi_nxp
+    - name: mcux-sdk-middleware-ieee_802.15.4
+      url: ssh://git@bitbucket.sw.nxp.com/mcucore/mcux-sdk-middleware-ieee_802.15.4.git
+      revision: 17bbddcd20b5d6ec9dd158e4b390c84bd8dea4f5
+      path: repo/middleware/wireless/ieee-802.15.4
