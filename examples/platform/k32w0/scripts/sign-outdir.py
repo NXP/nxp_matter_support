@@ -49,15 +49,12 @@ def linux_sign_cmd(tool_path):
     return cmd
 
 def main(args):
-    if "NXP_K32W0_SDK_ROOT" in os.environ and os.environ["NXP_K32W0_SDK_ROOT"] != "":
-        path_prefix = ""
-        # Treat particular case of CI
-        if "third_party/nxp/nxp_matter_support/github_sdk/k32w0/repo" in os.environ["NXP_K32W0_SDK_ROOT"]:
-            path_prefix = "/core"
-        tool_path = os.environ["NXP_K32W0_SDK_ROOT"] + path_prefix + "/tools/imagetool/sign_images.sh"
+    if "nxp_matter_support/github_sdk/k32w0/repo" in args.sdk_root:
+        # For github SDK, the signing tool is under the core folder.
+        tool_path = os.path.abspath(os.path.join(args.sdk_root, "core/tools/imagetool/sign_images.sh"))
     else:
-        tool_path = os.path.abspath(
-            __file__ + "/../../../../../github_sdk/k32w0/repo/core/tools/imagetool/sign_images.sh")
+        # For package SDK, the core folder is missing.
+        tool_path = os.path.abspath(os.path.join(args.sdk_root, "tools/imagetool/sign_images.sh"))
 
     # Give execute permission if needed
     if os.access(tool_path, os.X_OK) is False:
@@ -73,6 +70,10 @@ def main(args):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--sdk-root",
+        help="Path to the SDK root folder."
+    )
     parser.add_argument(
         "--simple-hash",
         help="When enabled, adds a hash of the whole image at the end of the binary.",
