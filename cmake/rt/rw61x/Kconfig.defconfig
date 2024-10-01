@@ -1,0 +1,74 @@
+# Copyright 2024 NXP
+# SPDX-License-Identifier: BSD-3-Clause
+
+# The purpose of this file is to redefine default values of configurations used when building Matter applications.
+# This file only changes defaults, so all symbols here must be promptless.
+
+if CHIP_NXP_PLATFORM_RW61X
+
+# Add SDK dependencies required for RW61x
+config CHIP_SDK_DEPENDENCIES
+    select MCUX_COMPONENT_driver.conn_fwloader
+    select MCUX_COMPONENT_component.mflash_offchip
+    select MCUX_COMPONENT_middleware.freertos-kernel.cm33_non_trustzone
+    select MCUX_COMPONENT_middleware.mbedtls.els_pkc.config
+    select MCUX_COMPONENT_middleware.wireless.framework.platform.coex
+	select MCUX_COMPONENT_middleware.wireless.framework.platform.hdlc
+    select MCUX_COMPONENT_middleware.wireless.framework.factory_data_provider if CHIP_FACTORY_DATA
+    select MCUX_COMPONENT_middleware.wireless.framework.ota_support if CHIP_OTA_REQUESTOR
+    select MCUX_COMPONENT_middleware.wireless.framework.ota_support.external_flash if CHIP_OTA_REQUESTOR
+    select MCUX_COMPONENT_middleware.wifi.imu if CHIP_WIFI
+
+choice CHIP_NVM_COMPONENT
+	default CHIP_NVM_COMPONENT_NVS
+endchoice
+
+config REMOVE_SECTIONS_FROM_BIN
+	default "-R .flash_config -R .NVM" if BOOTLOADER_MCUBOOT
+	default "-R .NVM"
+
+# SDK defaults
+
+choice MCUX_DEPENDENCY_COMPONENT_component.serial_manager_uart_DEPEND_COMPONENT_driver.selection
+	default MCUX_DEPENDENCY_COMPONENT_component.serial_manager_uart_DEPEND_COMPONENT_driver.flexcomm_usart
+endchoice
+
+choice MCUX_COMPONENT_middleware.mbedtls.port.selection
+	default MCUX_COMPONENT_middleware.mbedtls.port.els_pkc
+endchoice
+
+choice MCUX_COMPONENT_middleware.wifi.wifidriver.selection
+	default MCUX_DEPENDENCY_COMPONENT_middleware.wifi.wifidriver_DEPEND_ANYOF_OPTION_2
+endchoice
+
+# FreeRTOS
+choice MCUX_MISC_middleware.freertos-kernel.dynamic_allocator.selection
+	default MCUX_COMPONENT_middleware.freertos-kernel.heap_4
+endchoice
+
+config MCUX_COMPONENT_middleware.freertos-kernel.cm33_non_trustzone
+    bool
+    default y
+
+# Framework defaults
+config gPlatformMonolithicApp_d
+	bool
+	default y
+
+config NVS_LOOKUP_CACHE
+	default y
+
+config NVS_LOOKUP_CACHE_SIZE
+	default 1024
+
+if CHIP_WIFI
+
+config WIFI_BOARD_RW610
+	bool
+	default y
+	help
+		No prefix in generated macro
+
+endif
+
+endif # CHIP_NXP_PLATFORM_RW61X

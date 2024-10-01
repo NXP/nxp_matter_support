@@ -1,0 +1,15 @@
+# Copyright 2024 NXP
+# SPDX-License-Identifier: BSD-3-Clause
+
+# The purpose of this file is to redefine default values of configurations used when building Matter applications.
+# This file only changes defaults, so all symbols here must be promptless.
+
+if CHIP_NXP_PLATFORM_RT1170
+
+# Add SDK dependencies required for RT1170
+config CHIP_SDK_DEPENDENCIES
+    # TODO : select here sdk components for rt1170
+
+# TODO : Add default values for RT1170 here
+
+endif # CHIP_NXP_PLATFORM_RT1170

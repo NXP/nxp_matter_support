@@ -1,0 +1,149 @@
+# Copyright 2024 NXP
+# SPDX-License-Identifier: BSD-3-Clause
+
+# The purpose of this file is to redefine default values of configurations used when building Matter applications.
+# This file only changes defaults, so all symbols here must be promptless.
+# This file is common to RT1060, RT1170, RW61X families.
+
+if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1170 || CHIP_NXP_PLATFORM_RT1060
+
+rsource "*/Kconfig.defconfig"
+
+config BOOTLOADER_MCUBOOT
+	bool
+	default y if CHIP_OTA_REQUESTOR
+
+config BUTTON_LONG_PRESS_THRESHOLD
+	default "500U"
+
+config BUTTON_LONG_PRESS_THRESHOLD
+	default "2000U"
+
+config SERIAL_MANAGER_TASK_STACK_SIZE
+	default "4048U"
+
+config SERIAL_MANAGER_TASK_HANDLE_RX_AVAILABLE_NOTIFY
+	bool
+	default y
+
+config SERIAL_MANAGER_RING_BUFFER_FLOWCONTROL
+	bool
+	default y
+
+config gMainThreadStackSize_c
+	default 4096
+
+config FSL_OSA_ALLOCATED_HEAP
+	default n
+
+config FSL_OSA_MAIN_FUNC_ENABLE
+	default n
+
+# FreeRTOS defaults
+config configTICK_RATE_HZ
+	default "(TickType_t) 1000"
+
+config configMAX_PRIORITIES
+	default 10
+
+config configRUN_FREERTOS_SECURE_ONLY
+	default y
+
+config configTIMER_QUEUE_LENGTH
+	default 10
+
+config configUSE_IDLE_HOOK
+	default y
+
+config configAPPLICATION_ALLOCATED_HEAP
+	default y
+
+config configCHECK_FOR_STACK_OVERFLOW
+	default y
+
+config configTIMER_TASK_PRIORITY
+	default "(configMAX_PRIORITIES - 3)"
+
+config configTOTAL_HEAP_SIZE
+	default "((size_t) (126 * 1024))"
+
+config configMINIMAL_STACK_SIZE
+	default "(uint16_t) 2048"
+
+config configTIMER_TASK_STACK_DEPTH
+	default 2048
+
+config configRECORD_STACK_HIGH_ADDRESS
+	default y
+
+config configINCLUDE_FREERTOS_TASK_C_ADDITIONS_H
+	default y
+
+config configUSE_TICK_HOOK
+	default y if CHIP_WIFI
+
+config configENABLE_FPU
+	default y
+
+config configMAX_TASK_NAME_LEN
+	default 16
+
+# BLE defaults
+if BT 
+
+config BT_DEVICE_NAME_GATT_WRITABLE
+	bool
+	default n
+
+config BT_MAX_CONN
+	default 1
+
+config BT_PERIPHERAL
+	bool
+	default y
+
+config BT_GATT_DYNAMIC_DB
+	bool
+	default y
+
+config BT_SMP
+	bool
+	default y
+
+config MCUX_PRJSEG_middleware.edgefast_bluetooth.storage
+	bool
+	default n
+
+config USB_DISK_ENABLE
+	bool
+	default n
+
+config USB_HOST_CONFIG_MSD
+	default 1
+
+config BT_HOST_CRYPTO
+	bool 
+	default y
+
+config BT_KEYS_OVERWRITE_OLDEST
+	bool
+	default y
+
+config BT_BUF_ACL_RX_SIZE
+	default 251
+
+config BT_L2CAP_TX_MTU
+	default 247
+
+config USB_HOST_CONFIG_EHCI
+	default 2
+
+config CONTROLLER_ID
+	default 2U
+
+config BT_DEVICE_NAME
+	default "\"NXP BLE test\""
+
+endif # BT
+
+endif # MCUX_HW_DEVICE_RW612 || MCUX_HW_DEVICE_RW610 || MCUX_HW_DEVICE_MIMXRT1171 || MCUX_HW_DEVICE_MIMXRT1172 || MCUX_HW_DEVICE_MIMXRT1173 || MCUX_HW_DEVICE_MIMXRT1175 || MCUX_HW_DEVICE_MIMXRT1176

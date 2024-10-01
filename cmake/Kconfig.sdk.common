@@ -1,0 +1,62 @@
+# Copyright 2024 NXP
+# SPDX-License-Identifier: BSD-3-Clause
+
+# The purpose of this file is to define NXP SDK dependencies required for Matter.
+
+if CHIP
+
+config CHIP_SDK_DEPENDENCIES
+    bool "Platform SDK dependencies for Matter protocol stack"
+	select MCUX_COMPONENT_component.osa
+	select MCUX_COMPONENT_component.osa_interface
+    select MCUX_COMPONENT_component.mem_manager
+    select MCUX_COMPONENT_component.messaging
+    select MCUX_COMPONENT_component.flash_adapter
+	select MCUX_COMPONENT_component.serial_manager
+	select MCUX_COMPONENT_component.serial_manager_uart
+	select MCUX_COMPONENT_component.software_rng_adapter
+	select MCUX_COMPONENT_utility.debug_console_lite
+	select MCUX_PRJSEG_utility.debug_console_transfer_non_blocking
+    select MCUX_COMPONENT_middleware.mbedtls
+	select MCUX_COMPONENT_middleware.freertos-kernel
+	select MCUX_COMPONENT_middleware.wireless.framework
+	select MCUX_COMPONENT_middleware.wireless.framework.function_lib
+	select NVS if CHIP_NVM_COMPONENT_NVS
+	select SETTINGS if CHIP_NVM_COMPONENT_NVS
+	select SETTINGS_RUNTIME if CHIP_NVM_COMPONENT_NVS
+	select MCUX_COMPONENT_middleware.wireless.framework.zephyr_port.nvs.stats if CHIP_NVM_COMPONENT_NVS
+	select MCUX_COMPONENT_middleware.littlefs if CHIP_NVM_COMPONENT_LITTLEFS
+	select CHIP_SDK_DEPENDENCIES_WIFI if CHIP_WIFI
+	select CHIP_SDK_DEPENDENCIES_BLE if BT
+	help
+        Enables the NXP SDK dependencies required for the Matter protocol stack to work.
+
+if CHIP_SDK_DEPENDENCIES
+
+config CHIP_SDK_DEPENDENCIES_WIFI
+	bool "SDK dependencies for Matter-over-WiFi protocol stack"
+	select MCUX_COMPONENT_middleware.wifi
+	select MCUX_COMPONENT_middleware.wifi.osa_free_rtos
+	select MCUX_COMPONENT_middleware.wifi.wifidriver
+	select MCUX_COMPONENT_middleware.wifi.net_free_rtos
+	select MCUX_COMPONENT_component.wifi_bt_module.config
+	select MCUX_COMPONENT_component.wifi_bt_module.tx_pwr_limits
+	select MCUX_COMPONENT_middleware.lwip
+	select MCUX_COMPONENT_middleware.lwip.apps.mdns
+	help
+		Enable SDK components required for NXP Wi-Fi support.
+
+config CHIP_SDK_DEPENDENCIES_BLE
+	bool "SDK dependencies for BLE"
+	select MCUX_COMPONENT_middleware.edgefast_bluetooth.porting
+	select MCUX_COMPONENT_middleware.edgefast_bluetooth.pal
+	select MCUX_COMPONENT_middleware.edgefast_bluetooth.pal.platform.ethermind
+	select MCUX_COMPONENT_middleware.edgefast_bluetooth.common.ethermind
+	select MCUX_COMPONENT_middleware.edgefast_bluetooth.btble.ethermind
+	select MCUX_COMPONENT_middleware.wireless.framework.platform.ble
+	help
+		Enable SDK components required for BLE support.
+
+endif # CHIP_SDK_DEPENDENCIES
+
+endif # CHIP

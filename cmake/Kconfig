@@ -1,0 +1,50 @@
+# Copyright 2024 NXP
+# SPDX-License-Identifier: BSD-3-Clause
+
+# The purpose of this file is to define common Kconfig for application configurations.
+
+if CHIP
+
+# Include SDK dependencies Kconfig
+rsource "Kconfig.sdk.common"
+
+config MATTER_APP_DEFAULT_BOARD_FILES
+    bool "Use default board files"
+    default y
+    help
+        If enabled, the default board files under "examples/platform" will be used.
+
+config REMOVE_SECTIONS_FROM_BIN
+	string "Sections to remove from the generated binary"
+	default "-R .NVM"
+	help
+		Define sections to remove from the generated binary of the application.
+
+config BOOTLOADER_MCUBOOT
+	bool "MCUBoot bootloader"
+	help
+		Use MCUBoot as the bootloader of the application.
+
+if BOOTLOADER_MCUBOOT
+
+config CHIP_MCUBOOT_SLOT_SIZE
+	hex "Slot size"
+	default 0x440000
+	help
+		The application slot size to communicate to the MCUBoot.
+
+config CHIP_MCUBOOT_MAX_SECTORS
+	int "Application max sectors"
+	default 1088
+	help
+		The maximum number of sectors comprised in the application slot.
+
+config CHIP_MCUBOOT_HEADER_SIZE
+	hex "Application header size"
+	default 0x1000
+	help
+		The header size of the application.
+
+endif # BOOTLOADER_MCUBOOT
+
+endif # CHIP
