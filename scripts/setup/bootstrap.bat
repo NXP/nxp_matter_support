@@ -59,7 +59,7 @@ if %ERRORLEVEL% NEQ 0 (
 
 set _BOOTSTRAP_NAME=%~n0
 set _CHIP_ROOT=%cd%
-set _CONFIG_FILE=%_CHIP_ROOT%\scripts\setup\environment.json
+set _CONFIG_FILE=%_CHIP_ROOT%\third_party\nxp\nxp_matter_support\scripts\setup\environment.json
 
 set PW_BRANDING_BANNER=%_CHIP_ROOT%\scripts\setup\banner.txt
 set PW_DOCTOR_SKIP_CIPD_CHECKS=1
@@ -69,9 +69,10 @@ set PW_ROOT=%PW_PROJECT_ROOT%\third_party\pigweed\repo
 :: Skip pw environment check for now. To be removed in the future.
 set PW_ACTIVATE_SKIP_CHECKS=1
 
-set _PIGWEED_CIPD_JSON=%PW_PROJECT_ROOT%/third_party/pigweed/repo/pw_env_setup/py/pw_env_setup/cipd_setup/pigweed.json
+set _PIGWEED_CIPD_JSON_ROOT=%PW_PROJECT_ROOT%\third_party\pigweed\repo\pw_env_setup\py\pw_env_setup\cipd_setup
 set _PW_ACTUAL_ENVIRONMENT_ROOT=%PW_ENVIRONMENT_ROOT%
 set _SETUP_BAT=%_PW_ACTUAL_ENVIRONMENT_ROOT%\activate.bat
+set NXP_SYSTEM_ROOT=C:\NXP
 
 :: Ensure a similar usage to bootstrap.sh for the --platform
 :: option. The only valid option is the 'nxp' platform, since
@@ -90,9 +91,17 @@ if "%_BOOTSTRAP_NAME%" == "bootstrap" (
 )
 
 if not exist "%_PW_ACTUAL_ENVIRONMENT_ROOT%" mkdir "%_PW_ACTUAL_ENVIRONMENT_ROOT%"
-set _GENERATED_PIGWEED_CIPD_JSON=%_PW_ACTUAL_ENVIRONMENT_ROOT%/pigweed.json
+set _GENERATED_PIGWEED_CIPD_JSON=%_PW_ACTUAL_ENVIRONMENT_ROOT%\pigweed.json
 
-call "%python%" "scripts/setup/gen_pigweed_cipd_json.py" -i "%_PIGWEED_CIPD_JSON%" -o "%_GENERATED_PIGWEED_CIPD_JSON%"
+:: To maintain backwards compatibility with older Matter versions,
+:: check if the extra arg file exists.
+set _PYTHON_CIPD_JSON="%_PIGWEED_CIPD_JSON_ROOT%\python311.json"
+if exist "%_PYTHON_CIPD_JSON%" (
+    set EXTRA_ARGS=-e windows:%_PYTHON_CIPD_JSON%
+) else (
+    set EXTRA_ARGS=
+)
+call "%python%" "scripts/setup/gen_pigweed_cipd_json.py" -i "%_PIGWEED_CIPD_JSON_ROOT%\pigweed.json" -o "%_GENERATED_PIGWEED_CIPD_JSON%" %EXTRA_ARGS%
 if %ERRORLEVEL% NEQ 0 goto finish
 
 if "%_BOOTSTRAP_NAME%" == "bootstrap" (
@@ -141,13 +150,20 @@ goto setup_sdk_paths
 :: work around the issue by creating symbolic links for the SDK paths.
 :: This is taken into account by NXP Matter build system.
 :setup_sdk_paths
-set NXP_SYSTEM_ROOT=C:\NXP
 if not exist "%NXP_SYSTEM_ROOT%\" (
     mkdir "%NXP_SYSTEM_ROOT%"
 )
-if not exist "%NXP_SYSTEM_ROOT%\sdk\" (
-    mklink /D "%NXP_SYSTEM_ROOT%\sdk" "%_CHIP_ROOT%\third_party\nxp\nxp_matter_support\github_sdk"
+goto create_sdk_symlink
+
+:: Create a separate step for this action. During bootstrap, it will be set to
+:: the current Matter repository SDK path. On the other hand, if activate is
+:: run inside another Matter repository, the old symlink will be removed and a
+:: new one will be created, which points to the current Matter SDK path.
+:create_sdk_symlink
+if exist "%NXP_SYSTEM_ROOT%\sdk\" (
+    rmdir "%NXP_SYSTEM_ROOT%\sdk\"
 )
+mklink /D "%NXP_SYSTEM_ROOT%\sdk" "%_CHIP_ROOT%\third_party\nxp\nxp_matter_support\github_sdk"
 goto pw_cleanup
 
 :pw_bootstrap
@@ -156,7 +172,6 @@ call "%python%" "%PW_ROOT%\pw_env_setup\py\pw_env_setup\env_setup.py" ^
     --shell-file "%_SETUP_BAT%" ^
     --install-dir "%_PW_ACTUAL_ENVIRONMENT_ROOT%" ^
     --config-file "%_CONFIG_FILE%" ^
-    --virtualenv-gn-out-dir "%_PW_ACTUAL_ENVIRONMENT_ROOT%\gn_out" ^
     --project-root "%PW_PROJECT_ROOT%" ^
     --additional-cipd-file "%_GENERATED_PIGWEED_CIPD_JSON%"
 if %ERRORLEVEL% NEQ 0 goto finish
@@ -167,7 +182,7 @@ call "%_SETUP_BAT%"
 if "%_BOOTSTRAP_NAME%" == "bootstrap" (
     goto install_additional_pip_requirements
 ) else (
-    goto pw_cleanup
+    goto create_sdk_symlink
 )
 
 :pw_cleanup
