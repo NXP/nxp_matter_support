@@ -36,7 +36,7 @@ manifest:
       path: repo/middleware/wireless/framework
     - name: wifi_nxp
       url: ssh://git@bitbucket.sw.nxp.com/mcucore/mcux-sdk-wifi-nxp.git
-      revision: 030ea66bb97f6cfe0c66f507901eb255eeacbf67
+      revision: d28f988a19297c68aa2525568c120deca5619645
       path: repo/middleware/wifi_nxp
     - name: mcux-sdk-middleware-ieee_802.15.4
       url: ssh://git@bitbucket.sw.nxp.com/mcucore/mcux-sdk-middleware-ieee_802.15.4.git
