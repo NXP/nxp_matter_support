@@ -428,6 +428,9 @@ template("rt_sdk") {
       "PRINTF_ADVANCED_ENABLE=1",
 
       "USB_HOST_CONFIG_EHCI=2",
+
+      #To be remove once the SDK 2.16.100 will be public
+      "SDK_2_16_100=1",
     ]
 
     if (nxp_nvm_component == "nvs"){
