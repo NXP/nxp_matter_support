@@ -107,19 +107,19 @@ middleware_sdk = {
     ]
   }
 
-  if (chip_key_storage == "fwk_nvm") {
+  if (nxp_nvm_component == "fwk_nvm") {
     middleware_include_dirs += [
       "${FRAMEWORK_DIR_PATH}/NVM/Source",
       "${FRAMEWORK_DIR_PATH}/NVM/Interface"
     ]
-  } else if (chip_key_storage == "littlefs") {
+  } else if (nxp_nvm_component == "littlefs") {
     middleware_include_dirs += [
       "${LITTLEFS_DIR_PATH}",
       "${FRAMEWORK_DIR_PATH}/FSAbstraction",
       "${FRAMEWORK_DIR_PATH}/FileCache",
       "${FRAMEWORK_DIR_PATH}/KeyStorage"
     ]
-  } else if (chip_key_storage == "nvs") {
+  } else if (nxp_nvm_component == "nvs") {
     middleware_include_dirs += [
       "${FRAMEWORK_DIR_PATH}/NVS/Interface",
       "${FRAMEWORK_DIR_PATH}/NVS/Interface/port",
@@ -188,14 +188,14 @@ middleware_sdk = {
     ]
   }
 
-  if (chip_key_storage == "littlefs") {
+  if (nxp_nvm_component == "littlefs") {
     middleware_defines += [
       "LFS_THREADSAFE",
       "LFS_NO_DEBUG",
       "LFS_NO_ERROR",
       "LFS_NO_WARN"
     ]
-  } else if (chip_key_storage == "nvs") {
+  } else if (nxp_nvm_component == "nvs") {
     middleware_defines += [
       "gAppNvsExternalFlash_c=0",
       "gAppNvsInternalFlash_c=1",
@@ -313,9 +313,9 @@ middleware_sdk = {
     ]
   }
 
-  if (chip_key_storage == "fwk_nvm") {
+  if (nxp_nvm_component == "fwk_nvm") {
     middleware_sources += [ "${FRAMEWORK_DIR_PATH}/NVM/Source/NV_Flash.c" ]
-  } else if (chip_key_storage == "littlefs") {
+  } else if (nxp_nvm_component == "littlefs") {
     middleware_sources += [
       "${LITTLEFS_DIR_PATH}/lfs.c",
       "${LITTLEFS_DIR_PATH}/lfs_util.c",
@@ -324,7 +324,7 @@ middleware_sdk = {
       "${FRAMEWORK_DIR_PATH}/FileCache/fwk_file_cache.c",
       "${FRAMEWORK_DIR_PATH}/KeyStorage/fwk_key_storage.c"
     ]
-  } else if (chip_key_storage == "nvs") {
+  } else if (nxp_nvm_component == "nvs") {
     middleware_sources += [
       "${FRAMEWORK_DIR_PATH}/NVS/Source/nvs.c",
       "${FRAMEWORK_DIR_PATH}/NVS/Source/crc8.c",

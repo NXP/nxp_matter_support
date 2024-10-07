@@ -28,35 +28,53 @@ declare_args() {
   # Defines the name of the nxp SDK target instance
   nxp_sdk_target = ""
 
-  # Enables target nxp_lwip. Used by RT platforms.
+  # Enables target nxp_lwip
   nxp_use_lwip = true
 
-  # Enables target nxp_mbedtls. Used by RT platforms.
+  # Enables target nxp_mbedtls
   nxp_use_mbedtls_port = true
 
   # Enables the support of the Matter CLI
-  chip_enable_matter_cli = false
+  nxp_enable_matter_cli = false
+
+  # Enables the support of the OT CLI
+  nxp_enable_ot_cli = false
 
   # Enables the support of factory data
-  chip_with_factory_data = 0
+  nxp_use_factory_data = false
 
-  # Enable DAC private key secure usage, chip_with_factory_data must be set to 1
-  chip_enable_secure_dac_private_key_storage = false
+  # Enable DAC private key secure usage, nxp_use_factory_data must be set to true
+  nxp_enable_secure_dac_private_key_storage = false
 
   # This mode allows to protect the matter factory dataset with a AES key protected in the secure element
-  chip_enable_secure_whole_factory_data = false
+  nxp_enable_secure_whole_factory_data = false
+
+  # Enable EdgeLock 2Go secure DAC key and certificate provisionning 
+  nxp_enable_secure_EL2GO_factory_data = false
+
+  # Enable OTA multi-image processor for factory data OTA
+  nxp_enable_ota_factory_data_processor = false
+
+  # Enable OTA multi-image processor for app OTA
+  nxp_enable_ota_firmware_processor = true
+
+  # Enable usage of plaintext DAC private key (not recommended)
+  nxp_use_plain_dac_key = false
 
   # Defines the NVM component supported
   nxp_nvm_component = "littlefs"
 
+  # Enable wear statistics for key storage
+  nxp_key_storage_wear_stats = false
+
   # Enables the auto pairing advertisement at boot
-  chip_enable_pairing_autostart = 1
+  nxp_enable_pairing_autostart = true
 
   # Indicates if the nxp SDK used has the SDK package format
-  is_sdk_package = false
+  nxp_is_sdk_package = false
 
   # Indicates if the nxp SDK used has the nxp SDK internal format
-  is_sdk_internal = false
+  nxp_is_sdk_internal = false
 
   # Enables to use external sdk. If set to true, this removes the dependency on nxp_sdk
   nxp_external_sdk = false
@@ -85,13 +103,31 @@ declare_args() {
   # Enable multiple BLE connections after commissioning feature.
   # This feature is platform specific and not standardized by Matter.
   nxp_multiple_ble_connections = false
+
+  # Enable app usage of SMU2
+  nxp_use_smu2_static = false
+
+  # Enable app usage of extra SMU2 after commissioning
+  nxp_use_smu2_dynamic = false
+
+  # Enable hardware acceleration of SHA256 operations
+  nxp_use_hw_sha256 = false
+
+  # Enable hardware acceleration of AES operations
+  nxp_use_hw_aes = false
+
+  # Enable adding SDK sources needed by apps with dimmable LED
+  nxp_config_dimmable_led = false
+
+  # Enable low power support
+  nxp_use_low_power = false
 }
 
 declare_args() {
   nxp_sdk_name = "${nxp_platform}_sdk"
 }
 
-if (is_sdk_package || getenv("NXP_SDK_ROOT") != "") {
+if (nxp_is_sdk_package || getenv("NXP_SDK_ROOT") != "") {
   nxp_sdk_root = getenv("NXP_SDK_ROOT")
 } else if (host_os == "win") {
   # On Windows, the bootstrap script creates a symbolic link to the

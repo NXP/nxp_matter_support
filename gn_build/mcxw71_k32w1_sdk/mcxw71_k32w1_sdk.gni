@@ -33,21 +33,12 @@ import("${chip_root}/examples/common/pigweed/pigweed_rpcs.gni")
 import("${nxp_sdk_build_root}/${nxp_sdk_name}/core_sdk.gni")
 import("${nxp_sdk_build_root}/${nxp_sdk_name}/middleware_sdk.gni")
 
-declare_args() {
-  use_smu2_static = false
-  use_smu2_dynamic = false
-  use_hw_sha256 = false
-  use_hw_aes = false
-  chip_config_dimmable_led = false
-  chip_enable_ota_factory_data_processor = 0
-}
-
 openthread_nxp_root = "${chip_root}/third_party/openthread/ot-nxp"
 
 assert(nxp_sdk_root != "", "nxp_sdk_root must be specified")
 
-assert(!((use_smu2_static && !chip_openthread_ftd) ||
-             (use_smu2_dynamic && !chip_openthread_ftd)),
+assert(!((nxp_use_smu2_static && !chip_openthread_ftd) ||
+         (nxp_use_smu2_dynamic && !chip_openthread_ftd)),
        "SMU2 can be used as system memory only with OT-FTD suppport")
 
 forward_variables_from(core_sdk, "*")
@@ -61,9 +52,9 @@ forward_variables_from(middleware_sdk, "*")
 template("${nxp_platform}_sdk") {
 
   assert(
-      chip_enable_ota_factory_data_processor == 0 ||
-          chip_with_factory_data == 1,
-      "Please set chip_with_factory_data=1 if using default factory data processor.")
+      nxp_enable_ota_factory_data_processor == false ||
+          nxp_use_factory_data,
+      "Please set nxp_use_factory_data=true if using default factory data processor.")
 
   sdk_target_name = target_name
 
@@ -94,7 +85,7 @@ template("${nxp_platform}_sdk") {
       ]
     }
 
-    if (chip_config_dimmable_led) {
+    if (nxp_config_dimmable_led) {
         _sdk_include_dirs += [
           "${COMPONENT_PWM_DIR_PATH}",
         ]
@@ -134,7 +125,7 @@ template("${nxp_platform}_sdk") {
       defines += [ "SERIAL_PORT_TYPE_UART=1" ]
     }
 
-    if (chip_with_low_power == 1 && chip_logging == true) {
+    if (nxp_use_low_power && chip_logging == true) {
       print(
           "WARNING: enabling logs in low power might break the LP timings. Use at your own risk!")
       print("WARNING: set chip_logging=false to disable logging.")
@@ -147,7 +138,7 @@ template("${nxp_platform}_sdk") {
       ]
     }
 
-    if (use_smu2_static) {
+    if (nxp_use_smu2_static) {
       defines += [
         "__STARTUP_CLEAR_SMU2",
         "USE_SMU2_AS_SYSTEM_MEMORY",
@@ -155,14 +146,14 @@ template("${nxp_platform}_sdk") {
       ]
     }
 
-    if (use_smu2_dynamic) {
+    if (nxp_use_smu2_dynamic) {
       defines += [
         "USE_SMU2_AS_SYSTEM_MEMORY",
         "USE_SMU2_DYNAMIC",
       ]
     }
 
-    if (chip_with_factory_data == 1) {
+    if (nxp_use_factory_data) {
       defines += [
         "CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA=1",
         # This should be deprecated and replaced with the above one
@@ -171,13 +162,13 @@ template("${nxp_platform}_sdk") {
       ]
     }
 
-    if (chip_enable_ota_factory_data_processor == 1) {
+    if (nxp_enable_ota_factory_data_processor) {
         defines += [ "CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR=1" ]
     }
 
-    if (chip_with_low_power == 1) {
+    if (nxp_use_low_power) {
       defines += [
-        "chip_with_low_power=1",
+        "nxp_use_low_power=1",
         "cPWR_UsePowerDownMode=1",
         "gAppLowpowerEnabled_d=1",
       ]
@@ -202,11 +193,11 @@ template("${nxp_platform}_sdk") {
       ]
     }
 
-    if (use_hw_sha256) {
+    if (nxp_use_hw_sha256) {
       defines += [ "USE_HW_SHA256" ]
     }
 
-    if (use_hw_aes) {
+    if (nxp_use_hw_aes) {
       defines += [ "USE_HW_AES" ]
     }
 
@@ -270,14 +261,14 @@ template("${nxp_platform}_sdk") {
         ]
       }
 
-    if (chip_config_dimmable_led) {
+    if (nxp_config_dimmable_led) {
         sources += [
           "${COMPONENT_PWM_DIR_PATH}/fsl_adapter_pwm_tpm.c",
           "${DRIVER_TPM_DIR_PATH}/fsl_tpm.c",
         ]
       }
 
-    if (chip_with_low_power == 1) {
+    if (nxp_use_low_power) {
       sources += []
     }
 

@@ -30,8 +30,6 @@ declare_args() {
   k32w0_sdk_root = getenv("NXP_K32W0_SDK_ROOT")
   chip_with_DK6 = true
   chip_with_OM15082 = 0
-  chip_with_ot_cli = 0
-  chip_with_low_power = 0
   build_for_k32w061 = 1
   build_for_k32w041am = 0
   build_for_k32w041a = 0
@@ -44,8 +42,6 @@ declare_args() {
   use_custom_factory_provider = 0
   chip_crypto_flavor = "NXP-Ultrafast-P256"
   chip_reduce_ssbl_size = false
-  chip_enable_ota_firmware_processor = 1
-  chip_enable_ota_factory_data_processor = 0
   chip_with_pdm_encryption = 1
   ota_custom_entry_address = "0x000C1000"
   use_antenna_diversity = 0
@@ -97,24 +93,24 @@ template("k32w0_sdk") {
   assert(chip_with_OM15082 == 0 || chip_with_DK6,
          "OM15082 expansion board is only supported on DK6 board")
   assert(
-      chip_with_low_power == 0 ||
-          (chip_with_low_power == 1 && chip_with_OM15082 == 0 &&
-               chip_with_ot_cli == 0 && chip_with_se05x == 0),
+      !nxp_use_low_power ||
+          (nxp_use_low_power && chip_with_OM15082 == 0 &&
+               !nxp_enable_ot_cli && chip_with_se05x == 0),
       "Please disable low power if expansion board, openthread CLI or SE is needed!")
 
   assert(
-      use_custom_factory_provider == 0 || chip_with_factory_data == 1,
-      "Please set chip_with_factory_data=1 if using custom factory provider.")
+      use_custom_factory_provider == 0 || nxp_use_factory_data,
+      "Please set nxp_use_factory_data=true if using custom factory provider.")
 
   assert(
-      chip_enable_ota_factory_data_processor == 0 ||
-          chip_enable_ota_firmware_processor == 1,
-      "Please set chip_enable_ota_firmware_processor=1 if using default factory data processor.")
+      !nxp_enable_ota_factory_data_processor ||
+          nxp_enable_ota_firmware_processor,
+      "Please set nxp_enable_ota_firmware_processor=true if using default factory data processor.")
 
   assert(
-      chip_enable_ota_factory_data_processor == 0 ||
-          chip_with_factory_data == 1,
-      "Please set chip_with_factory_data=1 if using default factory data processor.")
+      !nxp_enable_ota_factory_data_processor ||
+          nxp_use_factory_data,
+      "Please set nxp_use_factory_data=true if using default factory data processor.")
 
   if (build_for_k32w041am == 1 || build_for_k32w041a == 1 ||
       build_for_k32w041 == 1) {
@@ -163,31 +159,31 @@ template("k32w0_sdk") {
     CORE_PATH = "${k32w0_sdk_root}"
     EXAMPLES_PATH = "${k32w0_sdk_root}/boards"
   }
-  print("k32w0_sdk_root", k32w0_sdk_root)
-  print("chip_with_sdk_package", chip_with_sdk_package)
-  print("device:", device)
-  print("board:", board)
-  print("ntag:", chip_with_ntag)
-  print("increased TX power:", chip_with_high_power)
-  print("FRO32k: ", use_fro_32k)
-  print("low power: ", chip_with_low_power)
-  print("OTA default firmware processor: ", chip_enable_ota_firmware_processor)
-  print("OTA default factory data processor: ",
-        chip_enable_ota_factory_data_processor)
-  print("PDM Encryption: ", chip_with_pdm_encryption)
-  print("Antenna Diversity enabled: ", use_antenna_diversity)
+  print("------------- Matter config --------------")
+  print("- k32w0_sdk_root                      ", k32w0_sdk_root)
+  print("- Built with SDK package:             ", chip_with_sdk_package)
+  print("- device:                             ", device)
+  print("- board:                              ", board)
+  print("- ntag:                               ", chip_with_ntag)
+  print("- increased TX power:                 ", chip_with_high_power)
+  print("- FRO32k:                             ", use_fro_32k)
+  print("- low power:                          ", nxp_use_low_power)
+  print("- OTA default firmware processor:     ", nxp_enable_ota_firmware_processor)
+  print("- OTA default factory data processor: ",
+        nxp_enable_ota_factory_data_processor)
+  print("- PDM Encryption:                     ", chip_with_pdm_encryption)
+  print("- Antenna Diversity enabled:          ", use_antenna_diversity)
 
-  if (chip_with_low_power == 1 && chip_logging == true) {
+  if (chip_crypto == "platform") {
+    print("- ECC crypto lib:                   ", chip_crypto_flavor)
+  }
+
+  if (nxp_use_low_power && chip_logging) {
     print(
         "WARNING: enabling logs in low power might break the LP timings. Use at your own risk!")
     print("WARNING: set chip_logging=false to disable logging.")
   }
 
-  if (chip_crypto == "platform") {
-    print("ECC crypto lib: ", chip_crypto_flavor)
-  }
-
-  print("chip_with_sdk_package:", chip_with_sdk_package)
   device_lowercase = string_replace(board, "dk6", "")
 
   sdk_target_name = target_name
@@ -213,7 +209,7 @@ template("k32w0_sdk") {
     ]
 
     if (chip_with_DK6) {
-      if (chip_with_low_power != 0) {
+      if (nxp_use_low_power) {
         _sdk_include_dirs +=
             [ "${EXAMPLES_PATH}/${board}/wireless_examples/openthread/lped/bm" ]
       } else {
@@ -222,7 +218,7 @@ template("k32w0_sdk") {
       }
     }
 
-    if (chip_with_low_power != 0) {
+    if (nxp_use_low_power) {
       _sdk_include_dirs += [ "${EXAMPLES_PATH}/${board}/wireless_examples/hybrid/ble_ot/lped_ble_wuart/ble_802_15_4_common" ]
     }
 
@@ -398,7 +394,7 @@ template("k32w0_sdk") {
 
     # If OTA default processors are enabled, then OTA custom entry structure
     # will be saved in external flash: gOTACustomOtaEntryMemory=OTACustomStorage_ExtFlash (1)
-    if (chip_enable_ota_firmware_processor == 1) {
+    if (nxp_enable_ota_firmware_processor) {
       defines += [
         "gOTAAllowCustomStartAddress=1",
         "gOTAUseCustomOtaEntry=1",
@@ -406,7 +402,7 @@ template("k32w0_sdk") {
         "OTA_ENTRY_TOP_ADDR=${ota_custom_entry_address}",
       ]
 
-      if (chip_enable_ota_factory_data_processor == 1) {
+      if (nxp_enable_ota_factory_data_processor) {
         defines += [ "CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR=1" ]
       }
     }
@@ -487,7 +483,7 @@ template("k32w0_sdk") {
         ]
       }
 
-      if (chip_with_low_power == 0) {
+      if (!nxp_use_low_power) {
         defines += [
           "gLEDSupported_d=1",
           "gLEDsOnTargetBoardCnt_c=2",
@@ -496,13 +492,13 @@ template("k32w0_sdk") {
       }
     }
 
-    if (chip_with_ot_cli == 1) {
+    if (nxp_enable_ot_cli) {
       defines += [ "CHIP_DEVICE_CONFIG_THREAD_ENABLE_CLI=1" ]
     }
 
-    if (chip_with_low_power == 1) {
+    if (nxp_use_low_power) {
       defines += [
-        "chip_with_low_power=1",
+        "nxp_use_low_power=1",
         "cPWR_UsePowerDownMode=1",
         "cPWR_FullPowerDownMode=1",
         "DBG_PostStepTickAssess=0",
@@ -559,7 +555,7 @@ template("k32w0_sdk") {
       ]
     }
 
-    if (chip_with_factory_data == 1) {
+    if (nxp_use_factory_data) {
       defines += [ "CONFIG_CHIP_LOAD_REAL_FACTORY_DATA=1" ]
     }
 
@@ -739,7 +735,7 @@ template("k32w0_sdk") {
       }
     }
 
-    if (chip_with_low_power != 0) {
+    if (nxp_use_low_power) {
       sources += [ "${EXAMPLES_PATH}/${board}/wireless_examples/hybrid/ble_ot/lped_ble_wuart/ble_802_15_4_common/app_dual_mode_low_power.c" ]
     }
 

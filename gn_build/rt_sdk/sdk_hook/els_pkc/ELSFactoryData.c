@@ -725,3 +725,676 @@ exit:
     }
     return status;
 }
+
+static uint32_t get_uint32_val(const uint8_t * input)
+{
+    uint32_t output = 0U;
+    output          = *(input);
+    output <<= 8;
+    output |= *(input + 1);
+    output <<= 8;
+    output |= *(input + 2);
+    output <<= 8;
+    output |= *(input + 3);
+    return output;
+}
+
+static uint16_t get_uint16_val(const uint8_t * input)
+{
+    uint16_t output = 0U;
+    output          = *input;
+    output <<= 8;
+    output |= *(input + 1);
+    return output;
+}
+
+static status_t get_len(const unsigned char ** p, const unsigned char * end, size_t * len)
+{
+    status_t status = STATUS_SUCCESS;
+
+    ASSERT_OR_EXIT_MSG((end - *p) >= 1, "Issue in length encoding");
+
+    if ((**p & 0x80) == 0)
+        *len = *(*p)++;
+    else
+    {
+        switch (**p & 0x7F)
+        {
+        case 1:
+            ASSERT_OR_EXIT_MSG((end - *p) >= 2, "Issue in length encoding");
+            *len = (*p)[1];
+            (*p) += 2;
+            break;
+
+        case 2:
+            ASSERT_OR_EXIT_MSG((end - *p) >= 3, "Issue in length encoding");
+
+            *len = ((size_t) (*p)[1] << 8) | (*p)[2];
+            (*p) += 3;
+            break;
+
+        case 3:
+            ASSERT_OR_EXIT_MSG((end - *p) >= 4, "Issue in length encoding");
+
+            *len = ((size_t) (*p)[1] << 16) | ((size_t) (*p)[2] << 8) | (*p)[3];
+            (*p) += 4;
+            break;
+
+        case 4:
+            ASSERT_OR_EXIT_MSG((end - *p) >= 5, "Issue in length encoding");
+
+            *len = ((size_t) (*p)[1] << 24) | ((size_t) (*p)[2] << 16) | ((size_t) (*p)[3] << 8) | (*p)[4];
+            (*p) += 5;
+            break;
+
+        default:
+            status = STATUS_ERROR_GENERIC;
+            goto exit;
+        }
+    }
+
+    ASSERT_OR_EXIT_MSG(*len <= (size_t) (end - *p), "Issue in calculated length");
+exit:
+    return status;
+}
+
+static status_t get_tag(const unsigned char ** p, const unsigned char * end, size_t * len, int tag)
+{
+    status_t status = STATUS_SUCCESS;
+
+    ASSERT_OR_EXIT_MSG((end - *p) >= 1, "Issue in ltag encoding");
+    ASSERT_OR_EXIT_MSG(**p == tag, "Issue in tag encoding");
+
+    (*p)++;
+
+    status = get_len(p, end, len);
+exit:
+    return status;
+}
+
+static size_t get_len_custom(const unsigned char * p)
+{
+    size_t len = 0U;
+    size_t i   = 0U;
+
+    while (i <= MAX_TLV_BYTE_LENGTH)
+    {
+        if (p + i == NULL)
+            return 0;
+        i++;
+    }
+
+    if ((*p & 0x80) == 0U)
+        len = ((size_t) *p + 1);
+    else
+    {
+        switch (*p & 0x7F)
+        {
+        case 1:
+            len = p[1];
+            len += 2;
+            break;
+        case 2:
+            len = ((size_t) p[1] << 8) | p[2];
+            len += 3;
+            break;
+        case 3:
+            len = ((size_t) p[1] << 16) | ((size_t) p[2] << 8) | p[3];
+            len += 4;
+            break;
+        case 4:
+            len = ((size_t) p[1] << 24) | ((size_t) p[2] << 16) | ((size_t) p[3] << 8) | p[4];
+            len += 5;
+            break;
+        default:
+            len = 0;
+        }
+    }
+
+    return len;
+}
+
+static bool is_blob_magic(const uint8_t * ptr, const uint8_t * end)
+{
+    if (ptr + MAGIC_TLV_SIZE >= end)
+        return false;
+
+    // The magic TLV is 104 bits long, sufficient to not randomly appear inside the blob (for practical purposes)
+    return get_uint32_val(ptr) == MAGIC_TLV_1 && get_uint32_val(ptr + 4) == MAGIC_TLV_2 && get_uint32_val(ptr + 8) == MAGIC_TLV_3 &&
+        *(ptr + 12) == MAGIC_TLV_4;
+}
+
+static size_t calc_blob_size(uint8_t * blob_ptr)
+{
+    size_t blob_size = 0U;
+    size_t tlv_size  = 0U;
+
+    uint8_t tag = 0U;
+
+    while (1)
+    {
+        tag = *blob_ptr;
+        switch (tag)
+        {
+        case TAG_MAGIC:
+            tlv_size = get_len_custom(blob_ptr + 1) + 1;
+            blob_ptr += tlv_size;
+            break;
+        case TAG_KEY_ID:
+            tlv_size = get_len_custom(blob_ptr + 1) + 1;
+            blob_ptr += tlv_size;
+            break;
+        case TAG_PSA_PERMITTED_ALGORITHM:
+            tlv_size = get_len_custom(blob_ptr + 1) + 1;
+            blob_ptr += tlv_size;
+            break;
+        case TAG_PSA_USAGE:
+            tlv_size = get_len_custom(blob_ptr + 1) + 1;
+            blob_ptr += tlv_size;
+            break;
+        case TAG_PSA_KEY_TYPE:
+            tlv_size = get_len_custom(blob_ptr + 1) + 1;
+            blob_ptr += tlv_size;
+            break;
+        case TAG_PSA_KEY_BITS:
+            tlv_size = get_len_custom(blob_ptr + 1) + 1;
+            blob_ptr += tlv_size;
+            break;
+        case TAG_PSA_KEY_LIFETIME:
+            tlv_size = get_len_custom(blob_ptr + 1) + 1;
+            blob_ptr += tlv_size;
+            break;
+        case TAG_PSA_DEVICE_LIFECYLE:
+            tlv_size = get_len_custom(blob_ptr + 1) + 1;
+            blob_ptr += tlv_size;
+            break;
+        case TAG_WRAPPING_KEY_ID:
+            tlv_size = get_len_custom(blob_ptr + 1) + 1;
+            blob_ptr += tlv_size;
+            break;
+        case TAG_WRAPPING_ALGORITHM:
+            tlv_size = get_len_custom(blob_ptr + 1) + 1;
+            blob_ptr += tlv_size;
+            break;
+        case TAG_IV:
+            tlv_size = get_len_custom(blob_ptr + 1) + 1;
+            blob_ptr += tlv_size;
+            break;
+        case TAG_SIGNATURE_KEY_ID:
+            tlv_size = get_len_custom(blob_ptr + 1) + 1;
+            blob_ptr += tlv_size;
+            break;
+        case TAG_SIGNATURE_ALGORITHM:
+            tlv_size = get_len_custom(blob_ptr + 1) + 1;
+            blob_ptr += tlv_size;
+            break;
+        case TAG_PLAIN:
+            tlv_size = get_len_custom(blob_ptr + 1) + 1;
+            blob_ptr += tlv_size;
+            break;
+        case TAG_SIGNATURE:
+            tlv_size = get_len_custom(blob_ptr + 1) + 1;
+            blob_size += tlv_size;
+            return blob_size;
+        default:
+            return 0U;
+        }
+        blob_size += tlv_size;
+    }
+}
+
+static status_t parse_blob(const uint8_t * blob, size_t blob_size, blob_context_t * blob_ctx)
+{
+    status_t status = STATUS_SUCCESS;
+
+    uint8_t tag     = 0U; // the tag of the current TLV
+    size_t blob_len = 0U; // the length of the current TLV
+
+    const uint8_t * blob_ptr = NULL;
+    const uint8_t * end      = NULL;
+
+    ASSERT_OR_EXIT_MSG(blob != NULL, "blob address is NULL");
+    ASSERT_OR_EXIT_MSG(blob_ctx != NULL, "blob_ctx address is NULL");
+
+    memset(blob_ctx, 0, sizeof(blob_context_t));
+
+    blob_ptr = blob;
+    end      = blob_ptr + blob_size;
+
+    while ((blob_ptr + 1) < end)
+    {
+        tag    = *blob_ptr;
+        status = get_tag(&blob_ptr, end, &blob_len, tag);
+        STATUS_SUCCESS_OR_EXIT_MSG("Issue in getting the tag: 0x%08x", status);
+
+        switch (tag)
+        {
+        case TAG_MAGIC:
+            blob_ctx->magic      = blob_ptr;
+            blob_ctx->magic_size = blob_len;
+            break;
+        case TAG_KEY_ID:
+            blob_ctx->key_id = get_uint32_val(blob_ptr);
+            break;
+        case TAG_PSA_PERMITTED_ALGORITHM:
+            blob_ctx->psa_permitted_algorithm = get_uint32_val(blob_ptr);
+            break;
+        case TAG_PSA_USAGE:
+            blob_ctx->psa_usage = get_uint32_val(blob_ptr);
+            break;
+        case TAG_PSA_KEY_TYPE:
+            blob_ctx->psa_key_type = get_uint16_val(blob_ptr);
+            break;
+        case TAG_PSA_KEY_BITS:
+            blob_ctx->psa_key_bits = get_uint32_val(blob_ptr);
+            break;
+        case TAG_PSA_KEY_LIFETIME:
+            blob_ctx->psa_key_lifetime = get_uint32_val(blob_ptr);
+            break;
+        case TAG_PSA_DEVICE_LIFECYLE:
+            blob_ctx->psa_device_lifecycle = get_uint32_val(blob_ptr);
+            break;
+        case TAG_WRAPPING_KEY_ID:
+            blob_ctx->wrapping_key_id = get_uint32_val(blob_ptr);
+            break;
+        case TAG_WRAPPING_ALGORITHM:
+            blob_ctx->wrapping_algorithm = get_uint32_val(blob_ptr);
+            break;
+        case TAG_IV:
+            blob_ctx->iv = blob_ptr;
+            break;
+        case TAG_SIGNATURE_KEY_ID:
+            blob_ctx->signature_key_id = get_uint32_val(blob_ptr);
+            break;
+        case TAG_SIGNATURE_ALGORITHM:
+            blob_ctx->signature_algorithm = get_uint32_val(blob_ptr);
+            break;
+        case TAG_PLAIN:
+            blob_ctx->plain_blob      = blob_ptr;
+            blob_ctx->plain_blob_size = blob_len;
+            break;
+        case TAG_SIGNATURE:
+            blob_ctx->signature      = blob_ptr;
+            blob_ctx->signature_size = blob_len;
+            break;
+        default:
+            break;
+        }
+        blob_ptr += blob_len;
+    }
+exit:
+    return status;
+}
+
+status_t read_el2go_blob(const uint8_t * blob_area, size_t blob_area_size, size_t object_id, uint8_t * blob, size_t blob_size,
+                         size_t * blob_length)
+{
+    status_t status         = STATUS_SUCCESS;
+    uint8_t * blob_start    = NULL;
+    bool object_id_match    = false;
+    blob_context_t blob_ctx = { 0U };
+
+    ASSERT_OR_EXIT_MSG(blob_area != NULL, "blob_area address is NULL");
+    ASSERT_OR_EXIT_MSG(blob != NULL, "blob address is NULL");
+    ASSERT_OR_EXIT_MSG(blob_length != NULL, "blob_length address is NULL");
+
+    const uint8_t * blob_area_end = blob_area + blob_area_size;
+
+    // the blob area should start with an EL2GO blob
+    ASSERT_OR_EXIT_MSG(is_blob_magic(blob_area, blob_area_end), "No blob present in the blob area");
+
+    uint8_t * blob_ptr = (uint8_t *) blob_area;
+
+    do
+    {
+        blob_start = blob_ptr;
+        do
+        {
+            blob_ptr++;
+        } while (!is_blob_magic(blob_ptr, blob_area_end) && blob_ptr < blob_area_end);
+
+        // This will be longer than the actual blob size for the last blob (handled by the blob parser)
+        *blob_length = calc_blob_size(blob_start);
+        status       = parse_blob(blob_start, *blob_length, &blob_ctx);
+        STATUS_SUCCESS_OR_EXIT_MSG("Issue in parsing the blob: 0x%08x", status);
+
+        if (object_id == blob_ctx.key_id)
+        {
+            object_id_match = true;
+            break;
+        }
+    } while (blob_ptr < blob_area_end);
+
+    ASSERT_OR_EXIT_MSG(object_id_match == true, "Object id not found");
+    ASSERT_OR_EXIT_MSG(*blob_length <= blob_size, "Blob size exceeds the maximum allowed size");
+    memset(blob, 0, blob_size);
+    memcpy(blob, blob_start, *blob_length);
+exit:
+    return status;
+}
+
+static status_t cmac_verify(const uint8_t * data, size_t data_size, mcuxClEls_KeyIndex_t key_index, uint8_t * pCmac)
+{
+    mcuxClEls_CmacOption_t options;
+    options.bits.initialize = MCUXCLELS_CMAC_INITIALIZE_ENABLE;
+    options.bits.finalize   = MCUXCLELS_CMAC_FINALIZE_ENABLE;
+    options.bits.extkey     = MCUXCLELS_CMAC_EXTERNAL_KEY_DISABLE;
+
+    MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(result, token, mcuxClEls_Cmac_Async(options, key_index, NULL, 0, data, data_size, pCmac));
+    if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_Cmac_Async) != token) || (MCUXCLELS_STATUS_OK_WAIT != result))
+    {
+        PLOG_ERROR("mcuxClEls_Cmac_Async failed: 0x%x\r\n", result);
+        return STATUS_ERROR_GENERIC;
+    }
+    MCUX_CSSL_FP_FUNCTION_CALL_END();
+
+    MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(result, token, mcuxClEls_WaitForOperation(MCUXCLELS_ERROR_FLAGS_CLEAR));
+    if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_WaitForOperation) != token) || (MCUXCLELS_STATUS_OK != result))
+    {
+        PLOG_ERROR("mcuxClEls_Cmac_Async LimitedWaitForOperation failed: 0x%x", result);
+        return STATUS_ERROR_GENERIC;
+    }
+    MCUX_CSSL_FP_FUNCTION_CALL_END();
+
+    return STATUS_SUCCESS;
+}
+
+static status_t pad_iso7816d4(uint8_t * data, size_t unpadded_length, size_t blocksize, size_t * padded_length)
+{
+    status_t status = STATUS_SUCCESS;
+    ASSERT_OR_EXIT_MSG(data != NULL, "data is NULL");
+    ASSERT_OR_EXIT_MSG(padded_length != NULL, "padded_length is NULL");
+    *padded_length        = ((unpadded_length + blocksize) / blocksize) * blocksize;
+    data[unpadded_length] = 0x80U;
+    memset(&data[unpadded_length + 1], 0, *padded_length - (unpadded_length + 1));
+
+exit:
+    return status;
+}
+
+static status_t verify_blob(const uint8_t * blob, size_t blob_size)
+{
+    status_t status                         = STATUS_SUCCESS;
+    size_t blob_to_be_signed_length         = 0U;
+    uint8_t cmac[CMAC_BLOCK_SIZE]           = { 0U };
+    uint8_t blob_signature[CMAC_BLOCK_SIZE] = { 0U };
+    uint8_t * blob_to_be_signed             = NULL;
+
+    ASSERT_OR_EXIT_MSG(blob != NULL, "blob is NULL");
+
+    memcpy(blob_signature, (blob + blob_size - CMAC_BLOCK_SIZE), CMAC_BLOCK_SIZE);
+
+    blob_to_be_signed = calloc(1, blob_size);
+    blob_size         = blob_size - CMAC_BLOCK_SIZE;
+
+    memcpy(blob_to_be_signed, blob, blob_size);
+
+    status = pad_iso7816d4(blob_to_be_signed, blob_size, CMAC_BLOCK_SIZE, &blob_to_be_signed_length);
+    STATUS_SUCCESS_OR_EXIT_MSG("pad_iso7816d4 failed: 0x%08x", status);
+
+    // Attention, CSS expects size before padding
+    status = cmac_verify(blob_to_be_signed, blob_size, EL2GOIMPORT_AUTH_SK_ID, cmac);
+    STATUS_SUCCESS_OR_EXIT_MSG("pad_iso7816d4 failed: 0x%08x", status);
+
+    for (size_t i = 0; i < CMAC_BLOCK_SIZE; i++)
+    {
+        if (blob_signature[i] != cmac[i])
+        {
+            status = STATUS_ERROR_GENERIC;
+            PLOG_ERROR("#### Blob signature does not match");
+            goto exit;
+        }
+    }
+exit:
+    free(blob_to_be_signed);
+    return status;
+}
+
+static status_t derive_aes_key(mcuxClEls_KeyIndex_t parent_key_idx, mcuxClEls_KeyIndex_t key_idx, uint8_t * derivation_data,
+                               mcuxClEls_KeyProp_t key_properties)
+{
+    MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(result, token,
+                                     mcuxClEls_Ckdf_Sp800108_Async(parent_key_idx, key_idx, key_properties, derivation_data));
+
+    if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_Ckdf_Sp800108_Async) != token) || (MCUXCLELS_STATUS_OK_WAIT != result))
+    {
+        PLOG_ERROR("mcuxClEls_Ckdf_Sp800108_Async failed: 0x%08x\r\n", result);
+        return STATUS_ERROR_GENERIC;
+    }
+    MCUX_CSSL_FP_FUNCTION_CALL_END();
+
+    MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(result, token, mcuxClEls_WaitForOperation(MCUXCLELS_ERROR_FLAGS_CLEAR));
+    if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_WaitForOperation) != token) || (MCUXCLELS_STATUS_OK != result))
+    {
+        PLOG_ERROR("mcuxClEls_WaitForOperation failed: 0x%08x\r\n", result);
+        return STATUS_ERROR_GENERIC;
+    }
+    MCUX_CSSL_FP_FUNCTION_CALL_END();
+    return STATUS_SUCCESS;
+}
+
+static status_t derive_el2go_die_keys()
+{
+    status_t status                                = STATUS_SUCCESS;
+    mcuxClEls_KeyIndex_t el2gooem_mk_sk_idx        = 4U;
+    mcuxClEls_KeyIndex_t el2goimport_auth_sk_idx   = 16U;
+    mcuxClEls_KeyIndex_t el2goimporttfm_kek_sk_idx = 18U;
+    PLOG_INFO("#### derive_el2go_die_keys");
+
+    mcuxClEls_KeyProp_t el2goimport_kek_sk_prop = { 0 };
+
+    el2goimport_kek_sk_prop.bits.upprot_priv = MCUXCLELS_KEYPROPERTY_PRIVILEGED_TRUE;
+    el2goimport_kek_sk_prop.bits.upprot_sec  = MCUXCLELS_KEYPROPERTY_SECURE_TRUE;
+    el2goimport_kek_sk_prop.bits.kactv       = MCUXCLELS_KEYPROPERTY_ACTIVE_TRUE;
+    el2goimport_kek_sk_prop.bits.ksize       = MCUXCLELS_KEYPROPERTY_KEY_SIZE_256;
+    el2goimport_kek_sk_prop.bits.ukuok       = MCUXCLELS_KEYPROPERTY_KUOK_TRUE;
+
+    uint8_t el2goimport_kek_sk_dd[12] = { 0x00, 0x65, 0x32, 0x67, 0x69, 0x6b, 0x65, 0x6b, 0x5f, 0x73, 0x6b, 0x00 };
+
+    status = derive_aes_key(EL2GOOEM_MK_SK_ID, EL2GOIMPORT_KEK_SK_ID, el2goimport_kek_sk_dd, el2goimport_kek_sk_prop);
+    STATUS_SUCCESS_OR_EXIT_MSG("Derivation of el2goimport_kek failed", status);
+
+    mcuxClEls_KeyProp_t el2goimporttfm_kek_sk_prop = { 0 };
+
+    el2goimporttfm_kek_sk_prop.bits.upprot_priv = MCUXCLELS_KEYPROPERTY_PRIVILEGED_TRUE;
+    el2goimporttfm_kek_sk_prop.bits.upprot_sec  = MCUXCLELS_KEYPROPERTY_SECURE_TRUE;
+    el2goimporttfm_kek_sk_prop.bits.kactv       = MCUXCLELS_KEYPROPERTY_ACTIVE_TRUE;
+    el2goimporttfm_kek_sk_prop.bits.ksize       = MCUXCLELS_KEYPROPERTY_KEY_SIZE_256;
+    el2goimporttfm_kek_sk_prop.bits.uaes        = MCUXCLELS_KEYPROPERTY_AES_TRUE;
+
+    uint8_t el2goimporttfm_kek_sk_dd[12] = { 0x00, 0x65, 0x32, 0x67, 0x69, 0x74, 0x66, 0x6d, 0x5f, 0x73, 0x6b, 0x00 };
+
+    status = derive_aes_key(EL2GOOEM_MK_SK_ID, EL2GOIMPORTTFM_KEK_SK_ID, el2goimporttfm_kek_sk_dd, el2goimporttfm_kek_sk_prop);
+    STATUS_SUCCESS_OR_EXIT_MSG("Derivation of el2goimporttfm_kek failed", status);
+
+    mcuxClEls_KeyProp_t el2goimport_auth_sk_prop = { 0 };
+
+    el2goimport_auth_sk_prop.bits.upprot_priv = MCUXCLELS_KEYPROPERTY_PRIVILEGED_TRUE;
+    el2goimport_auth_sk_prop.bits.upprot_sec  = MCUXCLELS_KEYPROPERTY_SECURE_TRUE;
+    el2goimport_auth_sk_prop.bits.kactv       = MCUXCLELS_KEYPROPERTY_ACTIVE_TRUE;
+    el2goimport_auth_sk_prop.bits.ksize       = MCUXCLELS_KEYPROPERTY_KEY_SIZE_256;
+    el2goimport_auth_sk_prop.bits.ucmac       = MCUXCLELS_KEYPROPERTY_CMAC_TRUE;
+
+    uint8_t el2goimport_auth_sk_dd[12] = { 0x00, 0x65, 0x32, 0x67, 0x69, 0x61, 0x75, 0x74, 0x5f, 0x73, 0x6b, 0x00 };
+
+    status = derive_aes_key(EL2GOOEM_MK_SK_ID, EL2GOIMPORT_AUTH_SK_ID, el2goimport_auth_sk_dd, el2goimport_auth_sk_prop);
+    STATUS_SUCCESS_OR_EXIT_MSG("Derivation of el2goimport_auth failed", status);
+exit:
+    return status;
+}
+
+static status_t delete_el2go_die_keys()
+{
+    status_t status = STATUS_SUCCESS;
+
+    status = els_delete_key(EL2GOIMPORT_KEK_SK_ID);
+    STATUS_SUCCESS_OR_EXIT_MSG("Deletion of el2goimport_kek failed", status);
+
+    status = els_delete_key(EL2GOIMPORTTFM_KEK_SK_ID);
+    STATUS_SUCCESS_OR_EXIT_MSG("Deletion of el2goimporttfm_kek failed", status);
+
+    status = els_delete_key(EL2GOIMPORT_AUTH_SK_ID);
+    STATUS_SUCCESS_OR_EXIT_MSG("Deletion of el2goimport_auth failed", status);
+
+exit:
+    return status;
+}
+
+status_t import_el2go_key_in_els(const uint8_t * blob, size_t blob_size, mcuxClEls_KeyIndex_t * key_index)
+{
+    status_t status          = STATUS_SUCCESS;
+    const uint8_t * els_blob = NULL;
+    size_t els_blob_size     = 0U;
+    PLOG_INFO("#### import_el2go_blob_in_els");
+
+    ASSERT_OR_EXIT_MSG(blob != NULL, "blob is NULL");
+    ASSERT_OR_EXIT_MSG(key_index != NULL, "key_index is NULL");
+
+    status = derive_el2go_die_keys();
+    STATUS_SUCCESS_OR_EXIT_MSG("derive_el2go_die_keys failed: 0x%08x", status);
+
+    status = verify_blob(blob, blob_size);
+    STATUS_SUCCESS_OR_EXIT_MSG("verify_blob failed: 0x%08x", status);
+
+    blob_context_t blob_ctx = { 0U };
+    status                  = parse_blob(blob, blob_size, &blob_ctx);
+    STATUS_SUCCESS_OR_EXIT_MSG("parse_blob failed: 0x%08x", status);
+
+    mcuxClEls_KeyProp_t key_prop = { .word = { .value = MCUXCLELS_KEYPROPERTY_VALUE_SECURE |
+                                                   MCUXCLELS_KEYPROPERTY_VALUE_PRIVILEGED | MCUXCLELS_KEYPROPERTY_VALUE_ECSGN } };
+    status = els_import_key(blob_ctx.plain_blob, blob_ctx.plain_blob_size, key_prop, EL2GOIMPORT_KEK_SK_ID, key_index);
+    STATUS_SUCCESS_OR_EXIT_MSG("delete_el2go_die_keys failed: 0x%08x", status);
+
+    status = delete_el2go_die_keys();
+    STATUS_SUCCESS_OR_EXIT_MSG("delete_el2go_die_keys failed: 0x%08x", status);
+
+exit:
+    return status;
+}
+
+static status_t export_public_key_from_cert(const uint8_t * cert, size_t cert_size, uint8_t * public_key, size_t public_key_size,
+                                            size_t * public_key_length)
+{
+    status_t status = STATUS_SUCCESS;
+    int mbedtls_status;
+    mbedtls_x509_crt client_cert                       = { 0 };
+    char outBuf[128]                                   = { '\0' };
+    uint8_t temp_buf[MBEDTLS_PK_ECP_PUB_DER_MAX_BYTES] = { 0U };
+
+    mbedtls_x509_crt_init(&client_cert);
+
+    ASSERT_OR_EXIT_MSG(cert != NULL, "cert is NULL");
+    ASSERT_OR_EXIT_MSG(public_key != NULL, "public_key is NULL");
+    ASSERT_OR_EXIT_MSG(public_key_length != NULL, "public_key_length is NULL");
+
+    mbedtls_status = mbedtls_x509_crt_parse_der(&client_cert, cert, cert_size);
+    ASSERT_OR_EXIT_MSG(mbedtls_status == 0, "Error in parsing the client certificate");
+
+    uint8_t * ptr = temp_buf + sizeof(temp_buf);
+    int len       = mbedtls_pk_write_pubkey(&ptr, temp_buf, &client_cert.pk);
+
+    ASSERT_OR_EXIT_MSG(len >= 0, "Issue in size of extracted public key");
+    *public_key_length = len - 1;
+    ASSERT_OR_EXIT_MSG(*public_key_length <= public_key_size, "Issue in size of extracted public key");
+
+    memcpy(public_key, ptr + 1, *public_key_length);
+exit:
+    mbedtls_x509_crt_free(&client_cert);
+    return status;
+}
+
+static status_t unpad_iso7816d4(uint8_t * data, size_t * data_size)
+{
+    status_t status = STATUS_SUCCESS;
+    ASSERT_OR_EXIT_MSG(data_size != NULL, "data_size is NULL");
+    ASSERT_OR_EXIT_MSG(*data_size > 0u, "data_size lower then 0");
+
+    uint32_t count = *data_size - 1u;
+    while (count > 0u && data[count] == 0u)
+    {
+        count--;
+    }
+
+    ASSERT_OR_EXIT_MSG(data[count] == 0x80u, "Pad block corrupted");
+
+    *data_size -= *data_size - count;
+
+exit:
+    return status;
+}
+
+static status_t decrypt_external_blob(const uint8_t * enc_data, size_t enc_data_size, mcuxClEls_KeyIndex_t tfmKekKeyIdx,
+                                      const uint8_t * iv, uint8_t * plain_data, size_t * plain_data_size)
+{
+    status_t status                         = STATUS_SUCCESS;
+    mcuxClEls_CipherOption_t cipher_options = { 0U };
+    cipher_options.bits.dcrpt               = MCUXCLELS_CIPHER_DECRYPT;
+    cipher_options.bits.cphmde              = MCUXCLELS_CIPHERPARAM_ALGORITHM_AES_CBC;
+    cipher_options.bits.cphsie              = MCUXCLELS_CIPHER_STATE_IN_DISABLE;
+    cipher_options.bits.cphsoe              = MCUXCLELS_CIPHER_STATE_OUT_DISABLE;
+    cipher_options.bits.extkey              = MCUXCLELS_CIPHER_INTERNAL_KEY;
+
+    // We use CSS in a mode where it will not output its state, so casting away
+    // the const is safe here.
+    uint8_t * state = (uint8_t *) iv;
+    MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(
+        result, token,
+        mcuxClEls_Cipher_Async(cipher_options, tfmKekKeyIdx, NULL, (size_t) 0u, enc_data, enc_data_size, state, plain_data));
+
+    if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_Cipher_Async) != token) || (MCUXCLELS_STATUS_OK_WAIT != result))
+    {
+        PLOG_ERROR("mcuxClEls_Cipher_Async failed: 0x%x\r\n", result);
+        return STATUS_ERROR_GENERIC;
+    }
+    MCUX_CSSL_FP_FUNCTION_CALL_END();
+
+    MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(result, token, mcuxClEls_WaitForOperation(MCUXCLELS_ERROR_FLAGS_CLEAR));
+    if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_WaitForOperation) != token) || (MCUXCLELS_STATUS_OK != result))
+    {
+        PLOG_ERROR("mcuxClEls_Cipher_Async LimitedWaitForOperation failed: 0x%x", result);
+        return STATUS_ERROR_GENERIC;
+    }
+    MCUX_CSSL_FP_FUNCTION_CALL_END();
+
+    *plain_data_size = enc_data_size;
+    status           = unpad_iso7816d4(plain_data, plain_data_size);
+    if (status != kStatus_Success)
+    {
+        PLOG_ERROR("Error,  unpad_iso7816d4 failed\r\n");
+        return STATUS_ERROR_GENERIC;
+    }
+
+    return status;
+}
+
+status_t decrypt_el2go_cert_blob(const uint8_t * blob, size_t blob_size, uint8_t * cert, size_t cert_size, size_t * cert_length)
+{
+    status_t status = STATUS_SUCCESS;
+
+    PLOG_INFO("#### decrypt_el2go_cert_blob");
+
+    ASSERT_OR_EXIT_MSG(blob != NULL, "blob is NULL");
+    ASSERT_OR_EXIT_MSG(cert != NULL, "cert is NULL");
+    ASSERT_OR_EXIT_MSG(cert_length != NULL, "cert_length is NULL");
+
+    status = derive_el2go_die_keys();
+    STATUS_SUCCESS_OR_EXIT_MSG("derive_el2go_die_keys failed: 0x%08x", status);
+
+    status = verify_blob(blob, blob_size);
+    STATUS_SUCCESS_OR_EXIT_MSG("verify_blob failed: 0x%08x", status);
+
+    blob_context_t blob_ctx = { 0U };
+    status                  = parse_blob(blob, blob_size, &blob_ctx);
+    STATUS_SUCCESS_OR_EXIT_MSG("parse_blob failed: 0x%08x", status);
+
+    *cert_length = cert_size;
+    status       = decrypt_external_blob(blob_ctx.plain_blob, blob_ctx.plain_blob_size, EL2GOIMPORTTFM_KEK_SK_ID, blob_ctx.iv, cert,
+                                         cert_length);
+    STATUS_SUCCESS_OR_EXIT_MSG("decrypt_external_blob failed: 0x%08x", status);
+
+    status = delete_el2go_die_keys();
+    STATUS_SUCCESS_OR_EXIT_MSG("delete_el2go_die_keys failed: 0x%08x", status);
+
+exit:
+    return status;
+}

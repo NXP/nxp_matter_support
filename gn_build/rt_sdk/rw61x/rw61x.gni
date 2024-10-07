@@ -26,18 +26,18 @@ declare_args() {
   cpu1_cpu2_fw_type = "sb"
 }
 
-if (is_sdk_internal) {
+if (nxp_is_sdk_internal) {
   DRIVER_FILES_PATH = "${nxp_sdk_root}/platform/drivers"
   UTILITIES_FILES_PATH = "${nxp_sdk_root}/platform/utilities"
 } else {
-  if (!is_sdk_package) {
+  if (!nxp_is_sdk_package) {
     # sdk github is used (default sdk type) #
     DRIVER_FILES_PATH = "${rt_core_sdk_root}/drivers"
     UTILITIES_FILES_PATH = "${rt_core_sdk_root}/utilities"
   }
 }
 
-if (is_sdk_package) {
+if (nxp_is_sdk_package) {
   COMPONENT_FILES_PATH = "${nxp_sdk_root}/components"
   DRIVER_FILES_PATH = "${nxp_sdk_root}/devices/${deviceBoardName}/drivers"
   DRIVER_USART_FILES_PATH = "${DRIVER_FILES_PATH}"
@@ -357,7 +357,7 @@ template("rw61x_sdk_drivers") {
       ]
     }
 
-    if (chip_enable_matter_cli) {
+    if (nxp_enable_matter_cli) {
       #When the CLI is enabled the debug console should be moved in UART0 for RW61x
       defines += [ "DEBUG_CONSOLE_UART_INDEX=0" ]
     }
