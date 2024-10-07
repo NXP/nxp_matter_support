@@ -46,6 +46,9 @@ declare_args() {
   # This mode allows to protect the matter factory dataset with a AES key protected in the secure element
   chip_enable_secure_whole_factory_data = false
 
+  # Enable EdgeLock 2Go secure DAC key and certificate provisionning 
+  chip_enable_secure_EL2GO_factory_data = false
+
   # Defines the NVM component supported
   nxp_nvm_component = "littlefs"
 

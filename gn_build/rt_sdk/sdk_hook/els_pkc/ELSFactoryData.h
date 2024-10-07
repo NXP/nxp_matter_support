@@ -23,6 +23,7 @@
 #include "mcuxClEls_KeyManagement.h"
 #include "mcuxClEls_Rng.h"
 #include "mcuxClEls_Types.h"
+#include "mcuxClHashModes_Constants.h"
 #include "mcuxClHash_Constants.h"
 
 #include "psa/crypto.h"
@@ -30,6 +31,7 @@
 #include "mbedtls/ecdh.h"
 #include "mbedtls/entropy.h"
 #include "mbedtls/nist_kw.h"
+#include "mbedtls/x509_crt.h"
 
 #define BLOCK_SIZE_16_BYTES 16
 #define SHA256_OUTPUT_SIZE 32
@@ -107,8 +109,52 @@
         goto exit;                                                                                                                 \
     }
 
+#define ASSERT_OR_EXIT_MSG(CONDITION, ...)                                                                                         \
+    if (!(CONDITION))                                                                                                              \
+    {                                                                                                                              \
+        status = STATUS_ERROR_GENERIC;                                                                                             \
+        PLOG_ERROR(__VA_ARGS__);                                                                                                   \
+        goto exit;                                                                                                                 \
+    }
+
 #define NXP_DIE_INT_IMPORT_KEK_SK 0x7FFF817CU
 #define NXP_DIE_INT_IMPORT_AUTH_SK 0x7FFF817EU
+
+#define EL2GO_MAX_BLOB_SIZE 3072U
+#define EL2GO_MAX_CERT_SIZE 2048U
+#define PUBLIC_KEY_SIZE 64U
+
+// Internal defines
+#define MAGIC_TLV_SIZE 0x0D
+#define MAGIC_TLV_1 0x400B6564U
+#define MAGIC_TLV_2 0x67656C6FU
+#define MAGIC_TLV_3 0x636B3267U
+#define MAGIC_TLV_4 0x6FU
+#define EL2GOOEM_MK_SK_ID 4U
+#define EL2GOIMPORT_KEK_SK_ID 14U
+#define EL2GOIMPORTTFM_KEK_SK_ID 16U
+#define EL2GOIMPORT_AUTH_SK_ID 18U
+#define CMAC_BLOCK_SIZE 16U
+#define MAX_TLV_BYTE_LENGTH 0x4u
+
+// Tags used in Secure elements blobs
+#define TAG_MAGIC 0x40u
+#define TAG_KEY_ID 0x41u
+#define TAG_PSA_PERMITTED_ALGORITHM 0x42u
+#define TAG_PSA_USAGE 0x43u
+#define TAG_PSA_KEY_TYPE 0x44u
+#define TAG_PSA_KEY_BITS 0x45u
+#define TAG_PSA_KEY_LIFETIME 0x46u
+#define TAG_PSA_DEVICE_LIFECYLE 0x47u
+#define TAG_WRAPPING_KEY_ID 0x50u
+#define TAG_WRAPPING_ALGORITHM 0x51u
+#define TAG_IV 0x52u
+#define TAG_SIGNATURE_KEY_ID 0x53u
+#define TAG_SIGNATURE_ALGORITHM 0x54u
+#define TAG_PLAIN 0x55u
+#define TAG_SIGNATURE 0x5Eu
+
+#define MBEDTLS_PK_ECP_PUB_DER_MAX_BYTES (30 + 2 * MBEDTLS_ECP_MAX_BYTES)
 
 const mcuxClEls_KeyProp_t keypair_prop = { .bits = {
                                                .ksize       = MCUXCLELS_KEYPROPERTY_KEY_SIZE_256,
@@ -197,6 +243,34 @@ const char nibble_to_char[16] = {
     '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f',
 };
 
+typedef struct
+{
+    size_t size;
+    uint8_t data[EL2GO_MAX_CERT_SIZE];
+} buffer_t;
+
+typedef struct blob_context
+{
+    const uint8_t * magic;
+    size_t magic_size;
+    uint32_t key_id;
+    uint32_t psa_permitted_algorithm;
+    uint32_t psa_usage;
+    uint32_t psa_key_type;
+    uint32_t psa_key_bits;
+    uint32_t psa_key_lifetime;
+    uint32_t psa_device_lifecycle;
+    uint32_t wrapping_key_id;
+    uint32_t wrapping_algorithm;
+    const uint8_t * iv;
+    uint32_t signature_key_id;
+    uint32_t signature_algorithm;
+    const uint8_t * plain_blob;
+    size_t plain_blob_size;
+    const uint8_t * signature;
+    size_t signature_size;
+} blob_context_t;
+
 uint8_t * append_u32(uint8_t * pos, uint32_t val);
 uint8_t * append_u16(uint8_t * pos, uint32_t val);
 void write_uint32_msb_first(uint8_t * pos, uint32_t data);
@@ -217,4 +291,9 @@ status_t ELS_Cipher_Aes_Ecb_Decrypt(mcuxClEls_KeyIndex_t key_index, uint8_t cons
 status_t import_plain_key_into_els(const uint8_t * plain_key, size_t plain_key_size, mcuxClEls_KeyProp_t key_properties,
                                    mcuxClEls_KeyIndex_t * index_output);
 status_t export_key_from_els(mcuxClEls_KeyIndex_t key_index, uint8_t * output, size_t * output_size);
+
+status_t read_el2go_blob(const uint8_t * blob_area, size_t blob_area_size, size_t object_id, uint8_t * blob, size_t blob_size,
+                         size_t * blob_length);
+status_t import_el2go_key_in_els(const uint8_t * blob, size_t blob_size, mcuxClEls_KeyIndex_t * key_index);
+status_t decrypt_el2go_cert_blob(const uint8_t * blob, size_t blob_size, uint8_t * cert, size_t cert_size, size_t * cert_length);
 #endif
