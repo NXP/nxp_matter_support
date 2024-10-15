@@ -85,6 +85,23 @@
 #define BOARD_LED_BLUE_GPIO_PIN 0U
 #endif
 
+#ifndef BOARD_LED_GREEN_GPIO
+#define BOARD_LED_GREEN_GPIO GPIO
+#endif
+#define BOARD_LED_GREEN_GPIO_PORT 0U
+#ifndef BOARD_LED_GREEN_GPIO_PIN
+#define BOARD_LED_GREEN_GPIO_PIN 12U
+#endif
+
+#ifndef BOARD_LED_RED_GPIO
+#define BOARD_LED_RED_GPIO GPIO
+#endif
+#define BOARD_LED_RED_GPIO_PORT 0U
+#ifndef BOARD_LED_RED_GPIO_PIN
+#define BOARD_LED_RED_GPIO_PIN 1U
+#endif
+
+
 #define LED_BLUE_INIT(output)                                                                                                      \
     GPIO_PinInit(BOARD_LED_BLUE_GPIO, BOARD_LED_BLUE_GPIO_PORT, BOARD_LED_BLUE_GPIO_PIN,                                           \
                  &(gpio_pin_config_t){ kGPIO_DigitalOutput, (output) }) /*!< Enable target LED_BLUE */
@@ -102,7 +119,7 @@
 #endif
 #define BOARD_SW2_GPIO_PORT 0U
 #ifndef BOARD_SW2_GPIO_PIN
-#define BOARD_SW2_GPIO_PIN 25U
+#define BOARD_SW2_GPIO_PIN 11U
 #endif
 
 #define BOARD_ENET0_PHY_ADDRESS (0x02U)

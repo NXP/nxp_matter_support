@@ -37,6 +37,19 @@ void BOARD_InitBootPins(void);
  */
 void BOARD_InitPins(void); /*!< Function assigned for the core: Cortex-M4[cm4] */
 
+/*!
+ * \brief Configures pin routing for on-board button0
+ *
+ */
+void BOARD_InitPinButton0(void);
+
+/*!
+ * \brief Configures pin routing for on-board RGB LED
+ *
+ */
+void BOARD_InitPinLEDRGB(void);
+
+
 #if defined(__cplusplus)
 }
 #endif

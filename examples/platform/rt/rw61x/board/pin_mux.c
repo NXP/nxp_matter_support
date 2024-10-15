@@ -34,6 +34,21 @@ void BOARD_InitPins(void)
     IO_MUX_SetPinMux(IO_MUX_FC0_USART_DATA);
 }
 
+void BOARD_InitPinButton0(void)
+{
+    IO_MUX_SetPinMux(IO_MUX_GPIO11);
+}
+
+void BOARD_InitPinLEDRGB(void)
+{
+    /* BLUE LED */
+    IO_MUX_SetPinMux(IO_MUX_GPIO0);
+    /* RED LED */
+    IO_MUX_SetPinMux(IO_MUX_GPIO1);
+    /* GREEN LED */
+    IO_MUX_SetPinMux(IO_MUX_GPIO12);
+}
+
 /***********************************************************************************************************************
  * EOF
  **********************************************************************************************************************/
