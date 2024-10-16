@@ -35,7 +35,7 @@
 
 // BR specific defines
 #define LWIP_IPV6_SCOPES 1
-#define MAX_SOCKETS_UDP 10
+#define MAX_SOCKETS_UDP 14
 #define MEMP_NUM_UDP_PCB (MAX_SOCKETS_UDP + 2)
 #define LWIP_IPV6_NUM_ADDRESSES 8
 #define LWIP_IPV6_FORWARD 1
