@@ -103,8 +103,8 @@ template("k32w0_sdk") {
       "Please disable low power if expansion board, openthread CLI or SE is needed!")
 
   assert(
-      use_custom_factory_provider == 0 || chip_with_factory_data == 1,
-      "Please set chip_with_factory_data=1 if using custom factory provider.")
+      use_custom_factory_provider == 0 || nxp_use_factory_data,
+      "Please set nxp_use_factory_data=true if using custom factory provider.")
 
   assert(
       chip_enable_ota_factory_data_processor == 0 ||
@@ -113,8 +113,8 @@ template("k32w0_sdk") {
 
   assert(
       chip_enable_ota_factory_data_processor == 0 ||
-          chip_with_factory_data == 1,
-      "Please set chip_with_factory_data=1 if using default factory data processor.")
+          nxp_use_factory_data,
+      "Please set nxp_use_factory_data=true if using default factory data processor.")
 
   if (build_for_k32w041am == 1 || build_for_k32w041a == 1 ||
       build_for_k32w041 == 1) {
@@ -559,7 +559,7 @@ template("k32w0_sdk") {
       ]
     }
 
-    if (chip_with_factory_data == 1) {
+    if (nxp_use_factory_data) {
       defines += [ "CONFIG_CHIP_LOAD_REAL_FACTORY_DATA=1" ]
     }
 

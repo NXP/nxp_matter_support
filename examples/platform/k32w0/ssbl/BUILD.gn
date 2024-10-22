@@ -54,7 +54,7 @@ declare_args() {
   ssbl_use_redlib = false
 }
 
-is_sdk_package = false
+nxp_is_sdk_package = false
 
 # Support both github SDK and package SDK
 if (get_path_info(k32w0_sdk_root, "name") == "repo") {
@@ -65,7 +65,7 @@ if (get_path_info(k32w0_sdk_root, "name") == "repo") {
   sdk_wireless_examples = "${k32w0_sdk_root}/examples/k32w061dk6/wireless_examples"
 } else {
   print("Using package SDK")
-  is_sdk_package = true
+  nxp_is_sdk_package = true
   sdk_CMSIS = "${k32w0_sdk_root}/CMSIS"
   sdk_devices = "${k32w0_sdk_root}/devices"
   sdk_drivers = "${k32w0_sdk_root}/devices/${device}/drivers"
@@ -198,7 +198,7 @@ config("ssbl_config") {
     "${sdk_wireless_examples}/framework/ssbl/bm"
   ]
 
-  if (!is_sdk_package) {
+  if (!nxp_is_sdk_package) {
     include_dirs += [
       "${sdk_drivers}/aes",
       "${sdk_drivers}/common",
@@ -240,7 +240,7 @@ k32w0_executable("ssbl") {
     "${sdk_devices}/K32W061/drivers/fsl_reset.c"
   ]
 
-  if (!is_sdk_package) {
+  if (!nxp_is_sdk_package) {
     sources += [
       "${sdk_drivers}/aes/fsl_aes.c",
       "${sdk_drivers}/common/fsl_common.c",

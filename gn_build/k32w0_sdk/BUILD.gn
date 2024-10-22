@@ -58,7 +58,7 @@ config("mbedtls_k32w0_config") {
     ]
   }
 
-  if (chip_with_factory_data == 1) {
+  if (nxp_use_factory_data) {
     defines += [
       "MBEDTLS_X509_CRT_PARSE_C",
       "MBEDTLS_X509_USE_C",
