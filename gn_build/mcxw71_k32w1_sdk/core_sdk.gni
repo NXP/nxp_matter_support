@@ -16,6 +16,7 @@ import("//build_overrides/build.gni")
 import("//build_overrides/chip.gni")
 import("//build_overrides/nxp_sdk.gni")
 
+import("${chip_root}/src/lib/core/core.gni")
 import("${chip_root}/src/platform/device.gni")
 import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")
 
@@ -220,11 +221,15 @@ core_sdk = {
   } else if (nxp_device == "MCXW727C") {
     core_defines += [
       "CPU_MCXW727CMFTA_cm33_core0",
-      "gDebugConsoleEnable_d=1",
-      "DEBUG_CONSOLE_TRANSFER_NON_BLOCKING",
-      "DebugConsole_c=1",
-      "DEFAULT_APP_UART=0",
     ]
+    if (chip_logging || nxp_enable_matter_cli) {
+      core_defines += [
+        "gDebugConsoleEnable_d=1",
+        "DEBUG_CONSOLE_TRANSFER_NON_BLOCKING",
+        "DebugConsole_c=1",
+        "DEFAULT_APP_UART=0",
+      ]
+    }
   }
 
   if (nxp_enable_matter_cli && nxp_device != "MCXW727C") {

@@ -131,6 +131,11 @@ template("${nxp_platform}_sdk") {
       print("WARNING: set chip_logging=false to disable logging.")
     }
 
+    if (nxp_use_low_power && nxp_enable_matter_cli) {
+      print(
+          "WARNING: enabling matter cli in low power might break the LP timings. Use at your own risk!")
+    }
+
     if (nxp_multiple_ble_connections)
     {
       defines += [
@@ -171,6 +176,7 @@ template("${nxp_platform}_sdk") {
         "nxp_use_low_power=1",
         "cPWR_UsePowerDownMode=1",
         "gAppLowpowerEnabled_d=1",
+        "OSA_USED=1",
       ]
 
       if (chip_logging == false) {
@@ -181,7 +187,6 @@ template("${nxp_platform}_sdk") {
       } else {
         defines += [
           "K32W_LOG_ENABLED=1",
-          "OSA_USED=1",
           "gUartDebugConsole_d=1",
         ]
       }
