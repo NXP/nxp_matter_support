@@ -184,7 +184,7 @@ template("rt1060_sdk_drivers") {
       ]
     }
 
-    if (chip_enable_matter_cli) {
+    if (nxp_enable_matter_cli) {
       if (evkname == "evkcmimxrt1060") {
         #When the CLI is enabled the debug console should be moved in UART8 for RT1060_EVKC
         defines += [ "DEBUG_CONSOLE_UART_INDEX=8" ]

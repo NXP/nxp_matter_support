@@ -20,7 +20,7 @@ import("${chip_root}/src/platform/nxp/${nxp_platform}/args.gni")  # declares all
                                                                   # rt local
                                                                   # args
 import("${nxp_sdk_build_root}/nxp_sdk.gni")  # declares some sdk args such as
-                                             # chip_with_ot_cli
+                                             # nxp_enable_ot_cli
 
 declare_args() {
   # Enables Matter over Ethernet support
@@ -486,7 +486,7 @@ template("rt_sdk") {
       defines += [ "FSL_FEATURE_PHYKSZ8081_USE_RMII50M_MODE" ]
     }
 
-    if (chip_enable_pairing_autostart == 1) {
+    if (nxp_enable_pairing_autostart) {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART=1" ]
     } else {
       defines += [ "CHIP_DEVICE_CONFIG_ENABLE_PAIRING_AUTOSTART=0" ]
