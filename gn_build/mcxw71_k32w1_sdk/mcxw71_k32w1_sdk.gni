@@ -62,8 +62,8 @@ template("${nxp_platform}_sdk") {
 
   assert(
       chip_enable_ota_factory_data_processor == 0 ||
-          chip_with_factory_data == 1,
-      "Please set chip_with_factory_data=1 if using default factory data processor.")
+          nxp_use_factory_data,
+      "Please set nxp_use_factory_data=true if using default factory data processor.")
 
   sdk_target_name = target_name
 
@@ -162,7 +162,7 @@ template("${nxp_platform}_sdk") {
       ]
     }
 
-    if (chip_with_factory_data == 1) {
+    if (nxp_use_factory_data) {
       defines += [
         "CONFIG_CHIP_PLAT_LOAD_REAL_FACTORY_DATA=1",
         # This should be deprecated and replaced with the above one

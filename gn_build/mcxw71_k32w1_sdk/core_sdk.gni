@@ -24,7 +24,7 @@ import("${nxp_sdk_build_root}/nxp_sdk.gni")
 assert(nxp_sdk_root != "", "nxp_sdk_root must be specified")
 
 core_sdk = {
-  if (is_sdk_package) {
+  if (nxp_is_sdk_package) {
     ADDITIONAL_DRIVERS_DIR_PATH = "${nxp_sdk_root}/devices/${nxp_device}/drivers"
     CMSIS_CORE_DIR_PATH = "${nxp_sdk_root}/CMSIS/Core"
     COMPONENT_DIR_PATH = "${nxp_sdk_root}/components"
@@ -227,7 +227,7 @@ core_sdk = {
     ]
   }
 
-  if (chip_enable_matter_cli && nxp_device != "MCXW727C") {
+  if (nxp_enable_matter_cli && nxp_device != "MCXW727C") {
     core_defines += [
       "gDebugConsoleEnable_d=1",
       "DebugConsole_c=0",
