@@ -177,7 +177,7 @@ core_sdk = {
     ]
   }
 
-  if (chip_key_storage != "fwk_nvm") {
+  if (nxp_nvm_component != "fwk_nvm") {
     core_include_dirs += [
       "${COMPONENT_FLASH_DIR_PATH}/mflash",
       "${COMPONENT_FLASH_DIR_PATH}/mflash/k4w1"
@@ -313,7 +313,7 @@ core_sdk = {
     "${UTILITIES_DIR_PATH_ASSERT}/fsl_assert.c",
   ]
 
-  if (chip_key_storage != "fwk_nvm") {
+  if (nxp_nvm_component != "fwk_nvm") {
     core_sources += [
       "${COMPONENT_FLASH_DIR_PATH}/mflash/k4w1/mflash_drv.c"
     ]

@@ -13,23 +13,28 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import("//build_overrides/chip.gni")
 import("//build_overrides/nxp_sdk.gni")
 
 import("//build_overrides/mbedtls.gni")
+import("//build_overrides/openthread.gni")
+
+import("${chip_root}/src/crypto/crypto.gni")
+import("${chip_root}/src/platform/device.gni")
 
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
-import("${nxp_sdk_build_root}/${nxp_sdk_name}/${nxp_sdk_name}.gni")
-
 import("${mbedtls_root}/mbedtls.gni")
 
-assert(nxp_sdk_target != "", "nxp_sdk_target must be specified")
+if (!nxp_external_sdk) {
+  assert(nxp_sdk_target != "", "nxp_sdk_target must be specified")
 
-group("nxp_sdk") {
-  public_deps = [
-    nxp_sdk_target,
-    ":nxp_mbedtls"
-  ]
+  group("nxp_sdk") {
+    public_deps = [
+      nxp_sdk_target,
+      ":nxp_mbedtls"
+    ]
+  }
 }
 
 group("nxp_mbedtls") {
@@ -84,6 +89,13 @@ config("mbedtls_k32w1_config") {
   }
 
   include_dirs = [ chip_root ]
+
+  if (nxp_external_sdk) {
+    include_dirs += [
+      "${nxp_sdk_root}/middleware/mbedtls/include",
+      "${nxp_sdk_root}/middleware/mbedtls/port/sssapi"
+    ]
+  }
 }
 
 mbedtls_target("mbedtls") {
