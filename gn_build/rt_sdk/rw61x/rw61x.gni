@@ -266,7 +266,10 @@ template("rw61x_sdk_drivers") {
       defines += [
         # needed to compile els_pkc port for mbedtls
         "MBEDTLS_MCUX_ELS_PKC_API",
+        # needed for S50 secure DAC key implementation
+        "MBEDTLS_NIST_KW_C",
       ]
+
       _rw61x_sdk_drivers_include_dirs += [
         "${ELS_PKC_CL_PATH}",
         "${ELS_PKC_CL_PATH}/src/compiler",
