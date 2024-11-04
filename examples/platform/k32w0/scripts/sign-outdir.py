@@ -28,7 +28,7 @@ def sign_cmd(tool, image, identifer):
 def windows_sign_cmd(tool_path):
     # sign_images is a Linux wrapper over dk6_image_tool.py.
     # On Windows, use the Python script directly.
-    tool = f"{tool_path}/../dk6_image_tool.py"
+    tool = os.path.abspath(os.path.join(tool_path, "../dk6_image_tool.py"))
 
     image = [f for f in os.listdir(os.getcwd()) if f.startswith('chip-') and f.endswith('-example')][0]
     cmd = sign_cmd(tool, image, 1)
@@ -49,7 +49,10 @@ def linux_sign_cmd(tool_path):
     return cmd
 
 def main(args):
-    if "nxp_matter_support/github_sdk/k32w0/repo" in args.sdk_root:
+    # Use realpath to account for any symlink in the SDK root path.
+    # This will be expanded to an absolute path.
+    github_identifier = ["nxp_matter_support", "github_sdk", "k32w0", "repo"]
+    if os.sep.join(github_identifier) in os.path.realpath(args.sdk_root):
         # For github SDK, the signing tool is under the core folder.
         tool_path = os.path.abspath(os.path.join(args.sdk_root, "core/tools/imagetool/sign_images.sh"))
     else:
