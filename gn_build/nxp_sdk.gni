@@ -43,9 +43,6 @@ declare_args() {
   # Enables the support of factory data
   nxp_use_factory_data = false
 
-  # Enable DAC private key secure usage, nxp_use_factory_data must be set to true
-  nxp_enable_secure_dac_private_key_storage = false
-
   # This mode allows to protect the matter factory dataset with a AES key protected in the secure element
   nxp_enable_secure_whole_factory_data = false
 
