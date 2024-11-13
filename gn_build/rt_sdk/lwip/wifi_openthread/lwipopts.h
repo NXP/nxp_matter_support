@@ -35,11 +35,12 @@
 
 // BR specific defines
 #define LWIP_IPV6_SCOPES 1
-#define MAX_SOCKETS_UDP 14
+#define MAX_SOCKETS_UDP 22
 #define MEMP_NUM_UDP_PCB (MAX_SOCKETS_UDP + 2)
 #define LWIP_IPV6_NUM_ADDRESSES 8
 #define LWIP_IPV6_FORWARD 1
-#define MEMP_NUM_RAW_PCB (2)
+#define DNS_MAX_SERVERS 4
+#define LWIP_ND6_RDNSS_MAX_DNS_SERVERS 2
 // Note: According to Thread Conformance v1.2.0, a Thread Border Router MUST be able to hold a Multicast Listeners Table
 //  in memory with at least seventy five (75) entries.
 #define MEMP_NUM_MLD6_GROUP 10 + 75
