@@ -88,6 +88,9 @@ config configENABLE_FPU
 config configMAX_TASK_NAME_LEN
 	default 16
 
+config configSUPPORT_STATIC_ALLOCATION
+	default y
+
 # BLE defaults
 if BT 
 

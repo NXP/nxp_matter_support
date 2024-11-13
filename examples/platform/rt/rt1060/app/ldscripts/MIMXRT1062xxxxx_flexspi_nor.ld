@@ -381,7 +381,9 @@ SECTIONS
     PROVIDE(__stop_NVM_TABLE = .);
     . = ALIGN(4);
     _net_buf_pool_list = .;
+    _net_buf_pool_list_start = .;
     KEEP(*(SORT(._net_buf_pool*)))
+    _net_buf_pool_list_end = .;
     . = ALIGN(4);
     __data_end__ = .;        /* define a global symbol at data end */
   } > m_data2
