@@ -37,14 +37,19 @@ class NxpSdk:
     sdk_manifest_name: str
     sdk_storage_location_abspath: str
     sdk_storage_location_relativepath_from_root: str
+    sdk_example_repo_abspath: str = ""
+    sdk_example_repo_version: str = ""
+    sdk_example_repo_url: str = ""
+    sdk_example_repo_folder_list: list
 
-    def __init__(self, name, sdk_target_relative_path):
+    def __init__(self, name, sdk_target_relative_path, sdk_example_repo_folder_list):
         self.sdk_name = name
         self.sdk_target_location_abspath = os.path.join(NXP_MATTER_SUPPORT_ROOT, sdk_target_relative_path)
         self.sdk_target_location_relativepath_from_root = sdk_target_relative_path
         self.sdk_manifest_path = os.path.abspath(os.path.join(self.sdk_target_location_abspath , 'manifest'))
         self.sdk_manifest_name = 'west.yml'
         self.get_sdk_storage_location()
+        self.sdk_example_repo_folder_list = sdk_example_repo_folder_list
 
     def get_sdk_storage_location(self):
         westFilePath = os.path.abspath(os.path.join(self.sdk_manifest_path, self.sdk_manifest_name))
@@ -58,16 +63,26 @@ class NxpSdk:
                 self.sdk_storage_location_abspath = os.path.abspath(self.sdk_storage_location_relativepath_from_root)
             except (KeyError) as exception:
                 logging.error("Wrong west file format %s", exception)
+            projects = west["manifest"]["projects"]
+            for project in projects:
+                if (project["name"] == "mcux-sdk-examples"):
+                    self.sdk_example_repo_abspath = os.path.abspath(os.path.join(NXP_MATTER_SUPPORT_ROOT, self.sdk_target_location_relativepath_from_root , project["path"]))
+                    print(self.sdk_example_repo_abspath)
+                    self.sdk_example_repo_version = project["revision"]
+                    self.sdk_example_repo_url = project["url"]
+
         else:
             logging.error("SDK west config file : %s does not exist", westFilePath)
             sys.exit(1)
 
 def NxpSdk_k32w0():
-    sdk = NxpSdk('k32w0', 'github_sdk/k32w0')
+    sdk = NxpSdk('k32w0', 'github_sdk/k32w0', [])
     return sdk
 
 def NxpSdk_common():
-    sdk = NxpSdk('common', 'github_sdk/common_sdk')
+    sdk = NxpSdk('common', 'github_sdk/common_sdk',
+            #listing here all folder that we want to keep in the SDK examples repo
+            ['evkbmimxrt1060','evkmimxrt1060', 'evkcmimxrt1060', 'evkmimxrt1170', 'evkbmimxrt1170', 'frdmmcxw71','frdmrw612','k32w148evk','rdrw612bga'])
     return sdk
 
 ALL_PLATFORM_SDK = [
@@ -99,12 +114,33 @@ def init_nxp_sdk_version(nxp_sdk, force):
     subprocess.run(command, check=True)
     update_nxp_sdk_version(nxp_sdk, force)
 
+def update_nxp_sdk_example_folder(nxp_sdk,force):
+    if os.path.exists(nxp_sdk.sdk_example_repo_abspath):
+        try:
+            # Repo already exist try to get the latest version
+            print(nxp_sdk.sdk_example_repo_version)
+            subprocess.run(['git', 'fetch', 'origin', nxp_sdk.sdk_example_repo_version], cwd=nxp_sdk.sdk_example_repo_abspath, check=True)
+            subprocess.run(['git', 'sparse-checkout', 'set'] + nxp_sdk.sdk_example_repo_folder_list, cwd=nxp_sdk.sdk_example_repo_abspath, check=True)
+            subprocess.run(['git', 'checkout', nxp_sdk.sdk_example_repo_version], cwd=nxp_sdk.sdk_example_repo_abspath, check=True)
+        except (RuntimeError, subprocess.CalledProcessError) as exception:
+            if force:
+                #In case of force update clean local modifcation and re-do a checkout
+                clean_sdk_local_changes(nxp_sdk.sdk_example_repo_version)
+                subprocess.run(['git', 'checkout', nxp_sdk.sdk_example_repo_version], cwd=nxp_sdk.sdk_example_repo_abspath, check=True)
+    else:
+        # folder sdk example does not exist so clone it and use sparse-checkout to get only required folder
+        subprocess.run(['git', 'clone', '--no-checkout', nxp_sdk.sdk_example_repo_url, nxp_sdk.sdk_example_repo_abspath], check=True)
+        subprocess.run(['git', 'sparse-checkout', 'set'] + nxp_sdk.sdk_example_repo_folder_list, cwd=nxp_sdk.sdk_example_repo_abspath, check=True)
+        subprocess.run(['git', 'checkout', nxp_sdk.sdk_example_repo_version], cwd=nxp_sdk.sdk_example_repo_abspath, check=True)
 
 def update_nxp_sdk_version(nxp_sdk, force):
     print("Update SDK in " + nxp_sdk.sdk_target_location_abspath)
     if not os.path.exists(os.path.join(nxp_sdk.sdk_target_location_abspath, '.west')):
         logging.error("--update-only error SDK is not initialized")
         sys.exit(1)
+    #update the nxp SDK example repo
+    if (nxp_sdk.sdk_example_repo_abspath != ""):
+        update_nxp_sdk_example_folder(nxp_sdk, force)
     command = ['west', 'update', '--fetch', 'smart']
     try:
         subprocess.run(command, cwd=nxp_sdk.sdk_target_location_abspath, check=True)
