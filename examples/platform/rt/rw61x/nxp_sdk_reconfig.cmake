@@ -9,10 +9,9 @@
 # and other project configurations needed for Matter to work.
 #
 # Structure :
-#   1. Pre-build steps
-#   2. General configurations (e.g. C/C++ flags)
-#   3. Include paths and source files
-#   4. Linker configurations
+#   1. General configurations (e.g. C/C++ flags)
+#   2. Include paths and source files
+#   3. Linker configurations
 #
 # ========================================================================================
 
@@ -21,37 +20,7 @@ if(CONFIG_CHIP_SDK_DEPENDENCIES)
 get_filename_component(NXP_MATTER_SUPPORT_DIR ${CMAKE_CURRENT_LIST_DIR}/../../../.. REALPATH)
 
 # ========================================================================================
-# 1. Pre-build steps
-# ========================================================================================
-
-# Monolithic app property
-# convert fw binaries into src files for CPU1/CPU2
-# this requires -DgPlatformMonolithicApp_d=1 to be defined in flags.cmake
-find_package(Python COMPONENTS Interpreter REQUIRED)
-
-get_filename_component(FW_BIN_PATH ${SdkRootDirPath}/components/conn_fwloader/fw_bin REALPATH)
-
-SET(FW_BIN_ARGS "-t"  "sb" ${FW_BIN_PATH})
-
-add_custom_command(OUTPUT
-    ${FW_BIN_PATH}/A2/fw_cpu1.c
-    ${FW_BIN_PATH}/A2/fw_cpu2_ble.c
-    ${FW_BIN_PATH}/A2/fw_cpu2_combo.c
-    COMMAND python ${SdkRootDirPath}/components/conn_fwloader/script/fw_bin2c_conv.py ${FW_BIN_ARGS}
-    COMMENT "Generating fw_cpu1.c , fw_cpu2_ble.c , fw_cpu2_combo.c"
-)
-
-add_custom_target(convert_fw_bin2c ALL
-    DEPENDS
-    ${FW_BIN_PATH}/A2/fw_cpu1.c
-    ${FW_BIN_PATH}/A2/fw_cpu2_ble.c
-    ${FW_BIN_PATH}/A2/fw_cpu2_combo.c
-)
-
-add_dependencies(McuxSDK convert_fw_bin2c)
-
-# ========================================================================================
-# 2. General Configurations
+# 1. General Configurations
 # ========================================================================================
 
 # Common macros
@@ -107,12 +76,13 @@ mcux_add_configuration(
 )
 
 # ========================================================================================
-# 3. Include Paths and Source Files
+# 2. Include Paths and Source Files
 # ========================================================================================
 
 if(CONFIG_BT)
-    mcux_add_source(PREINCLUDE true
+    mcux_add_source(
         BASE_PATH ${CMAKE_BINARY_DIR}
+        PREINCLUDE TRUE
         SOURCES edgefast_bluetooth_config_Gen.h
                 edgefast_bluetooth_extension_config_Gen.h
                 edgefast_bluetooth_audio_config_Gen.h
@@ -120,12 +90,9 @@ if(CONFIG_BT)
 endif()
 
 mcux_add_source(
-    BASE_PATH ${SdkRootDirPath}
-    SOURCES 
-        # cpu1/cpu2 fw binaries for monolithic app
-        components/conn_fwloader/fw_bin/A2/fw_cpu1.c
-        components/conn_fwloader/fw_bin/A2/fw_cpu2_ble.c
-        components/conn_fwloader/fw_bin/A2/fw_cpu2_combo.c
+    BASE_PATH ${NXP_MATTER_SUPPORT_DIR}
+    PREINCLUDE TRUE
+    SOURCES examples/platform/rt/rw61x/board/monolithic_config.h
 )
 
 mcux_add_source(
@@ -154,7 +121,7 @@ target_include_directories(McuxSDK PUBLIC
 )
 
 # ========================================================================================
-# 4. Linker Configurations
+# 3. Linker Configurations
 # ========================================================================================
 
 mcux_add_configuration(
