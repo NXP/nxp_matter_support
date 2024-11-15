@@ -12,6 +12,10 @@
 
 #include "wifi_bt_module_config.h"
 
+#ifdef WIFI_USER_CONFIG_FILE
+#include WIFI_USER_CONFIG_FILE
+#endif /* WIFI_USER_CONFIG_FILE */
+
 #define CONFIG_IPV6 1
 
 #ifndef CONFIG_MAX_IPV6_ADDRESSES
