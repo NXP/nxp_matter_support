@@ -380,7 +380,10 @@ SECTIONS
     KEEP(*(.NVM_TABLE));
     PROVIDE(__stop_NVM_TABLE = .);
     . = ALIGN(4);
-    _net_buf_pool_list = .;
+    _k_mem_slab_list_start = .;
+    KEEP(*(SORT(._k_mem_slab*)))
+    _k_mem_slab_list_end = .;
+    . = ALIGN(4);
     _net_buf_pool_list_start = .;
     KEEP(*(SORT(._net_buf_pool*)))
     _net_buf_pool_list_end = .;

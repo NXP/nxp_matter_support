@@ -93,7 +93,7 @@ template("${nxp_platform}_sdk") {
 
     libs = [
       "${BLE_HOST_DIR_PATH}/host/lib/lib_ble_host_peripheral_cm33_gcc.a",
-      "${FRAMEWORK_DIR_PATH}/SecLib/lib_crypto_m33.a",
+      "${FRAMEWORK_SERVICES_DIR_PATH}/SecLib_RNG/lib_crypto_m33.a",
     ]
 
     defines = []

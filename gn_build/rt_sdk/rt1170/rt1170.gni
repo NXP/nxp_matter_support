@@ -27,36 +27,36 @@ declare_args() {
 }
 
 
-COMPONENT_FILES_PATH = "${nxp_sdk_root}/core/components"
-DRIVER_FILES_PATH = "${nxp_sdk_root}/core/devices/${deviceBoardName}/drivers"
-DRIVER_LPUART_FILES_PATH = "${nxp_sdk_root}/core/drivers/lpuart"
-DRIVER_LPSPI_FILES_PATH = "${nxp_sdk_root}/core/drivers/lpspi"
-DRIVER_LPI2C_FILES_PATH = "${nxp_sdk_root}/core/drivers/lpi2c"
-DRIVER_EDMA_FILES_PATH = "${nxp_sdk_root}/core/drivers/edma"
-DRIVER_DMAMUX_FILES_PATH = "${nxp_sdk_root}/core/drivers/dmamux"
-DRIVER_PIT_FILES_PATH = "${nxp_sdk_root}/core/drivers/pit"
-DRIVER_GPT_FILES_PATH = "${nxp_sdk_root}/core/drivers/gpt"
-DRIVER_FLEXSPI_FILES_PATH = "${nxp_sdk_root}/core/drivers/flexspi"
-DRIVER_IGPIO_FILES_PATH = "${nxp_sdk_root}/core/drivers/igpio"
-DRIVER_ENET_FILES_PATH = "${nxp_sdk_root}/core/drivers/enet"
-DRIVER_CACHE_FILES_PATH = "${nxp_sdk_root}/core/drivers/cache/armv7-m7"
-DRIVER_CAAM_FILES_PATH = "${nxp_sdk_root}/core/drivers/caam"
-DRIVER_COMMON_FILES_PATH = "${nxp_sdk_root}/core/drivers/common"
-DRIVER_DEVICE_FILES_PATH = "${DRIVER_FILES_PATH}"
-DRIVER_USDHC_FILES_PATH = "${nxp_sdk_root}/core/drivers/usdhc"
+
+DRIVER_FILES_PATH = "${nxp_sdk_root}/drivers"
+DRIVER_COMMON_FILES_PATH = "${DRIVER_FILES_PATH}/common"
+DRIVER_DEVICE_FILES_PATH = "${nxp_sdk_root}/devices/RT/RT1170/${deviceBoardName}/drivers"
+COMPONENT_FILES_PATH = "${nxp_sdk_root}/components"
+
+DRIVER_LPUART_FILES_PATH = "${DRIVER_FILES_PATH}/lpuart"
+DRIVER_LPSPI_FILES_PATH = "${DRIVER_FILES_PATH}/lpspi"
+DRIVER_LPI2C_FILES_PATH = "${DRIVER_FILES_PATH}/lpi2c"
+DRIVER_EDMA_FILES_PATH = "${DRIVER_FILES_PATH}/edma"
+DRIVER_DMAMUX_FILES_PATH = "${DRIVER_FILES_PATH}/dmamux"
+DRIVER_PIT_FILES_PATH = "${DRIVER_FILES_PATH}/pit"
+DRIVER_GPT_FILES_PATH = "${DRIVER_FILES_PATH}/gpt"
+DRIVER_FLEXSPI_FILES_PATH = "${DRIVER_FILES_PATH}/flexspi"
+DRIVER_IGPIO_FILES_PATH = "${DRIVER_FILES_PATH}/igpio"
+DRIVER_ENET_FILES_PATH = "${DRIVER_FILES_PATH}/enet"
+DRIVER_CACHE_FILES_PATH = "${DRIVER_FILES_PATH}/cache/armv7-m7"
+DRIVER_CAAM_FILES_PATH = "${DRIVER_FILES_PATH}/caam"
+DRIVER_USDHC_FILES_PATH = "${DRIVER_FILES_PATH}/usdhc"
 COMPONENT_CRC_FILES_PATH = "${COMPONENT_FILES_PATH}/crc"
+COMPONENT_SPI_FILES_PATH = "${COMPONENT_FILES_PATH}/spi"
 COMPONENT_UART_FILES_PATH = "${COMPONENT_FILES_PATH}/uart"
 COMPONENT_TIMER_FILES_PATH = "${COMPONENT_FILES_PATH}/timer"
 COMPONENT_GPIO_FILES_PATH = "${COMPONENT_FILES_PATH}/gpio"
 COMPONENT_MEM_MANAGER_FILES_PATH = "${COMPONENT_FILES_PATH}/mem_manager"
-UTILITIES_FILES_PATH = "${nxp_sdk_root}/core/utilities"
-UTILITIES_SHELL_FILES_PATH = "${nxp_sdk_root}/core/utilities/shell"
-UTILITIES_ASSERT_FILES_PATH = "${nxp_sdk_root}/core/utilities/assert"
-DEBUG_CONSOLE_FILES_PATH = "${UTILITIES_FILES_PATH}/debug_console_lite"
-STR_FILES_PATH = "${UTILITIES_FILES_PATH}/str"
-FSL_FLEXSPI_NOR_BOOT_FILES_PATH =
-"${nxp_sdk_root}/core/devices/${deviceBoardName}/xip"
-WIRELESS_CONFIG_TEMPLATE_PATH = "${nxp_sdk_root}/core/boards/${evkname}/wireless_config_template"
+UTILITIES_SHELL_FILES_PATH = "${COMPONENT_FILES_PATH}/shell"
+UTILITIES_ASSERT_FILES_PATH = "${COMPONENT_FILES_PATH}/assert"
+DEBUG_CONSOLE_FILES_PATH = "${COMPONENT_FILES_PATH}/debug_console_lite"
+STR_FILES_PATH = "${COMPONENT_FILES_PATH}/str"
+FSL_FLEXSPI_NOR_BOOT_FILES_PATH = "${nxp_sdk_root}/devices/RT/RT1170/${deviceBoardName}/xip"
 
 
 
@@ -71,8 +71,11 @@ template("rt1170_sdk_drivers") {
 
     _rt1170_sdk_drivers_include_dirs = [
       #Drivers files
-      "${nxp_sdk_root}/core/devices/${deviceBoardName}/drivers",
-      "${nxp_sdk_root}/core/devices/${deviceBoardName}",
+      "${DRIVER_DEVICE_FILES_PATH}",
+      "${DRIVER_DEVICE_FILES_PATH}/power",
+      "${DRIVER_DEVICE_FILES_PATH}/anatop_ai",
+      "${nxp_sdk_root}/devices/RT/RT1170/periph",
+      "${nxp_sdk_root}/devices/RT/RT1170/${deviceBoardName}",
       "${COMPONENT_UART_FILES_PATH}",
       "${COMPONENT_TIMER_FILES_PATH}",
       "${COMPONENT_GPIO_FILES_PATH}",
@@ -97,21 +100,18 @@ template("rt1170_sdk_drivers") {
       "${STR_FILES_PATH}",
 
       # XIP
-      "${nxp_sdk_root}/core/boards/${evkname}/xip",
-      "${nxp_sdk_root}/core/components/flash/mflash",
-      "${nxp_sdk_root}/core/components/flash/mflash/${mevkname}",
-      "${nxp_sdk_root}/core/components/internal_flash",
+      "${nxp_sdk_root}/boards/${evkname}/xip",
+      "${COMPONENT_FILES_PATH}/flash/mflash",
+      "${COMPONENT_FILES_PATH}/flash/mflash/${mevkname}",
+      "${COMPONENT_FILES_PATH}/internal_flash",
 
       # freertos
       "${rt_sdk_freertos_kernel}/portable/GCC/ARM_CM4F",
 
       # Framework
-      "${nxp_sdk_root}/middleware/wireless/framework/boards/${rt_fwk_platform}",
       "${nxp_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/configs",
-      "${nxp_sdk_root}/middleware/wireless/framework/FactoryDataProvider",
+      "${nxp_sdk_root}/middleware/wireless/framework/services/FactoryDataProvider",
 
-      # wifi/bt config
-      "${WIRELESS_CONFIG_TEMPLATE_PATH}", 
     ]
 
     libs = []
@@ -199,7 +199,7 @@ template("rt1170_sdk_drivers") {
 
     sources += [
       "${COMPONENT_CRC_FILES_PATH}/fsl_adapter_software_crc.c",
-      "${COMPONENT_FILES_PATH}/spi/fsl_adapter_lpspi.c",
+      "${COMPONENT_SPI_FILES_PATH}/fsl_adapter_lpspi.c",
       "${COMPONENT_GPIO_FILES_PATH}/fsl_adapter_igpio.c",
       "${COMPONENT_MEM_MANAGER_FILES_PATH}/fsl_component_mem_manager.c",
       "${COMPONENT_TIMER_FILES_PATH}/fsl_adapter_pit.c",
@@ -210,10 +210,10 @@ template("rt1170_sdk_drivers") {
       #"${DRIVER_ENET_FILES_PATH}/fsl_enet.c",
       "${DRIVER_CACHE_FILES_PATH}/fsl_cache.c",
       "${DRIVER_COMMON_FILES_PATH}/fsl_common_arm.c",
-      "${DRIVER_DEVICE_FILES_PATH}/fsl_anatop_ai.c",
+      "${DRIVER_DEVICE_FILES_PATH}/anatop_ai/fsl_anatop_ai.c",
       "${DRIVER_DEVICE_FILES_PATH}/fsl_clock.c",
-      "${DRIVER_DEVICE_FILES_PATH}/fsl_dcdc.c",
-      "${DRIVER_DEVICE_FILES_PATH}/fsl_pmu.c",
+      "${DRIVER_DEVICE_FILES_PATH}/power/fsl_dcdc.c",
+      "${DRIVER_DEVICE_FILES_PATH}/power/fsl_pmu.c",
       "${DRIVER_DMAMUX_FILES_PATH}/fsl_dmamux.c",
       "${DRIVER_EDMA_FILES_PATH}/fsl_edma.c",
       "${DRIVER_FLEXSPI_FILES_PATH}/fsl_flexspi.c",
@@ -238,22 +238,19 @@ template("rt1170_sdk_drivers") {
       "${nxp_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform.c",
 
       #sdk hook
-      "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/zephyr/kernel.c",
-      "${rt_core_sdk_root}/components/internal_flash/${evkname}/fsl_adapter_flexspi_nor_flash.c",
+      "${COMPONENT_FILES_PATH}/internal_flash/${evkname}/fsl_adapter_flexspi_nor_flash.c",
 
       # freertos files
       # freertos
       "${rt_sdk_freertos_kernel}/portable/GCC/ARM_CM4F/port.c",
       "${rt_sdk_freertos_kernel}/portable/MemMang/heap_4.c",
-      "${nxp_sdk_root}/core/boards/${evkname}/xip/${evkname}_flexspi_nor_config.c",
-      "${nxp_sdk_root}/core/components/flash/mflash/${mevkname}/mflash_drv.c",
+      "${nxp_sdk_root}/examples/_boards/${evkname}/xip/${evkname}_flexspi_nor_config.c",
+      "${COMPONENT_FILES_PATH}/flash/mflash/${mevkname}/mflash_drv.c",
 
       #startup files
-      "${nxp_sdk_root}/core/devices/${deviceBoardName}/gcc/startup_${deviceBoardName}_cm7.S",
-      "${nxp_sdk_root}/core/devices/${deviceBoardName}/system_${deviceBoardName}_cm7.c",
+      "${nxp_sdk_root}/devices/RT/RT1170/${deviceBoardName}/gcc/startup_${deviceBoardName}_cm7.S",
+      "${nxp_sdk_root}/devices/RT/RT1170/${deviceBoardName}/system_${deviceBoardName}_cm7.c",
 
-      # Wi-Fi bt config files
-      "${WIRELESS_CONFIG_TEMPLATE_PATH}/wifi_bt_config.c",
     ]
 
     if (sdk_fsl_assert_support) {

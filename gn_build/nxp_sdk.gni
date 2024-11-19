@@ -22,6 +22,9 @@ declare_args() {
   # Indicates the name of the device targeted
   nxp_device = ""
 
+  # Indicates the name of the board
+  nxp_board = ""
+
   # Specifies the CHIP_DEVICE_LAYER_TARGET in src/platform/BUILD.gn
   nxp_device_layer = "nxp/common"
 
@@ -130,9 +133,9 @@ if (nxp_is_sdk_package || getenv("NXP_SDK_ROOT") != "") {
   # On Windows, the bootstrap script creates a symbolic link to the
   # actual github SDK path using mklink. This is mandatory in order to
   # build reference applications, because of the long paths limitation.
-  nxp_sdk_root = "C:/NXP/sdk/common_sdk/repo"
+  nxp_sdk_root = "C:/NXP/sdk/sdk_next/repo/mcuxsdk"
 } else {
-  nxp_sdk_root = "${nxp_sdk_matter_support_root}/github_sdk/common_sdk/repo"
+  nxp_sdk_root = "${nxp_sdk_matter_support_root}/github_sdk/sdk_next/repo/mcuxsdk"
 }
 
 assert(nxp_platform != "", "nxp_platform should be defined")

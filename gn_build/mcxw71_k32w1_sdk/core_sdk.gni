@@ -25,74 +25,42 @@ import("${nxp_sdk_build_root}/nxp_sdk.gni")
 assert(nxp_sdk_root != "", "nxp_sdk_root must be specified")
 
 core_sdk = {
-  if (nxp_is_sdk_package) {
-    ADDITIONAL_DRIVERS_DIR_PATH = "${nxp_sdk_root}/devices/${nxp_device}/drivers"
-    CMSIS_CORE_DIR_PATH = "${nxp_sdk_root}/CMSIS/Core"
-    COMPONENT_DIR_PATH = "${nxp_sdk_root}/components"
-    DEVICES_DIR_PATH = "${nxp_sdk_root}/devices/${nxp_device}"
-    DRIVER_DIR_PATH = "${ADDITIONAL_DRIVERS_DIR_PATH}"
-    DRIVER_CCM32K_DIR_PATH = "${DRIVER_DIR_PATH}"
-    DRIVER_CMC_DIR_PATH = "${DRIVER_DIR_PATH}"
-    DRIVER_COMMON_DIR_PATH = "${DRIVER_DIR_PATH}"
-    DRIVER_CRC_DIR_PATH = "${DRIVER_DIR_PATH}"
-    DRIVER_DMA3_DIR_PATH = "${DRIVER_DIR_PATH}"
-    DRIVER_ELEMU_DIR_PATH = "${DRIVER_DIR_PATH}"
-    DRIVER_FLASH_K4_DIR_PATH = "${DRIVER_DIR_PATH}"
-    DRIVER_GPIO_DIR_PATH = "${DRIVER_DIR_PATH}"
-    DRIVER_IMU_DIR_PATH = "${DRIVER_DIR_PATH}"
-    DRIVER_LPSPI_DIR_PATH = "${DRIVER_DIR_PATH}"
-    DRIVER_LPTMR_DIR_PATH = "${DRIVER_DIR_PATH}"
-    DRIVER_LPUART_DIR_PATH = "${DRIVER_DIR_PATH}"
-    DRIVER_LTC_DIR_PATH = "${DRIVER_DIR_PATH}"
-    DRIVER_MCM_DIR_PATH = "${DRIVER_DIR_PATH}"
-    DRIVER_PORT_DIR_PATH = "${DRIVER_DIR_PATH}"
-    DRIVER_SPC_DIR_PATH = "${DRIVER_DIR_PATH}"
-    DRIVER_TRDC_DIR_PATH = "${DRIVER_DIR_PATH}"
-    DRIVER_TPM_DIR_PATH = "${DRIVER_DIR_PATH}"
-    DRIVER_TRDC_DIR_PATH = "${DRIVER_DIR_PATH}"
-    DRIVER_WUU_DIR_PATH = "${DRIVER_DIR_PATH}"
-    UTILITIES_DIR_PATH = "${nxp_sdk_root}/devices/${nxp_device}/utilities"
-    UTILITIES_DIR_PATH_ASSERT = "${UTILITIES_DIR_PATH}"
-  }
-  else {
-    if (nxp_device == "K32W1480") {
-      ADDITIONAL_DRIVERS_DIR_PATH = "${nxp_sdk_root}/core/devices/KW45B41Z83/drivers"
-    } else if (nxp_device == "MCXW716C" || nxp_device == "MCXW727C") {
-      ADDITIONAL_DRIVERS_DIR_PATH = "${nxp_sdk_root}/core/devices/${nxp_device}/drivers"
-    }
-    CMSIS_CORE_DIR_PATH = "${nxp_sdk_root}/core/CMSIS/Core"
-    COMPONENT_DIR_PATH = "${nxp_sdk_root}/core/components"
-    DEVICES_DIR_PATH = "${nxp_sdk_root}/core/devices/${nxp_device}"
-    DRIVER_DIR_PATH = "${nxp_sdk_root}/core/drivers"
-    if (nxp_device == "MCXW727C") {
-      UTILITIES_DIR_PATH = "${nxp_sdk_root}/core/platform/utilities"
-    } else {
-      UTILITIES_DIR_PATH = "${nxp_sdk_root}/core/utilities"
-    }
-
-    DRIVER_CCM32K_DIR_PATH = "${DRIVER_DIR_PATH}/ccm32k"
-    DRIVER_CMC_DIR_PATH = "${DRIVER_DIR_PATH}/cmc"
-    DRIVER_COMMON_DIR_PATH = "${DRIVER_DIR_PATH}/common"
-    DRIVER_CRC_DIR_PATH = "${DRIVER_DIR_PATH}/crc"
-    DRIVER_DMA3_DIR_PATH = "${DRIVER_DIR_PATH}/dma3"
-    DRIVER_ELEMU_DIR_PATH = "${DRIVER_DIR_PATH}/elemu"
-    DRIVER_FLASH_K4_DIR_PATH = "${DRIVER_DIR_PATH}/flash_k4"
-    DRIVER_GPIO_DIR_PATH = "${DRIVER_DIR_PATH}/gpio"
-    DRIVER_IMU_DIR_PATH = "${DRIVER_DIR_PATH}/imu"
-    DRIVER_LPSPI_DIR_PATH = "${DRIVER_DIR_PATH}/lpspi"
-    DRIVER_LPTMR_DIR_PATH = "${DRIVER_DIR_PATH}/lptmr"
-    DRIVER_LPUART_DIR_PATH = "${DRIVER_DIR_PATH}/lpuart"
-    DRIVER_LTC_DIR_PATH = "${DRIVER_DIR_PATH}/ltc"
-    DRIVER_MCM_DIR_PATH = "${DRIVER_DIR_PATH}/mcm"
-    DRIVER_PORT_DIR_PATH = "${DRIVER_DIR_PATH}/port"
-    DRIVER_SPC_DIR_PATH = "${DRIVER_DIR_PATH}/spc"
-    DRIVER_TPM_DIR_PATH = "${DRIVER_DIR_PATH}/tpm"
-    DRIVER_TRDC_DIR_PATH = "${DRIVER_DIR_PATH}/trdc"
-    DRIVER_WUU_DIR_PATH = "${DRIVER_DIR_PATH}/wuu"
-    UTILITIES_DIR_PATH_ASSERT = "${UTILITIES_DIR_PATH}/assert"
+  if (nxp_device == "K32W1480") {
+    DEVICES_DIR_PATH = "${nxp_sdk_root}/devices/Wireless/K32W/${nxp_device}"
+  } else if (nxp_device == "MCXW716C" || nxp_device == "MCXW727C") {
+    # Maybe create gn args for SOC portofolio (MCX) and SOC series (MCXW)
+    DEVICES_DIR_PATH = "${nxp_sdk_root}/devices/MCX/MCXW/${nxp_device}"
   }
 
+  ADDITIONAL_DRIVERS_DIR_PATH = "${DEVICES_DIR_PATH}/drivers"
+  CMSIS_CORE_DIR_PATH = "${nxp_sdk_root}/arch/arm/CMSIS/Core"
+  COMPONENT_DIR_PATH = "${nxp_sdk_root}/components"
+  DRIVER_DIR_PATH = "${nxp_sdk_root}/drivers"
+
+  DRIVER_CCM32K_DIR_PATH = "${DRIVER_DIR_PATH}/ccm32k"
+  DRIVER_CMC_DIR_PATH = "${DRIVER_DIR_PATH}/cmc"
+  DRIVER_COMMON_DIR_PATH = "${DRIVER_DIR_PATH}/common"
+  DRIVER_CRC_DIR_PATH = "${DRIVER_DIR_PATH}/crc"
+  DRIVER_DMA3_DIR_PATH = "${DRIVER_DIR_PATH}/dma3"
+  DRIVER_ELEMU_DIR_PATH = "${DRIVER_DIR_PATH}/elemu"
+  DRIVER_FLASH_K4_DIR_PATH = "${DRIVER_DIR_PATH}/flash_k4"
+  DRIVER_GPIO_DIR_PATH = "${DRIVER_DIR_PATH}/gpio"
+  DRIVER_IMU_DIR_PATH = "${DRIVER_DIR_PATH}/imu"
+  DRIVER_LPSPI_DIR_PATH = "${DRIVER_DIR_PATH}/lpspi"
+  DRIVER_LPTMR_DIR_PATH = "${DRIVER_DIR_PATH}/lptmr"
+  DRIVER_LPUART_DIR_PATH = "${DRIVER_DIR_PATH}/lpuart"
+  DRIVER_LTC_DIR_PATH = "${DRIVER_DIR_PATH}/ltc"
+  DRIVER_MCM_DIR_PATH = "${DRIVER_DIR_PATH}/mcm"
+  DRIVER_PORT_DIR_PATH = "${DRIVER_DIR_PATH}/port"
+  DRIVER_SPC_DIR_PATH = "${DRIVER_DIR_PATH}/spc"
+  DRIVER_TPM_DIR_PATH = "${DRIVER_DIR_PATH}/tpm"
+  DRIVER_TRDC_DIR_PATH = "${DRIVER_DIR_PATH}/trdc"
+  DRIVER_VBAT_DIR_PATH = "${DRIVER_DIR_PATH}/vbat"
+  DRIVER_WUU_DIR_PATH = "${DRIVER_DIR_PATH}/wuu"
+
+  COMPONENT_ASSERT_PATH = "${COMPONENT_DIR_PATH}/assert"
   COMPONENT_BUTTON_DIR_PATH = "${COMPONENT_DIR_PATH}/button"
+  COMPONENT_DEBUG_CONSOLE_PATH = "${COMPONENT_DIR_PATH}/debug_console"
   COMPONENT_FLASH_DIR_PATH = "${COMPONENT_DIR_PATH}/flash"
   COMPONENT_GPIO_DIR_PATH = "${COMPONENT_DIR_PATH}/gpio"
   COMPONENT_INTERNAL_FLASH_DIR_PATH = "${COMPONENT_DIR_PATH}/internal_flash"
@@ -107,6 +75,7 @@ core_sdk = {
   COMPONENT_RESET_DIR_PATH = "${COMPONENT_DIR_PATH}/reset"
   COMPONENT_RPMSG_DIR_PATH = "${COMPONENT_DIR_PATH}/rpmsg"
   COMPONENT_SERIAL_MGR_DIR_PATH = "${COMPONENT_DIR_PATH}/serial_manager"
+  COMPONENT_STR_PATH = "${COMPONENT_DIR_PATH}/str"
   COMPONENT_TIMER_DIR_PATH = "${COMPONENT_DIR_PATH}/timer"
   COMPONENT_TIMER_MGR_DIR_PATH = "${COMPONENT_DIR_PATH}/timer_manager"
   COMPONENT_TIME_STAMP_DIR_PATH = "${COMPONENT_DIR_PATH}/time_stamp"
@@ -139,10 +108,14 @@ core_sdk = {
     "${DRIVER_SPC_DIR_PATH}",
     "${DRIVER_TPM_DIR_PATH}",
     "${DRIVER_TRDC_DIR_PATH}",
+    "${DRIVER_VBAT_DIR_PATH}",
     "${DRIVER_WUU_DIR_PATH}",
 
     # Components directories
+    "${COMPONENT_ASSERT_PATH}",
     "${COMPONENT_BUTTON_DIR_PATH}",
+    "${COMPONENT_DEBUG_CONSOLE_PATH}",
+    "${COMPONENT_DEBUG_CONSOLE_PATH}/config",
     "${COMPONENT_FLASH_DIR_PATH}/nor",
     "${COMPONENT_FLASH_DIR_PATH}/nor/lpspi",
     "${COMPONENT_GPIO_DIR_PATH}",
@@ -152,29 +125,34 @@ core_sdk = {
     "${COMPONENT_MEM_MGR_DIR_PATH}",
     "${COMPONENT_MESSAGING_DIR_PATH}",
     "${COMPONENT_OSA_DIR_PATH}",
+    "${COMPONENT_OSA_DIR_PATH}/config",
     "${COMPONENT_PANIC_DIR_PATH}",
     "${COMPONENT_POWER_MGR_DIR_PATH}/core",
-    "${COMPONENT_POWER_MGR_DIR_PATH}/devices/${nxp_device}",
+    "${COMPONENT_POWER_MGR_DIR_PATH}/devices/KW45B41Z83",
     "${COMPONENT_RESET_DIR_PATH}",
     "${COMPONENT_RPMSG_DIR_PATH}",
     "${COMPONENT_SERIAL_MGR_DIR_PATH}",
+    "${COMPONENT_STR_PATH}",
     "${COMPONENT_TIMER_DIR_PATH}",
     "${COMPONENT_TIMER_MGR_DIR_PATH}",
     "${COMPONENT_TIME_STAMP_DIR_PATH}",
     "${COMPONENT_UART_DIR_PATH}",
-
-    # Utilities directories
-    "${UTILITIES_DIR_PATH}",
-    "${UTILITIES_DIR_PATH}/debug_console",
-    "${UTILITIES_DIR_PATH}/misc_utilities",
-    "${UTILITIES_DIR_PATH}/str",
   ]
 
   if (nxp_device == "MCXW727C") {
     core_include_dirs += [
       "${nxp_sdk_root}/core/devices/MCXW727C/drivers/",
       "${COMPONENT_POWER_MGR_DIR_PATH}/devices/KW47B42ZB7/",
-      "${DRIVER_TRDC_DIR_PATH}"
+      "${DRIVER_TRDC_DIR_PATH}",
+      "${DEVICES_DIR_PATH}/../periph3",
+    ]
+  } else if (nxp_device == "MCXW716C")  {
+    core_include_dirs += [
+      "${DEVICES_DIR_PATH}/../periph2",
+    ]
+  } else if (nxp_device == "K32W1480") {
+    core_include_dirs += [
+      "${DEVICES_DIR_PATH}/../periph1",
     ]
   }
 
@@ -258,7 +236,7 @@ core_sdk = {
       # Use this startup file for now. Will switch to an SDK startup file in the future.
       "${nxp_sdk_matter_support_root}/examples/platform/mcxw72/app/startup.S",
       "${DEVICES_DIR_PATH}/system_${nxp_device}_cm33_core0.c",
-      "${nxp_sdk_root}/devices/MCXW727C/drivers/fsl_clock.c",
+      "${ADDITIONAL_DRIVERS_DIR_PATH}/fsl_clock.c",
       "${COMPONENT_POWER_MGR_DIR_PATH}/devices/KW47B42ZB7/fsl_pm_device.c",
       # Drivers
     ]
@@ -268,7 +246,7 @@ core_sdk = {
       "${DEVICES_DIR_PATH}/gcc/startup_${nxp_device}.S",
       "${DEVICES_DIR_PATH}/system_${nxp_device}.c",
       "${ADDITIONAL_DRIVERS_DIR_PATH}/fsl_clock.c",
-      "${COMPONENT_POWER_MGR_DIR_PATH}/devices/${nxp_device}/fsl_pm_device.c",
+      "${COMPONENT_POWER_MGR_DIR_PATH}/devices/KW45B41Z83/fsl_pm_device.c",
     ]
   }
 
@@ -288,10 +266,13 @@ core_sdk = {
     "${DRIVER_LTC_DIR_PATH}/fsl_ltc.c",
     "${DRIVER_TRDC_DIR_PATH}/fsl_trdc.c",
     "${DRIVER_SPC_DIR_PATH}/fsl_spc.c",
+    "${DRIVER_VBAT_DIR_PATH}/fsl_vbat.c",
     "${DRIVER_WUU_DIR_PATH}/fsl_wuu.c",
 
     # Components files
+    "${COMPONENT_ASSERT_PATH}/fsl_assert.c",
     "${COMPONENT_BUTTON_DIR_PATH}/fsl_component_button.c",
+    "${COMPONENT_DEBUG_CONSOLE_PATH}/fsl_debug_console.c",
     "${COMPONENT_DIR_PATH}/rpmsg/fsl_adapter_rpmsg.c",
     "${COMPONENT_FLASH_DIR_PATH}/nor/lpspi/fsl_lpspi_mem_adapter.c",
     "${COMPONENT_FLASH_DIR_PATH}/nor/lpspi/fsl_lpspi_nor_flash.c",
@@ -307,15 +288,11 @@ core_sdk = {
     "${COMPONENT_RESET_DIR_PATH}/fsl_adapter_reset.c",
     "${COMPONENT_SERIAL_MGR_DIR_PATH}/fsl_component_serial_manager.c",
     "${COMPONENT_SERIAL_MGR_DIR_PATH}/fsl_component_serial_port_uart.c",
+    "${COMPONENT_STR_PATH}/fsl_str.c",
     "${COMPONENT_TIMER_DIR_PATH}/fsl_adapter_lptmr.c",
     "${COMPONENT_TIMER_MGR_DIR_PATH}/fsl_component_timer_manager.c",
     "${COMPONENT_TIME_STAMP_DIR_PATH}/fsl_adapter_lptmr_time_stamp.c",
     "${COMPONENT_UART_DIR_PATH}/fsl_adapter_lpuart.c",
-    
-    # Utilities files
-    "${UTILITIES_DIR_PATH}/debug_console/fsl_debug_console.c",
-    "${UTILITIES_DIR_PATH}/str/fsl_str.c",
-    "${UTILITIES_DIR_PATH_ASSERT}/fsl_assert.c",
   ]
 
   if (nxp_nvm_component != "fwk_nvm") {

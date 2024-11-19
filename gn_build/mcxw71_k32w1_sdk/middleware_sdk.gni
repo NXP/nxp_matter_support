@@ -28,13 +28,15 @@ middleware_sdk = {
   BLE_CONTROLLER_DIR_PATH = "${nxp_sdk_root}/middleware/wireless/ble_controller"
   BLE_HOST_DIR_PATH = "${nxp_sdk_root}/middleware/wireless/bluetooth"
   FRAMEWORK_DIR_PATH = "${nxp_sdk_root}/middleware/wireless/framework"
+  FRAMEWORK_SERVICES_DIR_PATH = "${nxp_sdk_root}/middleware/wireless/framework/services"
+  FRAMEWORK_ZEPHYR_DIR_PATH = "${nxp_sdk_root}/middleware/wireless/framework/zephyr"
   FREERTOS_DIR_PATH = "${nxp_sdk_root}/rtos/freertos"
-  FRAMEWORK_PLATFORM_DIR_PATH = "${FRAMEWORK_DIR_PATH}/platform/connected_mcu"
+  FRAMEWORK_PLATFORM_DIR_PATH = "${FRAMEWORK_DIR_PATH}/platform/wireless_mcu"
   FREERTOS_KERNEL_DIR_PATH = "${FREERTOS_DIR_PATH}/freertos-kernel"
   IEEE_802_15_4_DIR_PATH = "${nxp_sdk_root}/middleware/wireless/ieee-802.15.4"
   MBEDTLS_DIR_PATH = "${nxp_sdk_root}/middleware/mbedtls"
   MULTICORE_DIR_PATH = "${nxp_sdk_root}/middleware/multicore"
-  MULTICORE_RPMSG_DIR_PATH = "${nxp_sdk_root}/middleware/multicore/rpmsg_lite"
+  MULTICORE_RPMSG_DIR_PATH = "${nxp_sdk_root}/middleware/multicore/rpmsg-lite"
   SECURE_SUBSYSTEM_DIR_PATH = "${nxp_sdk_root}/middleware/secure-subsystem"
   LITTLEFS_DIR_PATH = "${nxp_sdk_root}/middleware/littlefs"
 
@@ -52,19 +54,20 @@ middleware_sdk = {
     
     # Framework directories
     "${FRAMEWORK_DIR_PATH}/Common",
-    "${FRAMEWORK_DIR_PATH}/DBG",
-    "${FRAMEWORK_DIR_PATH}/FunctionLib",
-    "${FRAMEWORK_DIR_PATH}/HWParameter",
-    "${FRAMEWORK_DIR_PATH}/LowPower",
-    "${FRAMEWORK_DIR_PATH}/ModuleInfo",
-    "${FRAMEWORK_DIR_PATH}/OtaSupport/Interface",
-    "${FRAMEWORK_DIR_PATH}/OtaSupport/Source",
-    "${FRAMEWORK_DIR_PATH}/RNG",
-    "${FRAMEWORK_DIR_PATH}/SecLib",
-    "${FRAMEWORK_DIR_PATH}/Sensors",
+    "${FRAMEWORK_SERVICES_DIR_PATH}/DBG",
+    "${FRAMEWORK_SERVICES_DIR_PATH}/FunctionLib",
+    "${FRAMEWORK_SERVICES_DIR_PATH}/HWParameter",
+    "${FRAMEWORK_SERVICES_DIR_PATH}/LowPower",
+    "${FRAMEWORK_SERVICES_DIR_PATH}/ModuleInfo",
+    "${FRAMEWORK_SERVICES_DIR_PATH}/OtaSupport/Interface",
+    "${FRAMEWORK_SERVICES_DIR_PATH}/OtaSupport/Source",
+    "${FRAMEWORK_SERVICES_DIR_PATH}/SecLib_RNG",
+    "${FRAMEWORK_SERVICES_DIR_PATH}/Sensors",
     "${FRAMEWORK_PLATFORM_DIR_PATH}",
-    "${FRAMEWORK_PLATFORM_DIR_PATH}/configs",
+    # Note: fwk_platform_ot.h is the one from wireless_mcu, not the one from
+    # platform/include, so include the latter one after.
     "${FRAMEWORK_DIR_PATH}/platform/include",
+    "${FRAMEWORK_PLATFORM_DIR_PATH}/configs",
 
     # Freertos directories
     "${FREERTOS_DIR_PATH}/libraries/3rdparty/mbedtls_config",
@@ -95,36 +98,47 @@ middleware_sdk = {
   if (nxp_device == "K32W1480") {
     middleware_include_dirs += [
       "${MULTICORE_RPMSG_DIR_PATH}/lib/include/platform/k32w1",
+      "${FRAMEWORK_PLATFORM_DIR_PATH}/../kw45_k32w1_mcxw71",
+      "${FRAMEWORK_PLATFORM_DIR_PATH}/../kw45_k32w1_mcxw71/configs",
     ]
   } else if (nxp_device == "MCXW716C") {
     middleware_include_dirs += [
-      "${MULTICORE_RPMSG_DIR_PATH}/lib/include/platform/kw45b41",
+      "${MULTICORE_RPMSG_DIR_PATH}/lib/include/platform/mcxw71x",
+      "${FRAMEWORK_PLATFORM_DIR_PATH}/../kw45_k32w1_mcxw71",
+      "${FRAMEWORK_PLATFORM_DIR_PATH}/../kw45_k32w1_mcxw71/configs",
     ]
   } else if (nxp_device == "MCXW727C") {
     middleware_include_dirs += [
       "${MULTICORE_RPMSG_DIR_PATH}/lib/include/platform/mcxw72x",
+      "${FRAMEWORK_PLATFORM_DIR_PATH}/../kw47_mcxw72",
+      "${FRAMEWORK_PLATFORM_DIR_PATH}/../kw47_mcxw72/configs",
       "${nxp_sdk_root}/boards/mcxw72evk/wireless_examples/bluetooth/w_uart/freertos/"
     ]
   }
 
   if (nxp_nvm_component == "fwk_nvm") {
     middleware_include_dirs += [
-      "${FRAMEWORK_DIR_PATH}/NVM/Source",
-      "${FRAMEWORK_DIR_PATH}/NVM/Interface"
+      "${FRAMEWORK_SERVICES_DIR_PATH}/NVM/Source",
+      "${FRAMEWORK_SERVICES_DIR_PATH}/NVM/Interface"
     ]
   } else if (nxp_nvm_component == "littlefs") {
     middleware_include_dirs += [
       "${LITTLEFS_DIR_PATH}",
-      "${FRAMEWORK_DIR_PATH}/FSAbstraction",
-      "${FRAMEWORK_DIR_PATH}/FileCache",
-      "${FRAMEWORK_DIR_PATH}/KeyStorage"
+      "${FRAMEWORK_SERVICES_DIR_PATH}/FSAbstraction",
+      "${FRAMEWORK_SERVICES_DIR_PATH}/FileCache",
+      "${FRAMEWORK_SERVICES_DIR_PATH}/KeyStorage"
     ]
   } else if (nxp_nvm_component == "nvs") {
     middleware_include_dirs += [
-      "${FRAMEWORK_DIR_PATH}/NVS/Interface",
-      "${FRAMEWORK_DIR_PATH}/NVS/Interface/port",
-      "${FRAMEWORK_DIR_PATH}/Settings/Interface",
-      "${FRAMEWORK_DIR_PATH}/Settings/Interface/port"
+      "${FRAMEWORK_ZEPHYR_DIR_PATH}/include",
+      "${FRAMEWORK_ZEPHYR_DIR_PATH}/include/zephyr/fs",
+      "${FRAMEWORK_ZEPHYR_DIR_PATH}/include/zephyr/settings",
+      "${FRAMEWORK_ZEPHYR_DIR_PATH}/include/zephyr/sys",
+      "${FRAMEWORK_ZEPHYR_DIR_PATH}/port/common",
+      "${FRAMEWORK_ZEPHYR_DIR_PATH}/port/nvs",
+      "${FRAMEWORK_ZEPHYR_DIR_PATH}/port/settings",
+      "${FRAMEWORK_ZEPHYR_DIR_PATH}/subsys/fs/nvs",
+      "${FRAMEWORK_ZEPHYR_DIR_PATH}/subsys/settings/include",
     ]
   }
 
@@ -210,15 +224,16 @@ middleware_sdk = {
   middleware_sources = [
     # Framework files
     "${FRAMEWORK_DIR_PATH}/Common/rtos/freertos/heap_mem_manager.c",
-    "${FRAMEWORK_DIR_PATH}/FunctionLib/FunctionLib.c",
-    "${FRAMEWORK_DIR_PATH}/HWParameter/HWParameter.c",
-    "${FRAMEWORK_DIR_PATH}/LowPower/PWR.c",
-    "${FRAMEWORK_DIR_PATH}/LowPower/PWR_systicks.c",
-    "${FRAMEWORK_DIR_PATH}/OtaSupport/Source/OtaExternalFlash.c",
-    "${FRAMEWORK_DIR_PATH}/OtaSupport/Source/OtaSupport.c",
-    "${FRAMEWORK_DIR_PATH}/RNG/RNG.c",
-    "${FRAMEWORK_DIR_PATH}/Sensors/sensors.c",
+    "${FRAMEWORK_SERVICES_DIR_PATH}/FunctionLib/FunctionLib.c",
+    "${FRAMEWORK_SERVICES_DIR_PATH}/HWParameter/HWParameter.c",
+    "${FRAMEWORK_SERVICES_DIR_PATH}/LowPower/PWR.c",
+    "${FRAMEWORK_SERVICES_DIR_PATH}/LowPower/PWR_systicks.c",
+    "${FRAMEWORK_SERVICES_DIR_PATH}/OtaSupport/Source/OtaExternalFlash.c",
+    "${FRAMEWORK_SERVICES_DIR_PATH}/OtaSupport/Source/OtaSupport.c",
+    "${FRAMEWORK_SERVICES_DIR_PATH}/SecLib_RNG/RNG.c",
+    "${FRAMEWORK_SERVICES_DIR_PATH}/Sensors/sensors.c",
     "${FRAMEWORK_PLATFORM_DIR_PATH}/fwk_platform_ble.c",
+    "${FRAMEWORK_PLATFORM_DIR_PATH}/fwk_platform_crypto.c",
     "${FRAMEWORK_PLATFORM_DIR_PATH}/fwk_platform.c",
     "${FRAMEWORK_PLATFORM_DIR_PATH}/fwk_platform_extflash.c",
     "${FRAMEWORK_PLATFORM_DIR_PATH}/fwk_platform_ics.c",
@@ -287,8 +302,8 @@ middleware_sdk = {
     middleware_sources += [
       "${MULTICORE_DIR_PATH}/mcmgr/src/mcmgr_internal_core_api_mcxw716.c",
       "${MULTICORE_DIR_PATH}/mcmgr/src/mcmgr_internal_core_api_mcxw716_ext.c",
-      "${MULTICORE_RPMSG_DIR_PATH}/lib/rpmsg_lite/porting/platform/kw45b41/rpmsg_platform.c",
-      "${MULTICORE_RPMSG_DIR_PATH}/lib/rpmsg_lite/porting/platform/kw45b41/rpmsg_platform_ext.c",
+      "${MULTICORE_RPMSG_DIR_PATH}/lib/rpmsg_lite/porting/platform/mcxw71x/rpmsg_platform.c",
+      "${MULTICORE_RPMSG_DIR_PATH}/lib/rpmsg_lite/porting/platform/mcxw71x/rpmsg_platform_ext.c",
       "${BLE_HOST_DIR_PATH}/application/common/matter/ble_init.c",
     ]
   } else if (nxp_device == "MCXW727C") {
@@ -297,45 +312,43 @@ middleware_sdk = {
       "${MULTICORE_DIR_PATH}/mcmgr/src/mcmgr_internal_core_api_mcxw727_ext.c",
       "${MULTICORE_RPMSG_DIR_PATH}/lib/rpmsg_lite/porting/platform/mcxw72x/rpmsg_platform.c",
       "${MULTICORE_RPMSG_DIR_PATH}/lib/rpmsg_lite/porting/platform/mcxw72x/rpmsg_platform_ext.c",
-      "${FRAMEWORK_PLATFORM_DIR_PATH}/fwk_platform_crypto.c",
-      #"${BLE_HOST_DIR_PATH}/application/common/ble_init.c",
-      "${nxp_sdk_root}/boards/mcxw72evk/wireless_examples/bluetooth/w_uart/freertos/ble_init.c",
+      "${BLE_HOST_DIR_PATH}/application/common/matter/ble_init.c",
     ]
   }
 
   if (chip_crypto == "platform") {
     middleware_sources += [
-      "${FRAMEWORK_DIR_PATH}/SecLib/SecLib_sss.c",
+      "${FRAMEWORK_SERVICES_DIR_PATH}/SecLib_RNG/SecLib_sss.c",
     ]
   } else if (chip_crypto == "mbedtls") {
     middleware_sources += [
-      "${FRAMEWORK_DIR_PATH}/SecLib/SecLib_mbedTLS.c",
+      "${FRAMEWORK_SERVICES_DIR_PATH}/SecLib_RNG/SecLib_mbedTLS.c",
     ]
   }
 
   if (nxp_nvm_component == "fwk_nvm") {
-    middleware_sources += [ "${FRAMEWORK_DIR_PATH}/NVM/Source/NV_Flash.c" ]
+    middleware_sources += [ "${FRAMEWORK_SERVICES_DIR_PATH}/NVM/Source/NV_Flash.c" ]
   } else if (nxp_nvm_component == "littlefs") {
     middleware_sources += [
       "${LITTLEFS_DIR_PATH}/lfs.c",
       "${LITTLEFS_DIR_PATH}/lfs_util.c",
-      "${FRAMEWORK_DIR_PATH}/FSAbstraction/fwk_fs_abstraction.c",
-      "${FRAMEWORK_DIR_PATH}/FSAbstraction/fwk_lfs_mflash.c",
-      "${FRAMEWORK_DIR_PATH}/FileCache/fwk_file_cache.c",
-      "${FRAMEWORK_DIR_PATH}/KeyStorage/fwk_key_storage.c"
+      "${FRAMEWORK_SERVICES_DIR_PATH}/FSAbstraction/fwk_fs_abstraction.c",
+      "${FRAMEWORK_SERVICES_DIR_PATH}/FSAbstraction/fwk_lfs_mflash.c",
+      "${FRAMEWORK_SERVICES_DIR_PATH}/FileCache/fwk_file_cache.c",
+      "${FRAMEWORK_SERVICES_DIR_PATH}/KeyStorage/fwk_key_storage.c"
     ]
   } else if (nxp_nvm_component == "nvs") {
     middleware_sources += [
-      "${FRAMEWORK_DIR_PATH}/NVS/Source/nvs.c",
-      "${FRAMEWORK_DIR_PATH}/NVS/Source/crc8.c",
-      "${FRAMEWORK_DIR_PATH}/NVS/Source/fwk_nvs_flash.c",
-      "${FRAMEWORK_DIR_PATH}/NVS/Source/fwk_nvs_InternalFlash.c",
-      "${FRAMEWORK_DIR_PATH}/NVS/Source/fwk_nvs_stats.c",
-      "${FRAMEWORK_DIR_PATH}/Settings/Source/settings_init.c",
-      "${FRAMEWORK_DIR_PATH}/Settings/Source/settings.c",
-      "${FRAMEWORK_DIR_PATH}/Settings/Source/settings_store.c",
-      "${FRAMEWORK_DIR_PATH}/Settings/Source/settings_nvs.c",
-      "${FRAMEWORK_DIR_PATH}/Settings/Source/settings_runtime.c"
+      "${FRAMEWORK_ZEPHYR_DIR_PATH}/lib/crc/crc8_sw.c",
+      "${FRAMEWORK_ZEPHYR_DIR_PATH}/subsys/fs/nvs/nvs.c",
+      "${FRAMEWORK_ZEPHYR_DIR_PATH}/subsys/settings/src/settings.c",
+      "${FRAMEWORK_ZEPHYR_DIR_PATH}/subsys/settings/src/settings_init.c",
+      "${FRAMEWORK_ZEPHYR_DIR_PATH}/subsys/settings/src/settings_store.c",
+      "${FRAMEWORK_ZEPHYR_DIR_PATH}/subsys/settings/src/settings_nvs.c",
+      "${FRAMEWORK_ZEPHYR_DIR_PATH}/subsys/settings/src/settings_runtime.c",
+      "${FRAMEWORK_ZEPHYR_DIR_PATH}/port/nvs/fwk_nvs_flash.c",
+      "${FRAMEWORK_ZEPHYR_DIR_PATH}/port/nvs/fwk_nvs_InternalFlash.c",
+      "${FRAMEWORK_ZEPHYR_DIR_PATH}/port/nvs/fwk_nvs_stats.c",
     ]
   }
 }

@@ -37,19 +37,14 @@ class NxpSdk:
     sdk_manifest_name: str
     sdk_storage_location_abspath: str
     sdk_storage_location_relativepath_from_root: str
-    sdk_example_repo_abspath: str = ""
-    sdk_example_repo_version: str = ""
-    sdk_example_repo_url: str = ""
-    sdk_example_repo_folder_list: list
 
-    def __init__(self, name, sdk_target_relative_path, sdk_example_repo_folder_list):
+    def __init__(self, name, sdk_target_relative_path):
         self.sdk_name = name
         self.sdk_target_location_abspath = os.path.join(NXP_MATTER_SUPPORT_ROOT, sdk_target_relative_path)
         self.sdk_target_location_relativepath_from_root = sdk_target_relative_path
         self.sdk_manifest_path = os.path.abspath(os.path.join(self.sdk_target_location_abspath , 'manifest'))
         self.sdk_manifest_name = 'west.yml'
         self.get_sdk_storage_location()
-        self.sdk_example_repo_folder_list = sdk_example_repo_folder_list
 
     def get_sdk_storage_location(self):
         westFilePath = os.path.abspath(os.path.join(self.sdk_manifest_path, self.sdk_manifest_name))
@@ -59,30 +54,24 @@ class NxpSdk:
             westStream.close()
             try:
                 path_prefix = west["manifest"]["projects"][0]["import"]["path-prefix"]
+                #In case of sdk_next SDK, all SDK modules would be stored in mcuxsdk folder therefore add it to path_prefix
+                if ("sdk_next" in self.sdk_target_location_relativepath_from_root):
+                    path_prefix = os.path.join(path_prefix, 'mcuxsdk')
                 self.sdk_storage_location_relativepath_from_root = os.path.join(NXP_MATTER_SUPPORT_ROOT, self.sdk_target_location_relativepath_from_root , path_prefix)
                 self.sdk_storage_location_abspath = os.path.abspath(self.sdk_storage_location_relativepath_from_root)
             except (KeyError) as exception:
                 logging.error("Wrong west file format %s", exception)
-            projects = west["manifest"]["projects"]
-            for project in projects:
-                if (project["name"] == "mcux-sdk-examples"):
-                    self.sdk_example_repo_abspath = os.path.abspath(os.path.join(NXP_MATTER_SUPPORT_ROOT, self.sdk_target_location_relativepath_from_root , project["path"]))
-                    print(self.sdk_example_repo_abspath)
-                    self.sdk_example_repo_version = project["revision"]
-                    self.sdk_example_repo_url = project["url"]
-
+                sys.exit(1)
         else:
             logging.error("SDK west config file : %s does not exist", westFilePath)
             sys.exit(1)
 
 def NxpSdk_k32w0():
-    sdk = NxpSdk('k32w0', 'github_sdk/k32w0', [])
+    sdk = NxpSdk('k32w0', 'github_sdk/k32w0')
     return sdk
 
 def NxpSdk_common():
-    sdk = NxpSdk('common', 'github_sdk/common_sdk',
-            #listing here all folder that we want to keep in the SDK examples repo
-            ['evkbmimxrt1060','evkmimxrt1060', 'evkcmimxrt1060', 'evkmimxrt1170', 'evkbmimxrt1170', 'frdmmcxw71','frdmrw612','k32w148evk','rdrw612bga'])
+    sdk = NxpSdk('common', 'github_sdk/sdk_next')
     return sdk
 
 ALL_PLATFORM_SDK = [
@@ -112,35 +101,35 @@ def init_nxp_sdk_version(nxp_sdk, force):
 
     command = ['west', 'init', '-l', nxp_sdk.sdk_manifest_path, '--mf', nxp_sdk.sdk_manifest_name]
     subprocess.run(command, check=True)
-    update_nxp_sdk_version(nxp_sdk, force)
-
-def update_nxp_sdk_example_folder(nxp_sdk,force):
-    if os.path.exists(nxp_sdk.sdk_example_repo_abspath):
-        try:
-            # Repo already exist try to get the latest version
-            print(nxp_sdk.sdk_example_repo_version)
-            subprocess.run(['git', 'fetch', 'origin', nxp_sdk.sdk_example_repo_version], cwd=nxp_sdk.sdk_example_repo_abspath, check=True)
-            subprocess.run(['git', 'sparse-checkout', 'set'] + nxp_sdk.sdk_example_repo_folder_list, cwd=nxp_sdk.sdk_example_repo_abspath, check=True)
-            subprocess.run(['git', 'checkout', nxp_sdk.sdk_example_repo_version], cwd=nxp_sdk.sdk_example_repo_abspath, check=True)
-        except (RuntimeError, subprocess.CalledProcessError) as exception:
-            if force:
-                #In case of force update clean local modifcation and re-do a checkout
-                clean_sdk_local_changes(nxp_sdk.sdk_example_repo_abspath)
-                subprocess.run(['git', 'checkout', nxp_sdk.sdk_example_repo_version], cwd=nxp_sdk.sdk_example_repo_abspath, check=True)
+    # In case of SDK next architecture a dedicated update process is required
+    if ("sdk_next" not in nxp_sdk.sdk_target_location_relativepath_from_root):
+        update_nxp_sdk_version(nxp_sdk, force)
     else:
-        # folder sdk example does not exist so clone it and use sparse-checkout to get only required folder
-        subprocess.run(['git', 'clone', '--no-checkout', nxp_sdk.sdk_example_repo_url, nxp_sdk.sdk_example_repo_abspath], check=True)
-        subprocess.run(['git', 'sparse-checkout', 'set'] + nxp_sdk.sdk_example_repo_folder_list, cwd=nxp_sdk.sdk_example_repo_abspath, check=True)
-        subprocess.run(['git', 'checkout', nxp_sdk.sdk_example_repo_version], cwd=nxp_sdk.sdk_example_repo_abspath, check=True)
+        update_nxp_sdk_next_version(nxp_sdk, force)
+
+def update_nxp_sdk_next_version(nxp_sdk, force):
+    print("Update SDK in " + nxp_sdk.sdk_target_location_abspath)
+    if not os.path.exists(os.path.join(nxp_sdk.sdk_target_location_abspath, '.west')):
+        logging.error("--update-only error SDK is not initialized")
+        sys.exit(1)
+    try:
+        subprocess.run(['west', 'update', 'bifrost'], cwd=nxp_sdk.sdk_target_location_abspath, check=True)
+        url_wrapper_dest = "includeif.gitdir:" + nxp_sdk.sdk_target_location_abspath + "/.path"
+        url_wrapper_src = os.path.join(nxp_sdk.sdk_target_location_abspath, 'repo/bifrost/.gitconfig')
+        subprocess.run(['git', 'config', '--global', url_wrapper_dest, url_wrapper_src], cwd=nxp_sdk.sdk_target_location_abspath, check=True)
+        subprocess.run(['west', 'config', 'commands.allow_extensions', 'true'], cwd=nxp_sdk.sdk_target_location_abspath, check=True)
+        subprocess.run(['west', 'update', '--fetch', 'smart'], cwd=nxp_sdk.sdk_target_location_abspath, check=True)
+        subprocess.run(['west', 'mcuxsdk-export'], cwd=nxp_sdk.sdk_target_location_abspath, check=True)
+    except (RuntimeError, subprocess.CalledProcessError) as exception:
+        logging.exception(
+            'Error SDK cannot be updated, local changes may need to be cleaned manually %s', exception)
+
 
 def update_nxp_sdk_version(nxp_sdk, force):
     print("Update SDK in " + nxp_sdk.sdk_target_location_abspath)
     if not os.path.exists(os.path.join(nxp_sdk.sdk_target_location_abspath, '.west')):
         logging.error("--update-only error SDK is not initialized")
         sys.exit(1)
-    #update the nxp SDK example repo
-    if (nxp_sdk.sdk_example_repo_abspath != ""):
-        update_nxp_sdk_example_folder(nxp_sdk, force)
     command = ['west', 'update', '--fetch', 'smart']
     try:
         subprocess.run(command, cwd=nxp_sdk.sdk_target_location_abspath, check=True)

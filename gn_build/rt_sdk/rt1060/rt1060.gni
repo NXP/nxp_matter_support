@@ -25,8 +25,12 @@ declare_args() {
   deviceBoardName = "MIMXRT1062"
 }
 
-COMPONENT_FILES_PATH = "${nxp_sdk_root}/core/components"
-DRIVER_FILES_PATH = "${nxp_sdk_root}/core/drivers"
+
+DRIVER_FILES_PATH = "${nxp_sdk_root}/drivers"
+DRIVER_COMMON_FILES_PATH = "${DRIVER_FILES_PATH}/common"
+DRIVER_DEVICE_FILES_PATH = "${nxp_sdk_root}/devices/RT/RT1060/${deviceBoardName}/drivers"
+COMPONENT_FILES_PATH = "${nxp_sdk_root}/components"
+
 DRIVER_LPUART_FILES_PATH = "${DRIVER_FILES_PATH}/lpuart"
 DRIVER_LPI2C_FILES_PATH = "${DRIVER_FILES_PATH}/lpi2c"
 DRIVER_LPSPI_FILES_PATH = "${DRIVER_FILES_PATH}/lpspi"
@@ -40,10 +44,8 @@ DRIVER_ENET_FILES_PATH = "${DRIVER_FILES_PATH}/enet"
 DRIVER_DCP_FILES_PATH = "${DRIVER_FILES_PATH}/dcp"
 DRIVER_WDOG_FILES_PATH = "${DRIVER_FILES_PATH}/wdog01"
 DRIVER_CACHE_FILES_PATH = "${DRIVER_FILES_PATH}/cache/armv7-m7"
-DRIVER_COMMON_FILES_PATH = "${DRIVER_FILES_PATH}/common"
-DRIVER_DEVICE_FILES_PATH =
-    "${nxp_sdk_root}/core/devices/${deviceBoardName}/drivers"
 DRIVER_USDHC_FILES_PATH = "${DRIVER_FILES_PATH}/usdhc"
+
 COMPONENT_CRC_FILES_PATH = "${COMPONENT_FILES_PATH}/crc"
 COMPONENT_RNG_FILES_PATH = "${COMPONENT_FILES_PATH}/rng"
 COMPONENT_SILICON_ID_FILES_PATH = "${COMPONENT_FILES_PATH}/silicon_id"
@@ -52,16 +54,11 @@ COMPONENT_TIMER_FILES_PATH = "${COMPONENT_FILES_PATH}/timer"
 COMPONENT_GPIO_FILES_PATH = "${COMPONENT_FILES_PATH}/gpio"
 COMPONENT_SPI_FILES_PATH = "${COMPONENT_FILES_PATH}/spi"
 COMPONENT_MEM_MANAGER_FILES_PATH = "${COMPONENT_FILES_PATH}/mem_manager"
-UTILITIES_FILES_PATH = "${nxp_sdk_root}/core/utilities"
-UTILITIES_DEVICE_FILES_PATH =
-    "${nxp_sdk_root}/core/devices/${deviceBoardName}/utilities"
-DEBUG_CONSOLE_FILES_PATH = "${UTILITIES_FILES_PATH}/debug_console_lite"
-STR_FILES_PATH = "${UTILITIES_FILES_PATH}/str"
-FSL_FLEXSPI_NOR_BOOT_FILES_PATH =
-    "${nxp_sdk_root}/core/devices/${deviceBoardName}/xip"
-
-WIRELESS_CONFIG_TEMPLATE_PATH =
-    "${nxp_sdk_root}/core/boards/${evkname}/wireless_config_template"
+UTILITIES_SHELL_FILES_PATH = "${COMPONENT_FILES_PATH}/shell"
+UTILITIES_ASSERT_FILES_PATH = "${COMPONENT_FILES_PATH}/assert"
+DEBUG_CONSOLE_FILES_PATH = "${COMPONENT_FILES_PATH}/debug_console_lite"
+STR_FILES_PATH = "${COMPONENT_FILES_PATH}/str"
+FSL_FLEXSPI_NOR_BOOT_FILES_PATH = "${nxp_sdk_root}/devices/RT/RT1064/MIMXRT1064/xip"
 
 template("rt1060_sdk_drivers") {
   config("${target_name}_config") {
@@ -75,7 +72,8 @@ template("rt1060_sdk_drivers") {
     _rt1060_sdk_drivers_include_dirs = [
       #Drivers files
       "${DRIVER_DEVICE_FILES_PATH}",
-      "${nxp_sdk_root}/core/devices/${deviceBoardName}",
+      "${nxp_sdk_root}/devices/RT/RT1060/${deviceBoardName}",
+      "${nxp_sdk_root}/devices/RT/RT1060/periph",
       "${COMPONENT_CRC_FILES_PATH}",
       "${COMPONENT_RNG_FILES_PATH}",
       "${COMPONENT_SILICON_ID_FILES_PATH}",
@@ -99,8 +97,6 @@ template("rt1060_sdk_drivers") {
       "${DRIVER_USDHC_FILES_PATH}",
       "${DRIVER_TRNG_FILES_PATH}",
       "${DRIVER_FLEXSPI_FILES_PATH}",
-      "${UTILITIES_FILES_PATH}",
-      "${UTILITIES_DEVICE_FILES_PATH}",
       "${DEBUG_CONSOLE_FILES_PATH}",
       "${STR_FILES_PATH}",
 
@@ -114,20 +110,12 @@ template("rt1060_sdk_drivers") {
 
       # freertos
       "${rt_sdk_freertos_kernel}/portable/GCC/ARM_CM4F",
-
-      # Framework
-      "${nxp_sdk_root}/middleware/wireless/framework/boards/${rt_fwk_platform}",
     ]
 
     if (evkname == "evkcmimxrt1060") {
-      _rt1060_sdk_drivers_include_dirs += [ "${nxp_sdk_root}/core/components/flash/mflash/evkcmimxrt1060" ]
+      _rt1060_sdk_drivers_include_dirs += [ "${nxp_sdk_root}/components/flash/mflash/evkcmimxrt1060" ]
     } else {
-      _rt1060_sdk_drivers_include_dirs += [ "${nxp_sdk_root}/core/components/flash/mflash/mimxrt1062" ]
-    }
-
-
-    if (chip_enable_wifi || iwx12_transceiver) {
-      _rt1060_sdk_drivers_include_dirs += [ "${WIRELESS_CONFIG_TEMPLATE_PATH}" ]
+      _rt1060_sdk_drivers_include_dirs += [ "${nxp_sdk_root}/components/flash/mflash/mimxrt1062" ]
     }
 
     ldflags = [
@@ -245,45 +233,36 @@ template("rt1060_sdk_drivers") {
       #"${STR_FILES_PATH}/fsl_str.c",
       # XIP
       "${FSL_FLEXSPI_NOR_BOOT_FILES_PATH}/fsl_flexspi_nor_boot.c",
-      "${UTILITIES_DEVICE_FILES_PATH}/fsl_shell.c",
+      "${UTILITIES_SHELL_FILES_PATH}/fsl_shell.c",
 
       #sdk hook
       "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/mbedtls/ksdk_mbedtls_hook.c",
-      "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/zephyr/kernel.c",
-      "${rt_core_sdk_root}/components/internal_flash/fsl_adapter_flexspi_nor_flash.c",
+      "${COMPONENT_FILES_PATH}/internal_flash/fsl_adapter_flexspi_nor_flash.c",
 
       # freertos files
       # freertos
       "${rt_sdk_freertos_kernel}/portable/GCC/ARM_CM4F/port.c",
       "${rt_sdk_freertos_kernel}/portable/MemMang/heap_4.c",
-      "${nxp_sdk_root}/core/boards/${evkname}/xip/${evkname}_flexspi_nor_config.c",
+      "${nxp_sdk_root}/examples/_boards/${evkname}/xip/${evkname}_flexspi_nor_config.c",
 
       #startup files
-      "${nxp_sdk_root}/core/devices/${deviceBoardName}/gcc/startup_${deviceBoardName}.S",
-      "${nxp_sdk_root}/core/devices/${deviceBoardName}/system_${deviceBoardName}.c",
+      "${nxp_sdk_root}/devices/RT/RT1060/${deviceBoardName}/gcc/startup_${deviceBoardName}.S",
+      "${nxp_sdk_root}/devices/RT/RT1060/${deviceBoardName}/system_${deviceBoardName}.c",
 
       # mdio
       #"${rt_core_sdk_root}/components/phy/mdio/enet/fsl_enet_mdio.c",
       # framework files
-      "${nxp_sdk_root}/middleware/wireless/framework/boards/${rt_fwk_platform}/board_comp.c",
       "${nxp_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform.c",
     ]
 
     if (evkname == "evkcmimxrt1060") {
-      sources += [ "${nxp_sdk_root}/core/components/flash/mflash/evkcmimxrt1060/mflash_drv.c" ]
+      sources += [ "${nxp_sdk_root}/components/flash/mflash/evkcmimxrt1060/mflash_drv.c" ]
     } else {
-      sources += [ "${nxp_sdk_root}/core/components/flash/mflash/mimxrt1062/mflash_drv.c" ]
+      sources += [ "${nxp_sdk_root}/components/flash/mflash/mimxrt1062/mflash_drv.c" ]
     }
 
     if (sdk_fsl_assert_support) {
-      sources += [ "${UTILITIES_FILES_PATH}/assert/fsl_assert.c" ]
-    }
-
-    if (chip_enable_wifi || iwx12_transceiver) {
-      sources += [
-        "${WIRELESS_CONFIG_TEMPLATE_PATH}/sdmmc_config.c",
-        "${WIRELESS_CONFIG_TEMPLATE_PATH}/wifi_bt_config.c",
-      ]
+      sources += [ "${UTILITIES_ASSERT_FILES_PATH}/fsl_assert.c" ]
     }
 
     if (chip_enable_ble) {

@@ -48,8 +48,14 @@ template("bt_ble_target") {
 
       #edgefast_bluetooth
       "${nxp_sdk_root}/middleware/edgefast_bluetooth/include",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/include/sys",
       "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/porting",
       "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/porting/fifo",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/porting/net",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/porting/thread",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/porting/slist",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/porting/work",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/porting/queue",
       "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/crypto",
       "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/host",
       "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/platform",
@@ -136,6 +142,9 @@ template("bt_ble_target") {
       # CONTROLLER_ID define as kUSB_ControllerEhci0 (= 2U)
       "CONTROLLER_ID=2U",
       "CONFIG_BT_DEVICE_NAME=\"NXP BLE test\"",
+      "LOG_ENABLE_ASYNC_MODE=1",
+      "LOG_MAX_ARGUMENT_COUNT=10",
+      "LOG_ENABLE_OVERWRITE=0",
     ]
 
     # Now add our "system-header" include dirs
@@ -145,7 +154,7 @@ template("bt_ble_target") {
 
     #Adding pre-include files
     cflags += [ "-include" + rebase_path(
-                    "${nxp_sdk_root}/middleware/edgefast_bluetooth/output/templates/config/edgefast_bluetooth_config.h",
+                    "${chip_root}/third_party/nxp/nxp_matter_support/gn_build/rt_sdk/transceiver/edgefast_bluetooth_config.h",
                     root_build_dir) ]
   }
 
@@ -178,10 +187,15 @@ template("bt_ble_target") {
       "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/platform/bt_ble_platform.c",
       "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/impl/ethermind/platform/bt_ble_settings.c",
       "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/porting/atomic_c.c",
-      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/porting/buf.c",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/porting/net/buf.c",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/porting/net/buf_simple.c",
       "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/porting/porting.c",
-      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/porting/slist.c",
-      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/porting/work_queue.c",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/porting/sem/sem.c",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/porting/slab/slab.c",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/porting/slist/slist.c",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/porting/work/work.c",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/porting/queue/queue.c",
+      "${nxp_sdk_root}/middleware/edgefast_bluetooth/source/porting/thread/thread.c",
       "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/export/extension/BT_common_pl.c",
       "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/export/extension/aes_cmac_pl.c",
       "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/export/extension/device_queue_pl.c",
