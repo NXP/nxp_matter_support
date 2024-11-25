@@ -9,6 +9,12 @@ if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1170 || CHIP_NXP_PLATFORM_RT10
 
 rsource "*/Kconfig.defconfig"
 
+if MCUX_COMPONENT_middleware.wireless.framework.ota_support
+choice MCUX_COMPONENT_middleware.wireless.framework.ota_support.flash_selection
+	default MCUX_COMPONENT_middleware.wireless.framework.ota_support.external_flash
+endchoice
+endif # MCUX_COMPONENT_middleware.wireless.framework.ota_support
+
 config BOOTLOADER_MCUBOOT
 	bool
 	default y if CHIP_OTA_REQUESTOR

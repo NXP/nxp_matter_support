@@ -118,11 +118,15 @@ endfunction(nxp_build_app_with_gn)
 #*********************************************************************************
 # Generate MCUBoot application
 #*********************************************************************************
+if(DEFINED CONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING)
+    string(REGEX REPLACE "\\\\" "" CONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING ${CONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING})
+endif()
+
 get_filename_component(MCUBOOT_OPENSOURCE_DIR "${NXP_SDK_ROOT}/middleware/mcuboot_opensource" REALPATH)
 if(CONFIG_CHIP_BUILD_APP_WITH_GN)
     get_filename_component(MCUBOOT_EXAMPLE_DIR "${NXP_SDK_ROOT}/examples/${CONFIG_BOARD_NAME}/ota_examples/mcuboot_opensource/${CONFIG_CORE_FOLDER}" REALPATH)
 else()
-    get_filename_component(MCUBOOT_EXAMPLE_DIR "${NXP_SDK_ROOT}/examples/src/ota_examples/mcuboot_opensource" REALPATH)
+    get_filename_component(MCUBOOT_EXAMPLE_DIR "${NXP_SDK_ROOT}/examples/ota_examples/mcuboot_opensource" REALPATH)
 endif()
 function(nxp_generate_mcuboot)
 if(CONFIG_CHIP_BUILD_APP_WITH_GN)
@@ -175,7 +179,7 @@ function(nxp_sign_app_imgtool bin_sections_to_remove)
     endif()
 
     add_custom_target(sign_application ALL
-        COMMAND ${Python3_EXECUTABLE} imgtool.py sign --key ${MCUBOOT_EXAMPLE_DIR}/keys/sign-rsa2048-priv.pem --align 4 --header-size ${CONFIG_CHIP_MCUBOOT_HEADER_SIZE} --pad-header
+        COMMAND ${Python3_EXECUTABLE} imgtool.py sign --key ${MCUBOOT_OPENSOURCE_DIR}/boot/nxp_mcux_sdk/keys/sign-rsa2048-priv.pem --align 4 --header-size ${CONFIG_CHIP_MCUBOOT_HEADER_SIZE} --pad-header
                --slot-size ${CONFIG_CHIP_MCUBOOT_SLOT_SIZE} --max-sectors ${CONFIG_CHIP_MCUBOOT_MAX_SECTORS} --version ${CONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING} ${CONFIG_MCUBOOT_ADDITIONAL_ARGS} ${APP_OUTPUT_DIR}/${APP_EXECUTABLE_NAME}.bin ${APP_OUTPUT_DIR}/${APP_EXECUTABLE_NAME}_SIGNED.bin
         WORKING_DIRECTORY ${MCUBOOT_OPENSOURCE_DIR}/scripts
         DEPENDS ${APP_OUTPUT_DIR}/${APP_EXECUTABLE_NAME}.bin
