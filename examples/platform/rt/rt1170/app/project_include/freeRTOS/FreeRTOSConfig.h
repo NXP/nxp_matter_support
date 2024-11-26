@@ -55,7 +55,7 @@
 #define configTOTAL_HEAP_SIZE ((size_t) (126 * 1024))
 #endif
 #define configAPPLICATION_ALLOCATED_HEAP 1
-#define configSUPPORT_STATIC_ALLOCATION 0
+#define configSUPPORT_STATIC_ALLOCATION 1
 #define configSUPPORT_DYNAMIC_ALLOCATION 1
 #define configFRTOS_MEMORY_SCHEME 4
 #define configMAX_TASK_NAME_LEN (16)
@@ -96,6 +96,7 @@
 #define INCLUDE_vTaskSuspend 1
 #define INCLUDE_vTaskDelayUntil 1
 #define INCLUDE_vTaskDelay 1
+#define INCLUDE_xTaskAbortDelay 1
 #define INCLUDE_xTaskGetSchedulerState 1
 #define INCLUDE_xTimerPendFunctionCall 1
 #define INCLUDE_xSemaphoreGetMutexHolder 1

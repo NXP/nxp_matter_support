@@ -9,11 +9,11 @@
 #include "clock_config.h"
 #include "pin_mux.h"
 
-#if (defined(K32W061_TRANSCEIVER) && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE) ||                                                        \
-    (defined(WIFI_IW416_BOARD_AW_AM510_USD) && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE) ||                                              \
-    (defined(WIFI_IW416_BOARD_AW_AM457_USD) && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE) ||                                              \
-    (defined(WIFI_IW612_BOARD_RD_USD) && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE) ||                                                    \
-    (defined(WIFI_IW612_BOARD_MURATA_2EL_USD) && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE)
+#if (defined(K32W061_TRANSCEIVER) && (CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE || CONFIG_BT)) ||                                                        \
+    (defined(WIFI_IW416_BOARD_AW_AM510_USD) && (CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE || CONFIG_BT)) ||                                              \
+    (defined(WIFI_IW416_BOARD_AW_AM457_USD) && (CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE || CONFIG_BT)) ||                                              \
+    (defined(WIFI_IW612_BOARD_RD_USD) && (CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE || CONFIG_BT)) ||                                                    \
+    (defined(WIFI_IW612_BOARD_MURATA_2EL_USD) && (CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE || CONFIG_BT))
 #include "controller_hci_uart.h"
 #endif
 /*${header:end}*/
@@ -39,7 +39,7 @@ void BOARD_InitHardware(void)
     {
         BOARD_ConfigMPU();
         BOARD_InitBootPins();
-#if (CHIP_DEVICE_CONFIG_ENABLE_WPA || CHIP_DEVICE_CONFIG_ENABLE_THREAD)
+#if (CHIP_DEVICE_CONFIG_ENABLE_WPA || CHIP_DEVICE_CONFIG_ENABLE_THREAD || CONFIG_CHIP_WIFI)
         BOARD_InitUSDHCPins();
 #else
         BOARD_InitENETPins();
@@ -52,9 +52,9 @@ void BOARD_InitHardware(void)
     }
 }
 
-#if (defined(K32W061_TRANSCEIVER) && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE) ||                                                        \
-    (defined(WIFI_IW612_BOARD_RD_USD) && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE) ||                                                    \
-    (defined(WIFI_IW612_BOARD_MURATA_2EL_USD) && CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE)
+#if (defined(K32W061_TRANSCEIVER) && (CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE || CONFIG_BT)) ||                                                        \
+    (defined(WIFI_IW612_BOARD_RD_USD) && (CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE || CONFIG_BT)) ||                                                    \
+    (defined(WIFI_IW612_BOARD_MURATA_2EL_USD) && (CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE || CONFIG_BT))
 int controller_hci_uart_get_configuration(controller_hci_uart_config_t * config)
 {
     if (NULL == config)

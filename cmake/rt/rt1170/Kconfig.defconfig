@@ -8,8 +8,32 @@ if CHIP_NXP_PLATFORM_RT1170
 
 # Add SDK dependencies required for RT1170
 config CHIP_SDK_DEPENDENCIES
-    # TODO : select here sdk components for rt1170
+	select MCUX_COMPONENT_middleware.wireless.framework.platform.coex
 
-# TODO : Add default values for RT1170 here
+choice CHIP_NVM_COMPONENT
+	default CHIP_NVM_COMPONENT_LITTLEFS
+endchoice
+
+# SDK defaults
+
+# Wifi
+choice MCUX_COMPONENT_middleware.wifi.wifidriver.selection
+	default MCUX_DEPENDENCY_COMPONENT_middleware.wifi.wifidriver_DEPEND_ANYOF_OPTION_1
+endchoice
+
+# sdmmc
+choice MCUX_COMPONENT_middleware.sdmmc.host.usdhc.selection
+	default MCUX_COMPONENT_middleware.sdmmc.host.usdhc.non_blocking
+endchoice
+
+# FreeRTOS
+choice MCUX_MISC_middleware.freertos-kernel.dynamic_allocator.selection
+	default MCUX_COMPONENT_middleware.freertos-kernel.heap_4
+endchoice
+
+# Framework defaults
+choice MCUX_COMPONENT_middleware.wireless.framework.platform.coex.transceiver
+    default MCUX_COMPONENT_middleware.wireless.framework.platform.coex.iw612
+endchoice
 
 endif # CHIP_NXP_PLATFORM_RT1170
