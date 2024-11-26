@@ -125,7 +125,7 @@ def update_nxp_sdk_example_folder(nxp_sdk,force):
         except (RuntimeError, subprocess.CalledProcessError) as exception:
             if force:
                 #In case of force update clean local modifcation and re-do a checkout
-                clean_sdk_local_changes(nxp_sdk.sdk_example_repo_version)
+                clean_sdk_local_changes(nxp_sdk.sdk_example_repo_abspath)
                 subprocess.run(['git', 'checkout', nxp_sdk.sdk_example_repo_version], cwd=nxp_sdk.sdk_example_repo_abspath, check=True)
     else:
         # folder sdk example does not exist so clone it and use sparse-checkout to get only required folder
