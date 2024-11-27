@@ -54,7 +54,6 @@ mcux_add_macro(
 
 if(CONFIG_BT)
     mcux_add_macro(
-        BT_BLE_PLATFORM_INIT_ESCAPE
         BT_PLATFORM
     )
 endif()
@@ -71,8 +70,8 @@ mcux_add_configuration(
 )
 
 mcux_add_configuration(
-    CC "-Wno-maybe-uninitialized -Wno-unused-variable"
-    CX "-Wno-maybe-uninitialized -Wno-unused-variable"
+    CC "-Wno-maybe-uninitialized -Wno-unused-variable -march=armv8-m.main"
+    CX "-Wno-maybe-uninitialized -Wno-unused-variable -march=armv8-m.main"
 )
 
 # ========================================================================================

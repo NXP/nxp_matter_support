@@ -115,10 +115,6 @@ config BT_GATT_DYNAMIC_DB
 	bool
 	default y
 
-config BT_SMP
-	bool
-	default y
-
 config MCUX_PRJSEG_middleware.edgefast_bluetooth.storage
 	bool
 	default n
@@ -152,6 +148,9 @@ config CONTROLLER_ID
 
 config BT_DEVICE_NAME
 	default "\"NXP BLE test\""
+
+config BT_BLE_PLATFORM_INIT_ESCAPE
+	default y
 
 endif # BT
 
