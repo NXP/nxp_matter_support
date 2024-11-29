@@ -135,7 +135,9 @@ template("bt_ble_target") {
       "USB_HOST_CONFIG_EHCI=2",
       # CONTROLLER_ID define as kUSB_ControllerEhci0 (= 2U)
       "CONTROLLER_ID=2U",
-      "CONFIG_BT_DEVICE_NAME=\"NXP BLE test\"",
+      "CONFIG_BT_DEVICE_NAME_DYNAMIC=1",
+      # Increase hci_rx_thread stack size (1024 by default) to fix stack overflow during commissining
+      "CONFIG_BT_RX_STACK_SIZE=1536"
     ]
 
     # Now add our "system-header" include dirs
