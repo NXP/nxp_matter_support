@@ -55,6 +55,10 @@ declare_args() {
   # Enable wifi PTA support
   wifi_enable_pta = false
 
+  # Customize BLE advertising data at application layer,
+  # instead of default Zephyr BLE manager implementation advertising data
+  ble_adv_data_custom = false
+
   # RT platform name
   rt_platform = ""
 
@@ -455,6 +459,11 @@ template("rt_sdk") {
         "LFS_NO_ERROR",
         "LFS_NO_WARN",
       ]
+    }
+
+    if(ble_adv_data_custom){
+      # to customize BLE advertising data
+      defines += [ "CONFIG_CHIP_CUSTOM_BLE_ADV_DATA=1"]
     }
 
     if (chip_enable_wifi || chip_enable_ethernet) {
