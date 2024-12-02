@@ -47,7 +47,7 @@ config FSL_OSA_MAIN_FUNC_ENABLE
 
 # FreeRTOS defaults
 config configTICK_RATE_HZ
-	default "(TickType_t) 1000"
+	default 1000
 
 config configMAX_PRIORITIES
 	default 10
@@ -71,13 +71,14 @@ config configTIMER_TASK_PRIORITY
 	default "(configMAX_PRIORITIES - 3)"
 
 config configTOTAL_HEAP_SIZE
-	default "((size_t) (126 * 1024))"
+	default 129024
 
 config configMINIMAL_STACK_SIZE
-	default "(uint16_t) 2048"
-
-config configTIMER_TASK_STACK_DEPTH
 	default 2048
+
+# This Kconfig requires quotes "" due to its definition as a string
+config configTIMER_TASK_STACK_DEPTH
+	default "2048"
 
 config configRECORD_STACK_HIGH_ADDRESS
 	default y

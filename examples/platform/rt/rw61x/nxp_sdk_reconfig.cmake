@@ -25,8 +25,6 @@ get_filename_component(NXP_MATTER_SUPPORT_DIR ${CMAKE_CURRENT_LIST_DIR}/../../..
 
 # Common macros
 mcux_add_macro(
-    # TODO : check if all these flags are still required & whether it could be defined within SDK
-    gMemManagerLightExtendHeapAreaUsage=1
     PRINTF_ADVANCED_ENABLE=1
     __STARTUP_CLEAR_BSS
     __STARTUP_INITIALIZE_NONCACHEDATA

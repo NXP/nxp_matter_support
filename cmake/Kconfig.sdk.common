@@ -9,8 +9,6 @@ config CHIP_SDK_DEPENDENCIES
     bool "Platform SDK dependencies for Matter protocol stack"
 	select MCUX_COMPONENT_component.osa
 	select MCUX_COMPONENT_component.osa_interface
-    select MCUX_COMPONENT_component.mem_manager
-    select MCUX_COMPONENT_component.messaging
     select MCUX_COMPONENT_component.flash_adapter
 	select MCUX_COMPONENT_component.serial_manager
 	select MCUX_COMPONENT_component.serial_manager_uart
@@ -52,7 +50,6 @@ config CHIP_SDK_DEPENDENCIES_BLE
 	select MCUX_COMPONENT_middleware.edgefast_bluetooth.pal
 	select MCUX_COMPONENT_middleware.edgefast_bluetooth.pal.platform.ethermind
 	select MCUX_COMPONENT_middleware.edgefast_bluetooth.common.ethermind
-	select MCUX_COMPONENT_middleware.edgefast_bluetooth.btble.ethermind
 	select MCUX_COMPONENT_middleware.wireless.framework.platform.ble
 	help
 		Enable SDK components required for BLE support.

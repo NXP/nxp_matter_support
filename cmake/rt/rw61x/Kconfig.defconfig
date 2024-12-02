@@ -16,7 +16,6 @@ config CHIP_SDK_DEPENDENCIES
 	select MCUX_COMPONENT_middleware.wireless.framework.platform.hdlc
     select MCUX_COMPONENT_middleware.wireless.framework.factory_data_provider if CHIP_FACTORY_DATA
     select MCUX_COMPONENT_middleware.wireless.framework.ota_support if CHIP_OTA_REQUESTOR
-    select MCUX_COMPONENT_middleware.wireless.framework.ota_support.external_flash if CHIP_OTA_REQUESTOR
     select MCUX_COMPONENT_middleware.wifi.imu if CHIP_WIFI
 
 choice CHIP_NVM_COMPONENT
