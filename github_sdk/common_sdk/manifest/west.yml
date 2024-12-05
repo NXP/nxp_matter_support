@@ -30,11 +30,8 @@ manifest:
           - mcux-sdk-middleware-usb
           - rpmsg-lite
           - mcux-secure-subsystem
+          - wifi_nxp
         path-prefix: repo
-    - name: wifi_nxp
-      url: https://github.com/NXP/wifi_nxp.git
-      revision: MCUX_2.16.100_QP1
-      path: repo/middleware/wifi_nxp
     - name: mcux-sdk-examples
       url: https://github.com/nxp-mcuxpresso/mcux-sdk-examples.git
       revision: MCUX_2.16.100
