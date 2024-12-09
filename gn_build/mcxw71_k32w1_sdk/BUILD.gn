@@ -43,7 +43,7 @@ group("nxp_mbedtls") {
 
 config("mbedtls_k32w1_config") {
   # Temporary solution until platform rework
-  if (nxp_device == "MCXW727C") {
+  if (nxp_platform == "mcxw72") {
     defines = [ "MBEDTLS_USER_CONFIG_FILE=<src/platform/nxp/${nxp_platform}/mcxw72-chip-mbedtls-config.h>" ]
   } else {
     defines = [ "MBEDTLS_USER_CONFIG_FILE=<src/platform/nxp/${nxp_platform}/k32w1-chip-mbedtls-config.h>" ]

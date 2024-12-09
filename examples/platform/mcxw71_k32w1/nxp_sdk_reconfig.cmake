@@ -1,0 +1,165 @@
+#
+#   Copyright (c) 2024 Project CHIP Authors
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+#
+
+get_filename_component(MATTER_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/../../../ REALPATH)
+get_filename_component(NXP_MATTER_SUPPORT_ROOT ${MATTER_ROOT}/third_party/nxp/nxp_matter_support REALPATH)
+
+mcux_add_source(
+    BASE_PATH ${SdkRootDirPath}/examples/_common/project_segments/wireless/wireless_mcu
+    SOURCES
+    board.c
+    app_common/app_services_init.c
+    app_common/hardware_init.c
+    components/board_comp.c
+    dcdc/board_dcdc.c
+    ext_flash/board_extflash.c
+    low_power/board_lp.c
+)
+
+mcux_add_source(
+    BASE_PATH ${SdkRootDirPath}/examples/_boards/${board}/wireless_examples
+    SOURCES
+    clock_config.c
+    pin_mux.c
+)
+
+mcux_add_source(
+    BASE_PATH ${NXP_MATTER_SUPPORT_ROOT}
+    SOURCES
+    examples/platform/common/ble/ble_function_mux.c
+)
+
+mcux_add_include(
+    BASE_PATH ${SdkRootDirPath}
+    INCLUDES
+    examples/_boards/${board}/wireless_examples
+    examples/_common/project_segments/wireless/wireless_mcu
+    examples/_common/project_segments/wireless/wireless_mcu/app_common
+    examples/_common/project_segments/wireless/wireless_mcu/components
+    examples/_common/project_segments/wireless/wireless_mcu/dcdc
+    examples/_common/project_segments/wireless/wireless_mcu/ext_flash
+    examples/_common/project_segments/wireless/wireless_mcu/low_power
+)
+
+mcux_add_include(
+    BASE_PATH ${MATTER_ROOT}
+    INCLUDES
+    # Temporary path for mbedtls config file location
+    .
+    # Temporary path for gatt_uuid128.h file
+    third_party/nxp/nxp_matter_support/examples/platform/common/ble
+    # Temporary path for FreeRTOS config file
+    third_party/nxp/nxp_matter_support/examples/platform/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/app/project_include/freeRTOS
+)
+
+# Here it is required to remove the default linker script added by the SDK Next build system
+# and include the application linker script
+mcux_remove_armgcc_linker_script(
+    TARGETS debug release flash_debug flash_release
+    BASE_PATH ${SdkRootDirPath}
+    LINKER devices/${soc_portfolio}/${soc_series}/${device}/gcc/${CONFIG_MCUX_TOOLCHAIN_LINKER_DEVICE_PREFIX}_flash.ld
+)
+
+mcux_remove_armgcc_linker_script(
+    TARGETS debug release
+    BASE_PATH ${SdkRootDirPath}
+    LINKER devices/${soc_portfolio}/${soc_series}/${device}/gcc/${CONFIG_MCUX_TOOLCHAIN_LINKER_DEVICE_PREFIX}_ram.ld
+)
+
+mcux_add_armgcc_linker_script(
+    TARGETS debug release flash_debug flash_release
+    BASE_PATH ${SdkRootDirPath}
+    LINKER examples/_boards/${board}/wireless_examples/linker/gcc/connectivity.ld
+)
+
+# Components configuration
+mcux_add_macro(
+    gAppButtonCnt_c=2
+)
+
+mcux_add_configuration(
+    LD "\
+    -Wl,--defsym=__heap_size__=0 \
+    -Wl,--defsym=__stack_size__=0x480 \
+    -Wl,--no-warn-rwx-segments \
+")
+
+mcux_add_configuration(
+    CX "\
+    -Wno-register \
+")
+
+# TODO check if all are needed
+mcux_add_macro(
+    SDK_COMPONENT_INTEGRATION=1
+    gSerialManagerMaxInterfaces_c=1
+    gAppHighSystemClockFrequency_d=1
+    gAppLedCnt_c
+    USE_NBU=1
+    gAspCapability_d=1
+    gNvStorageIncluded_d=1
+    gUnmirroredFeatureSet_d=1
+    gNvFragmentation_Enabled_d=1
+    gAppLowpowerEnabled_d=1
+    MULTICORE_APP=1
+)
+
+# TODO core defines. Check if all are needed
+mcux_add_macro(
+    __STARTUP_CLEAR_BSS
+    SERIAL_USE_CONFIGURE_STRUCTURE=1
+    SDK_OS_FREE_RTOS
+    HAL_RPMSG_SELECT_ROLE=0
+    TM_ENABLE_TIME_STAMP=1
+    USE_RTOS=1
+    FSL_RTOS_FREE_RTOS=1
+    gMemManagerLightExtendHeapAreaUsage=0
+    ENABLE_RAM_VECTOR_TABLE=1
+    NO_SYSCORECLK_UPD=0
+    DEBUG_SERIAL_INTERFACE_INSTANCE=0
+    gLoggingActive_d=0
+    gLogRingPlacementOffset_c=0xF000
+)
+
+# BLE configuration
+if(CONFIG_CHIP_SDK_DEPENDENCIES_BLE_HOST)
+mcux_add_macro(
+    gAppMaxConnections_c=1
+    gUseHciTransportDownward_d=1
+    gL2caMaxLeCbChannels_c=2
+    gGapSimultaneousEAChainedReports_c=0
+    gAppUseBonding_d=0
+    gAppUsePairing_d=0
+    gAppUsePrivacy_d=0
+    gGattUseUpdateDatabaseCopyProc_c=0
+    gBleBondIdentityHeaderSize_c=56
+    gPasskeyValue_c=999999
+    gHost_TaskStackSize_c=2400
+    gBleSetMacAddrFromVendorCommand_d=1
+    mAdvertisingDefaultTxPower_c=0 # default advertising TX power
+    mConnectionDefaultTxPower_c=0  # default connection TX power
+    BLE_HIGH_TX_POWER=0            # when enabled overwrite default tx power with following values gAdvertisingPowerLeveldBm_c and gConnectPowerLeveldBm_c
+    gAdvertisingPowerLeveldBm_c=0
+    gConnectPowerLeveldBm_c=0
+    gTmrStackTimers_c=6 # 3 + gAppMaxConnections_c * 2 + gL2caMaxLeCbChannels_c + gGapSimultaneousEAChainedReports_c
+)
+endif()
+
+# SSS config
+mcux_add_macro(
+    SSS_CONFIG_FILE=\\\"fsl_sss_config_elemu.h\\\"
+    SSCP_CONFIG_FILE=\\\"fsl_sscp_config_elemu.h\\\"
+)
