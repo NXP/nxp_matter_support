@@ -41,44 +41,51 @@
 /************************ Flash Layout with OTA enabled *********************
 
              0x6000_0000    FLASH_START
-    - - - +---------------+ - - - - - - - - - - - - - - - -
+    - - - +---------------+ - - - - - - - - - - - - - - - - - - - -
           |               |                 
           |    MCUBoot    |                 
-   68k    |   bootloader  |                 
+   256k   |   bootloader  |                 
           |               |
-    - - - +---------------+ - - - - - - - - - - - - - - - -
-   4k     |  Header_slot0 |                            '
-          +---------------+ m_interrupts_start         '
-   4k     |  m_interrupts |                            '
-          +---------------+ m_text_start               '
-          |               |                            '
-(3M-4*4k) |     m_text    |                            '  slot 0 (3M)
-          |               |                            '
-          +---------------+ m_text_end                 '
-   4k     | Trailer_slot0 |                            '
-          +---------------+                            '
-   4k     |    padding    | (padding used by mcuboot)  '
-    - - - +---------------+ - - - - - - - - - - - - - - - -
-          |               | OTA_STORAGE_START_ADDRESS  '
-          |               |                            '
-          |               |                            '
-          |               |                            '
-   3M     |     Slot 1    |                            '  slot 1 (3M)
-          |               |                            '
-          |               |                            '
-          |               |                            '
-          |               | OTA_STORAGE_END_ADDRESS    '
-    - - - +---------------+ - - - - - - - - - - - - - - - -
+    - - - +---------------+ - - - - - - - - - - - - - - - - - - - -
+   4k     |  Header_slot0 |                                 '
+          +---------------+ m_interrupts_start              '
+          |  m_interrupts |                                 '
+          +---------------+ m_text_start                    '
+          |               |                                 '      
+ m_app_   |               |                                 '
+_stated_  |     m_text    |                                 '   ACTIVE_APP (slot 0)
+ _size    |               |                                 '    (4 MB  for evkc)
+          |               |                                 '    (3 MB  for evkb)
+          |               |                                 '
+          +---------------+ m_text_end                      '
+   4k     | Trailer_slot0 |                                 '
+          +---------------+                                 '
+   4k     |    padding    |                                 '
+    - - - +---------------+ - - - - - - - - - - - - - - - - - - - -
+          |               | FW_UPDATE_STORAGE_START         '
+          |               |                                 '
+          |               |                                 '
+          |               |                                 '
+          |               |                                 '
+          |      OTA      |                                 '
+          |     Update    |                                 '   CANDIDATE_APP (slot 1)
+          |     Image     |                                 '      (4 MB  for evkc)
+          |               |                                 '      (3 MB  for evkb)
+          |               |                                 '
+          |               |                                 '
+          |               |                                 '
+          |               | FW_UPDATE_STORAGE_END           '
+    - - - +---------------+ - - - - - - - - - - - - - - - - - - - -
           +               +
           +               + 
-    - - - +---------------+ - - - - - - - - - - - - - - - -
-   4k     | FactoryData   |                             '
-    - - - +---------------+ - - - - - - - - - - - - - - - -
+    - - - +---------------+ - - - - - - - - - - - - - - - - - - - -
+    4k    |  FactoryData  |
+    - - - +---------------+ - - - - - - - - - - - - - - - - - - - - 
           |               | NV_STORAGE_START_ADDRESS
           |   NVM_region  | 
           |               | NV_STORAGE_END_ADDRESS
-    - - - +---------------+ - - - - - - - -
-             0x6080_0000    FLASH_END
+    - - - +---------------+ - - - - - - - - - - - - - - - - - - - -
+            FLASH_END        0x61000000  for evkc , 0x60800000 for evkb 
 
 *****************************************************************************/
 
@@ -87,7 +94,7 @@
 ENTRY(Reset_Handler)
 
 FLASH_START                  = 0x60000000;
-FLASH_SIZE                   = 0x800000; /* 8 MBytes */
+FLASH_SIZE                   = DEFINED(gEVKCFlashSize_d) ? gEVKCFlashSize_d : 0x800000; /* 16 MB for evkc, otherwise 8 MB */
 FLASH_END                    = FLASH_START + FLASH_SIZE - 1;
 FLASH_SECTOR_SIZE            = 0x1000;  /* 4k flash sector size */
 
@@ -106,28 +113,68 @@ __FACTORY_DATA_END    = NV_STORAGE_START_ADDRESS -1;
 __FACTORY_DATA_START  = __FACTORY_DATA_END - __FACTORY_DATA_SIZE + 1;
 __FACTORY_DATA_START_OFFSET = __FACTORY_DATA_START - FLASH_START;
 
-/* Max number of sectors in a slot (mcuboot design) */
-slot_max_sectors = 0x300; /* 3 MBytes */
+m_flash_start                       = FLASH_START;
+m_flash_sector_size                 = FLASH_SECTOR_SIZE;
 
-/* If OTA is enabled, we must reserve enough space for mcuboot and the image header before m_interrupts */
-/*mcu_boot_size                = DEFINED(__mcu_boot_size__)  ? __mcu_boot_size__  : 0;*/
-mcuboot_header_start         = DEFINED(__mcu_boot_size__) ? FLASH_START + mcu_boot_size : 0;
-m_flash_config_size          = FLASH_SECTOR_SIZE;
-m_interrupts_start           = DEFINED(__mcu_boot_size__) ? mcuboot_header_start + FLASH_SECTOR_SIZE : FLASH_START + 2*FLASH_SECTOR_SIZE;
-m_interrupts_size            = 0x00000400;
+m_boot_flash_conf_sector_start      = m_flash_start;
+m_boot_flash_conf_offset            = 0x400;
+m_boot_flash_conf_start             = m_boot_flash_conf_sector_start + m_boot_flash_conf_offset;
+m_boot_flash_conf_sector_end        = m_boot_flash_conf_sector_start + m_flash_sector_size - 1;
+m_boot_flash_conf_size              = m_flash_sector_size - m_boot_flash_conf_offset;
 
-/* m_text starts after the header of the application image (4kB) + ivt (m_interrupts_size) */
-m_text_start                 = m_interrupts_start + m_interrupts_size;
-m_text_max_sectors           = slot_max_sectors - 4;   /* m_text = slot0 (3MB) - [header(4kB) + ivt(1kB) + trailer(4kB) + padding(4kB)] */
-/* If mcuboot is used, allocate 3MB for text to accomodate OTA storage, else allocate memory up to FactoryData region */
-m_text_size                  = DEFINED(__mcu_boot_size__) ? m_text_max_sectors * FLASH_SECTOR_SIZE : __FACTORY_DATA_START - m_text_start;
-m_text_end                   = m_text_start + m_text_size - 1;
 
-/* OTA Update Image section */
-OTA_STORAGE_MAX_SECTORS      = slot_max_sectors; /* slot 1 must be equal to slot 0 */
-OTA_STORAGE_START_ADDRESS    = mcuboot_header_start + slot_max_sectors * FLASH_SECTOR_SIZE;
-OTA_STORAGE_SIZE             = FLASH_SECTOR_SIZE * OTA_STORAGE_MAX_SECTORS;
-OTA_STORAGE_END_ADDRESS      = OTA_STORAGE_START_ADDRESS + OTA_STORAGE_SIZE - 1;
+m_ivt_start                         = m_boot_flash_conf_sector_end + 1;
+m_ivt_size                          = m_flash_sector_size;
+m_ivt_end                           = m_ivt_start + m_ivt_size - 1;
+
+/* 
+ * If OTA is enabled, we must reserve enough space for MCUboot and the image header.
+ * Note that MCUboot itself embeds the FlashConfig section.
+*/
+m_mcuboot_size                      = DEFINED(__m_mcuboot_size__)  ? __m_mcuboot_size__  : 0; 
+m_mcuboot_start                     = m_flash_start; /* The flash config section is comprised */
+m_mcuboot_end                       = m_mcuboot_start + m_mcuboot_size - 1;
+m_mcuboot_img_hdr_sz                = ((0x400 + (m_flash_sector_size -1 )) / m_flash_sector_size) * m_flash_sector_size;
+
+/* 
+ * Active application section
+*/
+m_app_start                         = DEFINED(__m_mcuboot_size__)  ? m_mcuboot_end + 1 : m_ivt_end + 1;
+m_app_trailer_size                  = m_flash_sector_size;
+m_padding_size                      = m_flash_sector_size;
+
+/* Maximum number of sectors per slot */
+m_app_max_sectors                   = DEFINED(gEVKCFlashSize_d) ? 0x400 : 0x300; /* 4 MB for evkc, otherwise 2 MB / m_sector_size */
+
+/* The active image section contains the mcuboot header + active app + trailer 
+ * Note that an empty sector (padding) must be kept at the end of the active image section,
+ * this would be used by mcuboot to perform a swap-move operation of the upgrade.
+ */
+FW_ACTIVE_APP_START                 = m_app_start;
+FW_ACTIVE_APP_OFFSET                = m_app_start - m_flash_start;
+FW_ACTIVE_APP_SIZE                  = m_flash_sector_size * m_app_max_sectors - m_padding_size;
+FW_ACTIVE_APP_END                   = FW_ACTIVE_APP_START + FW_ACTIVE_APP_SIZE - 1;
+
+m_app_stated_size                   = FW_ACTIVE_APP_SIZE - m_mcuboot_img_hdr_sz - m_app_trailer_size;
+
+m_interrupts_start                  = DEFINED(__m_mcuboot_size__)  ? m_app_start + m_mcuboot_img_hdr_sz : m_app_start;
+m_interrupts_size                   = 0x00000400;
+m_interrupts_end                    = m_interrupts_start + m_interrupts_size - 1;
+m_text_start                        = m_interrupts_end + 1;
+m_text_size                         = m_app_stated_size - m_interrupts_size;
+m_text_end                          = m_text_start + m_text_size - 1;
+
+
+/* Candidate application (OTA Update Image) section 
+ * The size of the candidate image (slot 1) is equal to the active image (slot 0) size
+*/
+FW_UPDATE_STORAGE_START             = FW_ACTIVE_APP_END + 1 + m_padding_size;
+FW_UPDATE_STORAGE_SIZE              = DEFINED(__m_mcuboot_size__)  ? FW_ACTIVE_APP_SIZE : 0;
+FW_UPDATE_STORAGE_OFFSET            = FW_UPDATE_STORAGE_START - m_flash_start;
+FW_UPDATE_STORAGE_END               = FW_UPDATE_STORAGE_START + FW_UPDATE_STORAGE_SIZE - 1;
+
+
+
 
 HEAP_SIZE  = DEFINED(__heap_size__)  ? __heap_size__  : 0;
 STACK_SIZE = DEFINED(__stack_size__) ? __stack_size__ : 0x0800;
@@ -136,18 +183,17 @@ VECTOR_RAM_SIZE = DEFINED(__ram_vector_table__) ? 0x00000400 : 0;
 /* Specify the memory areas */
 MEMORY
 {
-  m_flash_config        (RX)  : ORIGIN = FLASH_START, LENGTH = m_flash_config_size
-  m_ivt                 (RX)  : ORIGIN = FLASH_START + m_flash_config_size, LENGTH = 0x00001000
+  m_flash_config        (RX)  : ORIGIN = m_boot_flash_conf_start, LENGTH = m_boot_flash_conf_size
+  m_ivt                 (RX)  : ORIGIN = m_ivt_start, LENGTH = m_ivt_size
   m_interrupts          (RX)  : ORIGIN = m_interrupts_start, LENGTH = m_interrupts_size
   m_text                (RX)  : ORIGIN = m_text_start, LENGTH = m_text_size
+  NVM_region            (RW)  : ORIGIN = NV_STORAGE_START_ADDRESS, LENGTH = NV_STORAGE_SIZE
   /* m_qacode zone is used to store code for functions to be executed from RAM. Adding an offset
    * to prevent overwrite in case of using NULL pointers to reference data
   */
   m_qacode              (RX)  : ORIGIN = 0x00000400, LENGTH = 0x00020000 /* ITCM 128 KB */
-  NVM_region            (RW)  : ORIGIN = NV_STORAGE_START_ADDRESS, LENGTH = NV_STORAGE_SIZE
-  m_data                (RW)  : ORIGIN = 0x20000000, LENGTH = 0x00020000 /* DTCM 128 KB */
-  m_ncache              (RW)  : ORIGIN = 0x20200000, LENGTH = 0x00008000 /* OCRAM2 32 KB */
-  m_data2               (RW)  : ORIGIN = 0x20208000, LENGTH = 0x000B8000 /* OCRAM2 480 KB + OCRAM-FlexRAM 256 KB */
+  m_ncache              (RW)  : ORIGIN = 0x20000000, LENGTH = 0x00020000 /* DTCM 128 KB */
+  m_data                (RW)  : ORIGIN = 0x20208000, LENGTH = 0x000B8000 /* OCRAM2 480 KB + OCRAM-FlexRAM 256 KB */
 }
 
 /* Define output sections */
@@ -360,7 +406,7 @@ SECTIONS
     . += VECTOR_RAM_SIZE;
     . = ALIGN(4);
     __interrupts_ram_end__ = .; /* Define a global symbol at data end */
-  } > m_data2
+  } > m_data
 
   __VECTOR_RAM = DEFINED(__ram_vector_table__) ? __VECTOR_RAM__ : ORIGIN(m_interrupts);
   __RAM_VECTOR_TABLE_SIZE_BYTES = DEFINED(__ram_vector_table__) ? (__interrupts_ram_end__ - __interrupts_ram_start__) : 0x0;
@@ -389,7 +435,7 @@ SECTIONS
     _net_buf_pool_list_end = .;
     . = ALIGN(4);
     __data_end__ = .;        /* define a global symbol at data end */
-  } > m_data2
+  } > m_data
 
   __ram_function_flash_start = __DATA_ROM + (__data_end__ - __data_start__); /* Symbol is used by startup for TCM data initialization */
 
@@ -456,7 +502,7 @@ SECTIONS
     . = ALIGN(4);
     __bss_end__ = .;
     __END_BSS = .;
-  } > m_data2
+  } > m_data
 
   .heap (NOLOAD) :
   {
@@ -467,7 +513,7 @@ SECTIONS
     KEEP(*(.heap*))
     __HeapLimit = .;
     __heap_limit = .; /* Add for _sbrk */
-  } > m_data2
+  } > m_data
 
   .stack :
   {
@@ -475,7 +521,7 @@ SECTIONS
     __StackLimit = .;
     . += STACK_SIZE;
     __StackTop = .;
-  } > m_data2
+  } > m_data
 
   PROVIDE(__stack = __StackTop);
 
@@ -491,8 +537,8 @@ SECTIONS
 
   ASSERT(__StackLimit >= __HeapLimit, "region m_data overflowed with stack and heap")
 
-  ASSERT( (DEFINED(__mcu_boot_size__) ? (__mcu_boot_size__ % FLASH_SECTOR_SIZE) : 0) == 0, "mcuboot size is not aligned on flash sector size")
+  ASSERT( (DEFINED(__m_mcuboot_size__) ? (__m_mcuboot_size__ % FLASH_SECTOR_SIZE) : 0) == 0, "mcuboot size is not aligned on flash sector size")
   
-  ASSERT(__FACTORY_DATA_START >= OTA_STORAGE_END_ADDRESS, "OTA storage section overflowed")
+  ASSERT(__FACTORY_DATA_START >= FW_UPDATE_STORAGE_END, "OTA storage section overflowed")
 
 }
