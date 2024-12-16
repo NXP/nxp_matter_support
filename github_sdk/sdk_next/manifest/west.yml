@@ -7,7 +7,7 @@ manifest:
   projects:
     - name: mcuxsdk_manifest
       url: https://github.com/nxp-mcuxpresso/mcuxsdk-manifests
-      revision: release/connectivity_stable
+      revision: 7b47a6c0ddfa78c887baf2918cf3b5d948296ec
       import:
         name-allowlist:
           - core 
@@ -24,6 +24,7 @@ manifest:
           - littlefs
           - ble_controller
           - bluetooth
+          - edgefast_bt_ble
           - ieee-802.15.4
           - mcux-sdk-middleware-multicore
           - usb
@@ -45,7 +46,3 @@ manifest:
       url: https://github.com/nxp-zephyr/bifrost
       revision: main
       path: repo/bifrost
-    - name: edgefast_bt_ble
-      revision: 4853c83b33534076cdba16f8db5541d496c119c7
-      path: repo/mcuxsdk/middleware/edgefast_bluetooth
-      url: ssh://git@bitbucket.sw.nxp.com/mcucore/bt-ble.git
