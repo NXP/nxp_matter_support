@@ -114,8 +114,8 @@ def update_nxp_sdk_next_version(nxp_sdk, force):
         sys.exit(1)
     try:
         subprocess.run(['west', 'update', 'bifrost'], cwd=nxp_sdk.sdk_target_location_abspath, check=True)
-        url_wrapper_dest = "includeif.gitdir:" + nxp_sdk.sdk_target_location_abspath + "/.path"
-        url_wrapper_src = os.path.join(nxp_sdk.sdk_target_location_abspath, 'repo/bifrost/.gitconfig')
+        url_wrapper_dest = "includeif.gitdir:" + str(os.path.abspath(os.path.join(nxp_sdk.sdk_target_location_abspath,'.path')).replace('\\','/'))
+        url_wrapper_src = os.path.abspath(os.path.join(nxp_sdk.sdk_target_location_abspath, 'repo/bifrost/.gitconfig').replace('\\','/'))
         subprocess.run(['git', 'config', '--global', url_wrapper_dest, url_wrapper_src], cwd=nxp_sdk.sdk_target_location_abspath, check=True)
         subprocess.run(['west', 'config', 'commands.allow_extensions', 'true'], cwd=nxp_sdk.sdk_target_location_abspath, check=True)
         subprocess.run(['west', 'update', '--fetch', 'smart'], cwd=nxp_sdk.sdk_target_location_abspath, check=True)
