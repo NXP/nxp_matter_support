@@ -58,7 +58,7 @@ UTILITIES_SHELL_FILES_PATH = "${COMPONENT_FILES_PATH}/shell"
 UTILITIES_ASSERT_FILES_PATH = "${COMPONENT_FILES_PATH}/assert"
 DEBUG_CONSOLE_FILES_PATH = "${COMPONENT_FILES_PATH}/debug_console_lite"
 STR_FILES_PATH = "${COMPONENT_FILES_PATH}/str"
-FSL_FLEXSPI_NOR_BOOT_FILES_PATH = "${nxp_sdk_root}/devices/RT/RT1064/MIMXRT1064/xip"
+FSL_FLEXSPI_NOR_BOOT_FILES_PATH = "${nxp_sdk_root}/devices/RT/RT1050/MIMXRT1052/xip"
 
 template("rt1060_sdk_drivers") {
   config("${target_name}_config") {

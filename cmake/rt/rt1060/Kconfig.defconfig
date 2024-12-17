@@ -1,0 +1,41 @@
+# Copyright 2024 NXP
+# SPDX-License-Identifier: BSD-3-Clause
+
+# The purpose of this file is to redefine default values of configurations used when building Matter applications.
+# This file only changes defaults, so all symbols here must be promptless.
+
+if CHIP_NXP_PLATFORM_RT1060
+
+# Add SDK dependencies required for RT1060
+config CHIP_SDK_DEPENDENCIES
+	select MCUX_COMPONENT_middleware.wireless.framework.platform.coex
+	select MCUX_COMPONENT_middleware.wireless.framework.factory_data_provider if CHIP_FACTORY_DATA
+	select MCUX_COMPONENT_middleware.wireless.framework.ota_support if CHIP_OTA_REQUESTOR
+	
+choice CHIP_NVM_COMPONENT
+	default CHIP_NVM_COMPONENT_LITTLEFS
+endchoice
+
+# SDK defaults
+
+# Wifi
+choice MCUX_COMPONENT_middleware.wifi.wifidriver.selection
+	default MCUX_DEPENDENCY_COMPONENT_middleware.wifi.wifidriver_DEPEND_ANYOF_OPTION_1
+endchoice
+
+# sdmmc
+choice MCUX_COMPONENT_middleware.sdmmc.host.usdhc.selection
+	default MCUX_COMPONENT_middleware.sdmmc.host.usdhc.non_blocking
+endchoice
+
+# FreeRTOS
+choice MCUX_MISC_middleware.freertos-kernel.dynamic_allocator.selection
+	default MCUX_COMPONENT_middleware.freertos-kernel.heap_4
+endchoice
+
+# Framework defaults
+choice MCUX_COMPONENT_middleware.wireless.framework.platform.coex.transceiver
+    default MCUX_COMPONENT_middleware.wireless.framework.platform.coex.iw612
+endchoice
+
+endif # CHIP_NXP_PLATFORM_RT1060
