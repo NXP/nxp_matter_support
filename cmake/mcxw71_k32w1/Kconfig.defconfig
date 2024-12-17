@@ -5,7 +5,7 @@
 # This file only changes defaults and thus all symbols here must be promptless
 # and safeguarded so that they only are applied when building Matter.
 
-if CHIP
+if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
 
 config CHIP_SDK_DEPENDENCIES
     select CHIP_SDK_DEPENDENCIES_BLE_HOST if BT
@@ -103,5 +103,4 @@ choice MCUX_COMPONENT_middleware.wireless.ieee_802_15_4.options
     default MCUX_COMPONENT_middleware.wireless.ieee_802_15_4.split_PHY
 endchoice
 
-endif # CHIP
-
+endif # if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
