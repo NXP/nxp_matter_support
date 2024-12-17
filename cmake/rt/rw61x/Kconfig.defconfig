@@ -49,6 +49,19 @@ config MCUX_COMPONENT_middleware.freertos-kernel.cm33_non_trustzone
     bool
     default y
 
+# Monolithic configs
+config MCUX_COMPONENT_driver.conn_fwloader.monolithic
+	default y
+
+config MONOLITHIC_WIFI
+	default y if CHIP_WIFI
+
+config MONOLITHIC_BLE
+	default y if !NET_L2_OPENTHREAD
+
+config MONOLITHIC_BLE_15_4
+	default y if NET_L2_OPENTHREAD
+
 # Framework defaults
 config gPlatformMonolithicApp_d
 	bool

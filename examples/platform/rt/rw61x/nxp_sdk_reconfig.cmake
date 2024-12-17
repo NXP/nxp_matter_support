@@ -88,12 +88,6 @@ endif()
 
 mcux_add_source(
     BASE_PATH ${NXP_MATTER_SUPPORT_DIR}
-    PREINCLUDE TRUE
-    SOURCES examples/platform/rt/rw61x/board/monolithic_config.h
-)
-
-mcux_add_source(
-    BASE_PATH ${NXP_MATTER_SUPPORT_DIR}
     SOURCES
     # board files
     examples/platform/rt/rw61x/board/${board}/board.c
