@@ -101,6 +101,11 @@ config configSUPPORT_STATIC_ALLOCATION
 # BLE defaults
 if BT 
 
+# Use debug console lite / assert lite in edgefast_bluetooth porting component
+choice MCUX_COMPONENT_middleware.edgefast_bluetooth.porting_debug_console_selection
+	default MCUX_COMPONENT_middleware.edgefast_bluetooth.porting_DEPEND_ANYOF_OPTION_2
+endchoice
+
 config BT_DEVICE_NAME_GATT_WRITABLE
 	bool
 	default n
