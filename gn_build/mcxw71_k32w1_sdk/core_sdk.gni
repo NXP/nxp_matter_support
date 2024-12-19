@@ -206,7 +206,7 @@ core_sdk = {
         "gDebugConsoleEnable_d=1",
         "DEBUG_CONSOLE_TRANSFER_NON_BLOCKING",
         "DebugConsole_c=1",
-        "DEFAULT_APP_UART=0",
+        "DEFAULT_APP_UART=1",
       ]
     }
   }
@@ -215,7 +215,7 @@ core_sdk = {
     core_defines += [
       "gDebugConsoleEnable_d=1",
       "DebugConsole_c=0",
-      "DEFAULT_APP_UART=0",
+      "DEFAULT_APP_UART=1",
       "BOARD_APP_UART_CLK_FREQ=6000000U",
     ]
   }
