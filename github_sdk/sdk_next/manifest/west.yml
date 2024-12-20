@@ -7,7 +7,7 @@ manifest:
   projects:
     - name: mcuxsdk_manifest
       url: https://github.com/nxp-mcuxpresso/mcuxsdk-manifests
-      revision: 7b47a6c0ddfa78c887baf2918cf3b5d948296ec
+      revision: release/connectivity_stable
       import:
         name-allowlist:
           - core 
