@@ -159,7 +159,7 @@ extern uint32_t SystemCoreClock;
 /* __BVIC_PRIO_BITS will be specified when CMSIS is being used. */
 #define configPRIO_BITS __NVIC_PRIO_BITS
 #else
-#define configPRIO_BITS 4 /* 15 priority levels */
+#define configPRIO_BITS 3 /* 7 priority levels */
 #endif
 
 /* The lowest interrupt priority that can be used in a call to a "set priority"

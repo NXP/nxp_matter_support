@@ -109,7 +109,15 @@ endchoice
 
 config BT_DEVICE_NAME_GATT_WRITABLE
 	bool
-	default n
+	default y
+
+config DEVICE_NAME_GATT_WRITABLE_ENCRYPT
+	bool
+	default y
+
+config BT_DEVICE_NAME_DYNAMIC
+	bool
+	default y
 
 config BT_MAX_CONN
 	default 1
@@ -168,5 +176,44 @@ config MCUX_COMPONENT_middleware.wifi.wifidriver.softap
 	default n
 
 endif # CHIP_WIFI
+
+config SETTINGS_NVS_SECTOR_SIZE_MULT
+	default "(((4096U) * 2u) / (4096U))"
+config SETTINGS_NVS_SECTOR_COUNT
+	default "((uint32_t)NV_STORAGE_SIZE / ((4096U) * 2u))"
+
+config MCUX_PRJSEG_middleware.fatfs.generated_config
+    default n
+
+#Need to be done manual in prj.conf app file as for now Wi-Fi SDK module is forcing the usage of this component
+config MCUX_COMPONENT_middleware.lwip.apps.lwiperf
+	default n
+
+config MCUX_COMPONENT_middleware.wireless.framework.platform.coex
+	default n if MCUX_COMPONENT_component.wifi_bt_module.88W8801 || MCUX_COMPONENT_component.wifi_bt_module.IW416
+
+if MCUX_COMPONENT_middleware.wireless.framework.platform.coex
+choice MCUX_COMPONENT_middleware.wireless.framework.platform.coex.transceiver
+	default MCUX_COMPONENT_middleware.wireless.framework.platform.coex.k32w0 if MCUX_COMPONENT_component.wifi_bt_module.K32W061_transceiver
+	default MCUX_COMPONENT_middleware.wireless.framework.platform.coex.iw612 if MCUX_COMPONENT_component.wifi_bt_module.IW61X
+endchoice
+endif
+
+#IW416 transceiver module type
+if MCUX_COMPONENT_component.wifi_bt_module.IW416
+choice IW416_MDOULE
+	default MCUX_COMPONENT_component.wifi_bt_module.board_aw_am510_usd
+endchoice
+endif
+
+#8801 transceiver module type
+if MCUX_COMPONENT_component.wifi_bt_module.88W8801
+choice 88W8801_MDOULE
+	default MCUX_COMPONENT_component.wifi_bt_module.board_murata_2el_m2
+endchoice
+endif
+
+config OT_NXP_SPINEL_INTERFACE_LINK
+	default "hci_spinel_single_uart" if MCUX_COMPONENT_component.wifi_bt_module.K32W061_transceiver
 
 endif # CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1170 || CHIP_NXP_PLATFORM_RT1060

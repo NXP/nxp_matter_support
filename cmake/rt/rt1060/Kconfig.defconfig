@@ -33,9 +33,11 @@ choice MCUX_MISC_middleware.freertos-kernel.dynamic_allocator.selection
 	default MCUX_COMPONENT_middleware.freertos-kernel.heap_4
 endchoice
 
-# Framework defaults
-choice MCUX_COMPONENT_middleware.wireless.framework.platform.coex.transceiver
-    default MCUX_COMPONENT_middleware.wireless.framework.platform.coex.iw612
+#IW612 transceiver module type
+if MCUX_COMPONENT_component.wifi_bt_module.IW61X
+choice IW61X_MDOULE
+	default MCUX_COMPONENT_component.wifi_bt_module.board_murata_2el_m2
 endchoice
+endif
 
 endif # CHIP_NXP_PLATFORM_RT1060

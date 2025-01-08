@@ -211,7 +211,6 @@ template("rt_wifi") {
 
     defines += [
       "CHIP_DEVICE_CONFIG_ENABLE_WPA",
-      "CONFIG_NXP_WIFI_SOFTAP_SUPPORT=1",
     ]
 
     if (wifi_enable_pta) {
@@ -435,7 +434,7 @@ template("rt_sdk") {
     if (nxp_nvm_component == "nvs"){
       # define gAppNvsInternalFlash_c = 0 to be sure it will not be define as 1 in the framework (NVS/Interface/port/nvs_port.h)
       defines += [ "gAppNvsExternalFlash_c = 1", "gNvsExternalFlash_d = 1", "gAppNvsInternalFlash_c = 0", "CONFIG_NVS_LOOKUP_CACHE = 1",
-        "CONFIG_NVS_LOOKUP_CACHE_SIZE = 1024", "CONFIG_SETTINGS_DYNAMIC_HANDLERS=1"]
+        "CONFIG_NVS_LOOKUP_CACHE_SIZE = 1024", "CONFIG_SETTINGS_DYNAMIC_HANDLERS=1", "CONFIG_SETTINGS_RUNTIME=1"]
     }
 
     if (use_watchdog != 0) {

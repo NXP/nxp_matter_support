@@ -47,4 +47,11 @@ config CHIP_MCUBOOT_HEADER_SIZE
 
 endif # BOOTLOADER_MCUBOOT
 
+config BUILD_K32W0_OT_RCP_IMAGE
+	bool "k32w0 rcp ot ble hci bb single uart image build"
+	default y if MCUX_COMPONENT_component.wifi_bt_module.K32W061_transceiver
+	default n
+	help
+		Enable k32w0 rcp ot ble hci bb single uart image build.
+
 endif # CHIP

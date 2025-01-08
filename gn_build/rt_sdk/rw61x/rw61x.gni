@@ -317,7 +317,6 @@ if(!custom_flash_driver){
       defines += [
         "gPlatformDisableBleLowPower_d=1",
         "BT_PLATFORM",
-        "GATT_DB",
         "CFG_BLE",
       ]
     }

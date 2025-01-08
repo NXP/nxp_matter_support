@@ -87,7 +87,7 @@ void BOARD_InitHardware(void)
         GPIO_PinWrite(MURATA_WIFI_RESET_GPIO, MURATA_WIFI_RESET_GPIO_PIN, 1U);
 #endif
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_WPA
+#if (!CHIP_DEVICE_CONFIG_ENABLE_WPA || !CONFIG_CHIP_WIFI)
         BOARD_InitModuleClock();
 #endif
 

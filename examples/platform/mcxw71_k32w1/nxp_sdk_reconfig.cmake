@@ -44,10 +44,13 @@ mcux_add_include(
 mcux_add_include(
     BASE_PATH ${MATTER_ROOT}
     INCLUDES
+
     # Temporary path for mbedtls config file location
     .
+
     # Temporary path for gatt_uuid128.h file
     third_party/nxp/nxp_matter_support/examples/platform/common/ble
+
     # Temporary path for FreeRTOS config file
     third_party/nxp/nxp_matter_support/examples/platform/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/app/project_include/freeRTOS
 )
@@ -70,6 +73,16 @@ mcux_add_armgcc_linker_script(
     TARGETS debug release flash_debug flash_release
     BASE_PATH ${SdkRootDirPath}
     LINKER examples/_boards/${board}/wireless_examples/linker/gcc/connectivity.ld
+)
+
+# replacing GNU99 to GNU11
+mcux_remove_configuration(
+    CC "-std=gnu99"
+)
+
+mcux_add_configuration(
+    CC " -std=gnu11 -save-temps"
+    CX " -std=gnu++17 -save-temps"
 )
 
 # Components configuration
@@ -123,26 +136,26 @@ mcux_add_macro(
 
 # BLE configuration
 if(CONFIG_CHIP_SDK_DEPENDENCIES_BLE_HOST)
-mcux_add_macro(
-    gAppMaxConnections_c=1
-    gUseHciTransportDownward_d=1
-    gL2caMaxLeCbChannels_c=2
-    gGapSimultaneousEAChainedReports_c=0
-    gAppUseBonding_d=0
-    gAppUsePairing_d=0
-    gAppUsePrivacy_d=0
-    gGattUseUpdateDatabaseCopyProc_c=0
-    gBleBondIdentityHeaderSize_c=56
-    gPasskeyValue_c=999999
-    gHost_TaskStackSize_c=2400
-    gBleSetMacAddrFromVendorCommand_d=1
-    mAdvertisingDefaultTxPower_c=0 # default advertising TX power
-    mConnectionDefaultTxPower_c=0  # default connection TX power
-    BLE_HIGH_TX_POWER=0            # when enabled overwrite default tx power with following values gAdvertisingPowerLeveldBm_c and gConnectPowerLeveldBm_c
-    gAdvertisingPowerLeveldBm_c=0
-    gConnectPowerLeveldBm_c=0
-    gTmrStackTimers_c=6 # 3 + gAppMaxConnections_c * 2 + gL2caMaxLeCbChannels_c + gGapSimultaneousEAChainedReports_c
-)
+    mcux_add_macro(
+        gAppMaxConnections_c=1
+        gUseHciTransportDownward_d=1
+        gL2caMaxLeCbChannels_c=2
+        gGapSimultaneousEAChainedReports_c=0
+        gAppUseBonding_d=0
+        gAppUsePairing_d=0
+        gAppUsePrivacy_d=0
+        gGattUseUpdateDatabaseCopyProc_c=0
+        gBleBondIdentityHeaderSize_c=56
+        gPasskeyValue_c=999999
+        gHost_TaskStackSize_c=2400
+        gBleSetMacAddrFromVendorCommand_d=1
+        mAdvertisingDefaultTxPower_c=0 # default advertising TX power
+        mConnectionDefaultTxPower_c=0 # default connection TX power
+        BLE_HIGH_TX_POWER=0 # when enabled overwrite default tx power with following values gAdvertisingPowerLeveldBm_c and gConnectPowerLeveldBm_c
+        gAdvertisingPowerLeveldBm_c=0
+        gConnectPowerLeveldBm_c=0
+        gTmrStackTimers_c=6 # 3 + gAppMaxConnections_c * 2 + gL2caMaxLeCbChannels_c + gGapSimultaneousEAChainedReports_c
+    )
 endif()
 
 # SSS config
