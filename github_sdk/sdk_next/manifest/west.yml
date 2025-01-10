@@ -31,6 +31,7 @@ manifest:
           - rpmsg-lite
           - secure-subsystem
           - wifi_nxp
+          - wpa_supplicant-rtos
           - fw_bin
           - mcu-sdk-components
           - mcu-sdk-examples
