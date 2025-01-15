@@ -27,7 +27,7 @@ import(
 #allows to get common NXP SDK gn options
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
-import("${nxp_sdk_build_root}/${nxp_sdk_name}/mbedtls/mbedtls.gni")
+import("${nxp_sdk_build_root}/mbedtls/mbedtls.gni")
 rt_mbedtls_root = "${nxp_sdk_root}/middleware/mbedtls"
 
 config("mbedtls_els_pkc_config") {
