@@ -147,7 +147,7 @@ else() # SDK Next Gen build system
     if(DEFINED core_id)
         add_custom_target(build_mcuboot ALL
             COMMAND export ARMGCC_DIR=${ARMGCC_DIR}
-            COMMAND west build -d ${CMAKE_CURRENT_BINARY_DIR}/mcuboot -b ${board} ${MCUBOOT_EXAMPLE_DIR} -Dcore_id=${core_id}
+            COMMAND west build -d ${CMAKE_CURRENT_BINARY_DIR}/mcuboot -b ${board} ${MCUBOOT_EXAMPLE_DIR} -Dcore_id=${core_id}  --config flexspi_nor_release
             WORKING_DIRECTORY ${SdkRootDirPath}
             COMMENT "Generating MCUBoot binary"
         )
