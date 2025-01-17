@@ -379,6 +379,7 @@ template("rw61x_sdk_drivers") {
       "${DRIVER_DEVICE_FILES_PATH}/fsl_ocotp.c",
       "${DRIVER_DEVICE_FILES_PATH}/fsl_power.c",
       "${DRIVER_DEVICE_FILES_PATH}/fsl_reset.c",
+      "${DRIVER_PINT_FILES_PATH}/fsl_pint.c",
       "${DRIVER_FLEXCOMM_FILES_PATH}/fsl_flexcomm.c",
       "${DRIVER_FLEXSPI_FILES_PATH}/fsl_flexspi.c",
       "${DRIVER_GDMA_FILES_PATH}/fsl_gdma.c",
