@@ -32,7 +32,7 @@ config("mbedtls_ksdk_config") {
     defines += [ "MBEDTLS_CONFIG_FILE=<ot-nxp-mbedtls-config.h>" ]
   } else {
     defines += [ "MBEDTLS_CONFIG_FILE=<matter_ksdk_mbedtls_config.h>" ]
-    include_dirs += [ "${nxp_sdk_build_root}/${nxp_sdk_name}/mbedtls/config" ]
+    include_dirs += [ "${nxp_sdk_build_root}/mbedtls/config" ]
   }
 }
 
