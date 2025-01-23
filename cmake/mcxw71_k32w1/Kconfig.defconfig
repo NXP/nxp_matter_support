@@ -51,10 +51,13 @@ config gMainThreadStackSize_c
 
 # Button     
 config BUTTON_SHORT_PRESS_THRESHOLD
-    default "1500U"
+    default "200U"
         
 config BUTTON_LONG_PRESS_THRESHOLD
-    default "2500U"
+    default "1200U"
+
+config BUTTON_DOUBLE_CLICK_THRESHOLD
+    default "500U"
 
 # Debug console
 config MCUX_PRJSEG_utility.debug_console_transfer_non_blocking
