@@ -116,14 +116,11 @@ __FACTORY_DATA_START_OFFSET = __FACTORY_DATA_START - FLASH_START;
 m_flash_start                       = FLASH_START;
 m_flash_sector_size                 = FLASH_SECTOR_SIZE;
 
-m_boot_flash_conf_sector_start      = m_flash_start;
-m_boot_flash_conf_offset            = 0x400;
-m_boot_flash_conf_start             = m_boot_flash_conf_sector_start + m_boot_flash_conf_offset;
-m_boot_flash_conf_sector_end        = m_boot_flash_conf_sector_start + m_flash_sector_size - 1;
-m_boot_flash_conf_size              = m_flash_sector_size - m_boot_flash_conf_offset;
+m_boot_flash_conf_start             = m_flash_start;
+m_boot_flash_conf_size              = m_flash_sector_size;
+m_boot_flash_conf_end               = m_boot_flash_conf_start + m_flash_sector_size - 1;
 
-
-m_ivt_start                         = m_boot_flash_conf_sector_end + 1;
+m_ivt_start                         = m_boot_flash_conf_end + 1;
 m_ivt_size                          = m_flash_sector_size;
 m_ivt_end                           = m_ivt_start + m_ivt_size - 1;
 
