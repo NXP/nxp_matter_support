@@ -4,46 +4,46 @@
 #
 # https://docs.zephyrproject.org/latest/guides/west/index.html
 manifest:
-  projects:
-    - name: mcuxsdk_manifest
-      url: https://github.com/nxp-mcuxpresso/mcuxsdk-manifests
-      revision: v24.12.00
-      import:
-        name-allowlist:
-          - core 
-          - freertos-kernel
-          - mcux-freertos-drivers
-          - mcux-devices-wireless
-          - CMSIS
-          - mcux-sdk-middleware-sdmmc
-          - fatfs
-          - ethermind
-          - mcux-sdk-middleware-connectivity-framework
-          - mbedtls
-          - lwip
-          - littlefs
-          - ble_controller
-          - bluetooth
-          - edgefast_bt_ble
-          - ieee-802.15.4
-          - mcux-sdk-middleware-multicore
-          - usb
-          - rpmsg-lite
-          - secure-subsystem
-          - wifi_nxp
-          - wpa_supplicant-rtos
-          - fw_bin
-          - mcu-sdk-components
-          - mcu-sdk-examples
-          - els_pkc
-          - mcux-devices-rt
-          - mcux-devices-mcx
-          - mcux-mcmgr
-          - erpc
-          - usb
-          - mcuboot_opensource
-        path-prefix: repo
-    - name: bifrost
-      url: https://github.com/nxp-zephyr/bifrost
-      revision: main
-      path: repo/bifrost
+    projects:
+        - name: mcuxsdk_manifest
+          url: https://github.com/nxp-mcuxpresso/mcuxsdk-manifests
+          revision: develop/connectivity_stable
+          import:
+              name-allowlist:
+                  - core
+                  - freertos-kernel
+                  - mcux-freertos-drivers
+                  - mcux-devices-wireless
+                  - CMSIS
+                  - mcux-sdk-middleware-sdmmc
+                  - fatfs
+                  - ethermind
+                  - mcux-sdk-middleware-connectivity-framework
+                  - mbedtls
+                  - lwip
+                  - littlefs
+                  - ble_controller
+                  - bluetooth
+                  - edgefast_bt_ble
+                  - ieee-802.15.4
+                  - mcux-sdk-middleware-multicore
+                  - usb
+                  - rpmsg-lite
+                  - secure-subsystem
+                  - wifi_nxp
+                  - wpa_supplicant-rtos
+                  - fw_bin
+                  - mcu-sdk-components
+                  - mcu-sdk-examples
+                  - els_pkc
+                  - mcux-devices-rt
+                  - mcux-devices-mcx
+                  - mcux-mcmgr
+                  - erpc
+                  - usb
+                  - mcuboot_opensource
+              path-prefix: repo
+        - name: bifrost
+          url: https://github.com/nxp-zephyr/bifrost
+          revision: main
+          path: repo/bifrost
