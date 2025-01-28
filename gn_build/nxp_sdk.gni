@@ -118,6 +118,9 @@ declare_args() {
 
   # Enable low power support
   nxp_use_low_power = false
+
+  # Define the openthread spinel interface type chosen
+  nxp_ot_spinel_interface_link = "spi"
 }
 
 declare_args() {

@@ -158,11 +158,11 @@ template("rt1060_sdk_drivers") {
 
     if (chip_enable_ble) {
       libs += [
-        #ethermind bt libs
-        "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/private/lib/mcux/default/btdm/cm7f/gcc/libethermind_bt_core.a",
-        "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/private/lib/mcux/default/btdm/cm7f/gcc/libethermind_bt_gatt.a",
-        "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/private/lib/mcux/default/btdm/cm7f/gcc/libethermind_bt_protocol.a",
-        "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/private/lib/mcux/default/btdm/cm7f/gcc/libethermind_bt_util.a",
+        #ethermind ble libs
+        "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/private/lib/mcux/default/ble/cm7f/gcc/libethermind_ble_core.a",
+        "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/private/lib/mcux/default/ble/cm7f/gcc/libethermind_ble_gatt.a",
+        "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/private/lib/mcux/default/ble/cm7f/gcc/libethermind_ble_protocol.a",
+        "${nxp_sdk_root}/middleware/wireless/ethermind/bluetooth/private/lib/mcux/default/ble/cm7f/gcc/libethermind_ble_util.a",
       ]
       defines += [
         # This flag must be defined here in order for the controller to only be initialized once for all (ble, ot, wifi)

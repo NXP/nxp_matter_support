@@ -34,14 +34,6 @@ declare_args() {
   w8801_transceiver = false
   iwx12_transceiver = false
 
-  # Enables hci and spinel communication on single UART
-  # Could be used only if k32w0_transceiver is enabled
-  hci_spinel_single_uart = false
-
-  # Enables spinel communication over spi
-  # Could be used only if iwx12_transceiver is enabled
-  spinel_over_spi = false
-
   # Allows to enable OTW logs to see
   # firmware download logs for K32W0 transceiver
   otw_logs_enabled = false
@@ -86,8 +78,8 @@ if (rt_platform == "rt1060") {
   nxp_transceiver_interface_detail = "WIFI_IW612_BOARD_MURATA_2EL_M2"
 }
 
-if (iwx12_transceiver && chip_enable_openthread) {
-  spinel_over_spi = true
+if (k32w0_transceiver) {
+  nxp_ot_spinel_interface_link = "hci_spinel_single_uart"
 }
 
 rt_sdk_freertos_kernel = "${nxp_sdk_root}/rtos/freertos/freertos-kernel"

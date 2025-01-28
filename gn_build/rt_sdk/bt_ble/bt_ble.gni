@@ -91,7 +91,7 @@ template("bt_ble_target") {
     ]
     libs = []
 
-    if (hci_spinel_single_uart) {
+    if (nxp_ot_spinel_interface_link == "hci_spinel_single_uart") {
       # Allows to wrap hci_uart functions to another implementation.
       # The goal is to have hci and spinel encapsulated in hdlc frames.
       # To view the content of new implementations, the code of spinel_hci_hdlc.cpp should be checked
@@ -146,7 +146,10 @@ template("bt_ble_target") {
       "CONFIG_BT_RX_STACK_SIZE=1536",
       "LOG_ENABLE_ASYNC_MODE=1",
       "LOG_MAX_ARGUMENT_COUNT=10",
-      "LOG_ENABLE_OVERWRITE=0",
+      "LOG_ENABLE_OVERWRITE=1",
+
+      #Support for BLE only
+      "CFG_BLE",
     ]
 
     # Now add our "system-header" include dirs
