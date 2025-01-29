@@ -26,7 +26,18 @@
 #define CONFIG_WIFI_AUTO_POWER_SAVE 0
 #endif
 
-#define CONFIG_WIFI_GET_LOG 1 /* missing in wifi_config_default.h for rt1060 and rt1170 */
+/*
+ * Temporarily disable CONFIG_WIFI_GET_LOG 
+ * until the WiFi diagnostics implementation is updated in 
+ * "src/platform/nxp/common/DiagnosticDataProviderImpl.cpp" to use new SDK API
+*/
+#define CONFIG_WIFI_GET_LOG 0 /* missing in wifi_config_default.h for rt1060 and rt1170 */
+
+/*
+ * "CONFIG_WMM" need to be enabled here, as it is required for wifi_nxp compilation.
+ * TODO : remove this define once SDK enable it by default in "wifi_config_default.h"
+*/
+#define CONFIG_WMM 1
 
 /*
  * Wifi extra debug options
