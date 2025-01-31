@@ -71,6 +71,7 @@ config configTIMER_TASK_PRIORITY
 	default "(configMAX_PRIORITIES - 3)"
 
 config configTOTAL_HEAP_SIZE
+	default 174080 if CHIP_WIFI && NET_L2_OPENTHREAD
 	default 129024
 
 config configMINIMAL_STACK_SIZE

@@ -63,6 +63,10 @@ if(CONFIG_CHIP_LIB_SHELL)
     )
 endif()
 
+mcux_add_macro(
+    MBEDTLS_USER_CONFIG_FILE=\\\"nxp_matter_mbedtls_config.h\\\"
+)
+
 mcux_add_configuration(
     CX "-std=c++17 -std=gnu++17"
 )
@@ -103,12 +107,31 @@ mcux_add_include(
     examples/platform/rt/rw61x/board
 )
 
-target_include_directories(McuxSDK PUBLIC
-    # Include config files for lwip and wifi
-    ${NXP_MATTER_SUPPORT_DIR}/gn_build/rt_sdk/lwip/wifi
-    ${NXP_MATTER_SUPPORT_DIR}/gn_build/rt_sdk/lwip/common
-    ${NXP_MATTER_SUPPORT_DIR}/gn_build/rt_sdk/transceiver
+# Include config files for lwip and wifi
+mcux_add_include(
+    BASE_PATH ${NXP_MATTER_SUPPORT_DIR}
+    INCLUDES gn_build/rt_sdk/transceiver
+             gn_build/rt_sdk/lwip/common
+             gn_build/mbedtls/config
 )
+
+# Include lwipopts.h
+if(CONFIG_CHIP_WIFI AND CONFIG_NET_L2_OPENTHREAD)
+    mcux_add_include(
+        BASE_PATH ${NXP_MATTER_SUPPORT_DIR}
+        INCLUDES gn_build/rt_sdk/lwip/wifi_openthread
+    )
+elseif(CONFIG_CHIP_WIFI AND NOT CONFIG_NET_L2_OPENTHREAD)
+    mcux_add_include(
+        BASE_PATH ${NXP_MATTER_SUPPORT_DIR}
+        INCLUDES gn_build/rt_sdk/lwip/wifi
+    )
+elseif(CONFIG_NET_L2_OPENTHREAD AND NOT CONFIG_CHIP_WIFI)
+    mcux_add_include(
+        BASE_PATH ${NXP_MATTER_SUPPORT_DIR}
+        INCLUDES gn_build/rt_sdk/lwip/openthread
+    )
+endif()
 
 # ========================================================================================
 # 3. Linker Configurations

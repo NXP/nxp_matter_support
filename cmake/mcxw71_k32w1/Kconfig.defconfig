@@ -29,12 +29,6 @@ config CHIP_SDK_DEPENDENCIES
     select MCUX_COMPONENT_middleware.wireless.ieee_802_15_4
     select MCUX_COMPONENT_middleware.mbedtls.port.sssapi_option
 
-if NET_L2_OPENTHREAD
-
-config MCUX_COMPONENT_middleware.wireless.framework.platform.ot
-    default y
-
-endif # NET_L2_OPENTHREAD
 
 # SDK defaults
 
