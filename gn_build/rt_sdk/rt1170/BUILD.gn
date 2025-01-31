@@ -26,14 +26,15 @@ import("${nxp_sdk_build_root}/mbedtls/mbedtls.gni")
 rt_mbedtls_root = "${nxp_sdk_root}/middleware/mbedtls"
 
 config("mbedtls_ksdk_config") {
-  include_dirs = [ "${rt_mbedtls_root}/port/ksdk" ]
-  defines = [ "MBEDTLS_PORT_INCLUDE=<ksdk_mbedtls.h>" ]
-  if (chip_enable_openthread) {
-    defines += [ "MBEDTLS_CONFIG_FILE=<ot-nxp-mbedtls-config.h>" ]
-  } else {
-    defines += [ "MBEDTLS_CONFIG_FILE=<matter_ksdk_mbedtls_config.h>" ]
-    include_dirs += [ "${nxp_sdk_build_root}/mbedtls/config" ]
-  }
+  include_dirs = [ 
+    "${rt_mbedtls_root}/port/ksdk",
+    "${nxp_sdk_build_root}/mbedtls/config",
+  ]
+  defines = [ 
+    "MBEDTLS_PORT_INCLUDE=<ksdk_mbedtls.h>",
+    "MBEDTLS_CONFIG_FILE=<ksdk_mbedtls_config.h>",
+    "MBEDTLS_USER_CONFIG_FILE=<nxp_matter_mbedtls_config.h>",
+  ]
 }
 
 mbedtls_target("nxp_ksdk_mbedtls") {

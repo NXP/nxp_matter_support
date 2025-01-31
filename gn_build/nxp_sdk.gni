@@ -97,9 +97,6 @@ declare_args() {
   nxp_active_mode_threshold_ms = 5000  # 5s Active Mode Threshold
   nxp_icd_supported_clients_per_fabric = 2  # 2 registration slots per fabric
 
-  # Build Matter as a standalone lib (without gn dependencies on OT)
-  nxp_build_matter_standalone_lib = false
-
   # Enable multiple BLE connections after commissioning feature.
   # This feature is platform specific and not standardized by Matter.
   nxp_multiple_ble_connections = false

@@ -327,18 +327,6 @@ if(!custom_flash_driver){
       defines += [ "DEBUG_CONSOLE_UART_INDEX=0" ]
     }
 
-    if (chip_enable_openthread) {
-      if (!spinel_interface_rpmsg) {
-        _rw61x_sdk_drivers_include_dirs += [
-          "${nxp_sdk_root}/middleware/wireless/ieee-802.15.4/ieee_802_15_4/phy/interface",
-          "${nxp_sdk_root}/middleware/wireless/ieee-802.15.4/ieee_802_15_4/phy/source/RW610N/RW610_RPMSG",
-          "${nxp_sdk_root}/middleware/wireless/ieee-802.15.4/utils",
-        ]
-      } else {
-        defines += [ "SPINEL_INTERFACE_RPMSG" ]
-      }
-    }
-
     cflags = []
     cflags_c = []
 
@@ -678,12 +666,6 @@ if(!custom_flash_driver){
         "${nxp_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform_hdlc.c",
         "${nxp_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform_ot.c",
       ]
-      if (!spinel_interface_rpmsg) {
-        sources += [
-          "${nxp_sdk_root}/middleware/wireless/ieee-802.15.4/ieee_802_15_4/phy/source/RW610N/RW610_RPMSG/ASP.c",
-          "${nxp_sdk_root}/middleware/wireless/ieee-802.15.4/ieee_802_15_4/phy/source/RW610N/RW610_RPMSG/Phy.c",
-        ]
-      }
     }
 
     if (!defined(public_configs)) {

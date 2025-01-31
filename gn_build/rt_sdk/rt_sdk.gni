@@ -561,18 +561,28 @@ template("rt_sdk") {
       "-Wno-stringop-truncation",
       "-Wno-unused-variable",
       "-Wno-format-truncation",
+      "-Wno-address",
     ]
 
     if (chip_enable_openthread) {
-      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_THREAD=1" ]
+      defines += [ 
+        "CHIP_DEVICE_CONFIG_ENABLE_THREAD=1",
+        "CONFIG_NET_L2_OPENTHREAD=1",
+      ]
     }
 
     if (chip_enable_ble) {
-      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=1" ]
+      defines += [ 
+        "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=1",
+        "CONFIG_BT=1",
+      ]
     }
 
     if (chip_enable_wifi) {
-      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION=1" ]
+      defines += [ 
+        "CHIP_DEVICE_CONFIG_ENABLE_WIFI_STATION=1",
+        "CONFIG_CHIP_WIFI=1",
+      ]
     }
 
     # Now add our "system-header" include dirs
