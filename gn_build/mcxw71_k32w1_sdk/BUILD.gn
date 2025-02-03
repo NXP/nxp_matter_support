@@ -41,35 +41,10 @@ group("nxp_mbedtls") {
 }
 
 config("mbedtls_k32w1_config") {
-  # Temporary solution until platform rework
-  if (nxp_platform == "mcxw72") {
-    defines = [ "MBEDTLS_USER_CONFIG_FILE=<src/platform/nxp/${nxp_platform}/mcxw72-chip-mbedtls-config.h>" ]
-  } else {
-    defines = [ "MBEDTLS_USER_CONFIG_FILE=<src/platform/nxp/${nxp_platform}/k32w1-chip-mbedtls-config.h>" ]
-  }
-
-  defines += [
-    "MBEDTLS_CONFIG_FILE=<third_party/openthread/repo/third_party/mbedtls/mbedtls-config.h>",
-
-    # These options should really be in the config.h...
-    "MBEDTLS_FREESCALE_FREERTOS_CALLOC_ALT=1",
-    "MBEDTLS_THREADING_C=1",
-    "MBEDTLS_THREADING_ALT=1",
-    "MBEDTLS_X509_CSR_WRITE_C",
-    "MBEDTLS_X509_CREATE_C",
-    "MBEDTLS_PEM_WRITE_C",
-    "MBEDTLS_HKDF_C",
-    "MBEDTLS_ERROR_C",
-    "MBEDTLS_PKCS5_C",
-
-    "MBEDTLS_ECP_FIXED_POINT_OPTIM=0",  # To reduce peak memory usage
-    "MBEDTLS_MPI_WINDOW_SIZE=1",
-    "MBEDTLS_ECP_WINDOW_SIZE=2",
-    "MBEDTLS_MPI_MAX_SIZE=32",  # Maximum number of bytes for usable MPIs.
-    "MBEDTLS_ECP_MAX_BITS=256",  # Maximum bit size of groups */
-    "MBEDTLS_ENTROPY_MAX_SOURCES=1",  # Maximum number of sources supported
-
-    "MBEDTLS_ENTROPY_HARDWARE_ALT",
+  
+  defines = [
+    "MBEDTLS_CONFIG_FILE=<sssapi_mbedtls_config.h>",
+    "MBEDTLS_USER_CONFIG_FILE=<nxp_matter_mbedtls_config.h>",
   ]
 
   if (chip_mdns == "none") {
@@ -95,6 +70,8 @@ config("mbedtls_k32w1_config") {
       "${nxp_sdk_root}/middleware/mbedtls/port/sssapi"
     ]
   }
+
+  include_dirs += [ "${nxp_sdk_build_root}/mbedtls/config" ]
 }
 
 mbedtls_target("mbedtls") {
