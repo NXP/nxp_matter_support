@@ -147,14 +147,14 @@ function(nxp_generate_mcuboot)
         if(DEFINED core_id)
             add_custom_target(build_mcuboot ALL
                 COMMAND export ARMGCC_DIR=${ARMGCC_DIR}
-                COMMAND west build -d ${CMAKE_CURRENT_BINARY_DIR}/mcuboot -b ${board} ${MCUBOOT_EXAMPLE_DIR} -Dcore_id=${core_id} --config flexspi_nor_release
+                COMMAND west build -d ${CMAKE_CURRENT_BINARY_DIR}/mcuboot -b ${board} ${MCUBOOT_EXAMPLE_DIR} -Dcore_id=${core_id} -DCONF_FILE=${NXP_MATTER_SUPPORT_DIR}/cmake/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/bootloader.conf
                 WORKING_DIRECTORY ${SdkRootDirPath}
                 COMMENT "Generating MCUBoot binary"
             )
         else()
             add_custom_target(build_mcuboot ALL
                 COMMAND export ARMGCC_DIR=${ARMGCC_DIR}
-                COMMAND west build -d ${CMAKE_CURRENT_BINARY_DIR}/mcuboot -b ${board} ${MCUBOOT_EXAMPLE_DIR}
+                COMMAND west build -d ${CMAKE_CURRENT_BINARY_DIR}/mcuboot -b ${board} ${MCUBOOT_EXAMPLE_DIR} -DCONF_FILE=${NXP_MATTER_SUPPORT_DIR}/cmake/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/bootloader.conf
                 WORKING_DIRECTORY ${SdkRootDirPath}
                 COMMENT "Generating MCUBoot binary"
             )

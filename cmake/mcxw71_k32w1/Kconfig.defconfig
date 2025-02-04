@@ -29,7 +29,6 @@ config CHIP_SDK_DEPENDENCIES
     select MCUX_COMPONENT_middleware.wireless.ieee_802_15_4
     select MCUX_COMPONENT_middleware.mbedtls.port.sssapi_option
 
-
 # SDK defaults
 
 # Board config
@@ -73,8 +72,8 @@ choice MCUX_COMPONENT_component.mem_manager_selection
     default MCUX_COMPONENT_component.mem_manager_light
 endchoice
 
-choice MCUX_DEPENDENCY_COMPONENT_utilityt.debug_console_selection
-    default MCUX_DEPENDENCY_COMPONENT_utilityt.debug_console_free_rtos
+choice MCUX_DEPENDENCY_COMPONENT_utility.debug_console_selection
+    default MCUX_DEPENDENCY_COMPONENT_utility.debug_console_free_rtos
 endchoice
 
 config MCUX_COMPONENT_middleware.wireless.controller_api
@@ -92,9 +91,8 @@ choice MCUX_COMPONENT_middleware.wireless.framework.ota_support.flash_selection
 endchoice
 endif # MCUX_COMPONENT_middleware.wireless.framework.ota_support
 
-choice MCUX_COMPONENT_middleware.wireless.framework.seclib_port
-    prompt "SecLib port selection"
-    default MCUX_COMPONENT_middleware.wireless.framework.seclib_port.secure_subsystem
+choice MCUX_COMPONENT_middleware.wireless.framework.seclib_rng_port
+    default MCUX_COMPONENT_middleware.wireless.framework.seclib_rng_port.secure_subsystem
 endchoice
 
 config MCUX_COMPONENT_middleware.wireless.framework.heap_mem_manager
@@ -103,7 +101,7 @@ config MCUX_COMPONENT_middleware.wireless.framework.heap_mem_manager
 config MCUX_COMPONENT_middleware.wireless.framework.platform.ble
     default y
 
-choice MCUX_COMPONENT_middleware.wireless.ieee_802_15_4.options
+choice MCUX_COMPONENT_middleware.wireless.ieee_802_15_4.selection
     default MCUX_COMPONENT_middleware.wireless.ieee_802_15_4.split_PHY
 endchoice
 

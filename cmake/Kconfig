@@ -14,28 +14,33 @@ config MATTER_APP_DEFAULT_BOARD_FILES
     help
         If enabled, the default board files under "examples/platform" will be used.
 
-config REMOVE_SECTIONS_FROM_BIN
-	string "Sections to remove from the generated binary"
-	default "-R .NVM"
-	help
-		Define sections to remove from the generated binary of the application.
-
 config BOOTLOADER_MCUBOOT
 	bool "MCUBoot bootloader"
+	default y if CHIP_OTA_REQUESTOR
+	depends on CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1170 || CHIP_NXP_PLATFORM_RT1060
 	help
 		Use MCUBoot as the bootloader of the application.
 
 if BOOTLOADER_MCUBOOT
 
+config CHIP_MCUBOOT_SIZE
+	hex "Size of MCUBoot"
+	default 0x20000 if CHIP_NXP_PLATFORM_RW61X
+	default 0x40000 if CHIP_NXP_PLATFORM_RT1170 || CHIP_NXP_PLATFORM_RT1060
+	help
+		The flash size to reserve for mcuboot application.
+
 config CHIP_MCUBOOT_SLOT_SIZE
 	hex "Slot size"
-	default 0x440000
+	default 0x440000 if CHIP_NXP_PLATFORM_RW61X
+	default 0x400000 if CHIP_NXP_PLATFORM_RT1170 || CHIP_NXP_PLATFORM_RT1060
 	help
 		The application slot size to communicate to the MCUBoot.
 
 config CHIP_MCUBOOT_MAX_SECTORS
 	int "Application max sectors"
-	default 1088
+	default 1088 if CHIP_NXP_PLATFORM_RW61X
+	default 1024 if CHIP_NXP_PLATFORM_RT1170 || CHIP_NXP_PLATFORM_RT1060
 	help
 		The maximum number of sectors comprised in the application slot.
 
@@ -47,11 +52,27 @@ config CHIP_MCUBOOT_HEADER_SIZE
 
 endif # BOOTLOADER_MCUBOOT
 
+config REMOVE_SECTIONS_FROM_BIN
+	string "Sections to remove from the generated binary"
+	default "-R .flash_config -R .ivt -R .NVM" if BOOTLOADER_MCUBOOT
+	default "-R .NVM"
+	help
+		Define sections to remove from the generated binary of the application.
+
 config BUILD_K32W0_OT_RCP_IMAGE
 	bool "k32w0 rcp ot ble hci bb single uart image build"
 	default y if MCUX_COMPONENT_component.wifi_bt_module.K32W061_transceiver
 	default n
 	help
 		Enable k32w0 rcp ot ble hci bb single uart image build.
+
+config MATTER_DEFAULT_LINKER_FILE_PATH
+	string "Default linker file path for Matter applications"
+	default "$(CHIP_ROOT)/third_party/nxp/nxp_matter_support/examples/platform/rt/rw61x/app/ldscripts/RW610_flash.ld" if CHIP_NXP_PLATFORM_RW61X
+	default "$(CHIP_ROOT)/third_party/nxp/nxp_matter_support/examples/platform/rt/rt1170/app/ldscripts/MIMXRT1176xxxxx_cm7_flexspi_nor.ld" if CHIP_NXP_PLATFORM_RT1170
+	default "$(CHIP_ROOT)/third_party/nxp/nxp_matter_support/examples/platform/rt/rt1060/app/ldscripts/MIMXRT1062xxxxx_flexspi_nor.ld" if CHIP_NXP_PLATFORM_RT1060
+	default "${SdkRootDirPath}/examples/_boards/${board}/wireless_examples/linker/gcc/connectivity.ld" if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	help
+		Defines the path to the linker file to use.
 
 endif # CHIP

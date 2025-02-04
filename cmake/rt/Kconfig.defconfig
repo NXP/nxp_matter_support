@@ -9,15 +9,23 @@ if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1170 || CHIP_NXP_PLATFORM_RT10
 
 rsource "*/Kconfig.defconfig"
 
+# Add SDK dependencies required for RT platforms
+config CHIP_SDK_DEPENDENCIES
+	select MCUX_COMPONENT_utility.debug_console_lite
+	select MCUX_COMPONENT_middleware.wireless.framework.platform.coex
+	select MCUX_COMPONENT_middleware.wireless.framework.factory_data_provider if CHIP_FACTORY_DATA
+	select MCUX_COMPONENT_middleware.wireless.framework.ota_support if CHIP_OTA_REQUESTOR
+	select MCUX_COMPONENT_middleware.lwip
+	select MCUX_COMPONENT_component.lpspi_adapter if OT_NXP_SPINEL_INTERFACE_LINK="spi"
+
 if MCUX_COMPONENT_middleware.wireless.framework.ota_support
 choice MCUX_COMPONENT_middleware.wireless.framework.ota_support.flash_selection
 	default MCUX_COMPONENT_middleware.wireless.framework.ota_support.external_flash
 endchoice
 endif # MCUX_COMPONENT_middleware.wireless.framework.ota_support
 
-config BOOTLOADER_MCUBOOT
-	bool
-	default y if CHIP_OTA_REQUESTOR
+config SERIAL_MANAGER_NON_BLOCKING_MODE
+	default y
 
 config BUTTON_SHORT_PRESS_THRESHOLD
 	default "500U"
@@ -99,6 +107,27 @@ config configMAX_TASK_NAME_LEN
 config configSUPPORT_STATIC_ALLOCATION
 	default y
 
+config configNUM_THREAD_LOCAL_STORAGE_POINTERS
+	default 0
+
+config configSTACK_DEPTH_TYPE
+	default "StackType_t"
+
+config INCLUDE_uxTaskGetStackHighWaterMark2
+	default n
+
+config INCLUDE_xTaskGetIdleTaskHandle
+	default n
+
+config INCLUDE_eTaskGetState
+	default n
+
+config INCLUDE_xTaskGetHandle
+	default n
+
+config configKERNEL_PROVIDED_STATIC_MEMORY
+	default y
+
 # BLE defaults
 if BT 
 
@@ -175,6 +204,9 @@ config MCUX_COMPONENT_middleware.wifi.wifidriver.softap
 	bool
 	default n
 
+config MCUX_COMPONENT_middleware.wifi.net_free_rtos.iperf
+	default n
+
 endif # CHIP_WIFI
 
 config SETTINGS_NVS_SECTOR_SIZE_MULT
@@ -185,19 +217,15 @@ config SETTINGS_NVS_SECTOR_COUNT
 config MCUX_PRJSEG_middleware.fatfs.generated_config
     default n
 
-#Need to be done manual in prj.conf app file as for now Wi-Fi SDK module is forcing the usage of this component
-config MCUX_COMPONENT_middleware.lwip.apps.lwiperf
-	default n
-
 config MCUX_COMPONENT_middleware.wireless.framework.platform.coex
 	default n if MCUX_COMPONENT_component.wifi_bt_module.88W8801 || MCUX_COMPONENT_component.wifi_bt_module.IW416
 
-if MCUX_COMPONENT_middleware.wireless.framework.platform.coex
+if MCUX_COMPONENT_middleware.wireless.framework.platform.coex && MCUX_COMPONENT_middleware.wireless.framework.platform.imx_rt
 choice MCUX_COMPONENT_middleware.wireless.framework.platform.coex.transceiver
 	default MCUX_COMPONENT_middleware.wireless.framework.platform.coex.k32w0 if MCUX_COMPONENT_component.wifi_bt_module.K32W061_transceiver
 	default MCUX_COMPONENT_middleware.wireless.framework.platform.coex.iw612 if MCUX_COMPONENT_component.wifi_bt_module.IW61X
 endchoice
-endif
+endif # MCUX_COMPONENT_middleware.wireless.framework.platform.coex && MCUX_COMPONENT_middleware.wireless.framework.platform.imx_rt
 
 #IW416 transceiver module type
 if MCUX_COMPONENT_component.wifi_bt_module.IW416
@@ -208,9 +236,9 @@ endif
 
 #8801 transceiver module type
 if MCUX_COMPONENT_component.wifi_bt_module.88W8801
-choice 88W8801_MDOULE
+choice 88W8801_MODULE
 	default MCUX_COMPONENT_component.wifi_bt_module.board_murata_2el_m2
-endchoice
+endchoice # 88W8801_MODULE
 endif
 
 config OT_NXP_SPINEL_INTERFACE_LINK
