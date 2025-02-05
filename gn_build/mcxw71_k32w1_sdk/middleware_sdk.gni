@@ -63,6 +63,7 @@ middleware_sdk = {
     "${FRAMEWORK_SERVICES_DIR_PATH}/OtaSupport/Source",
     "${FRAMEWORK_SERVICES_DIR_PATH}/SecLib_RNG",
     "${FRAMEWORK_SERVICES_DIR_PATH}/Sensors",
+    "${FRAMEWORK_SERVICES_DIR_PATH}/WorkQ",
     "${FRAMEWORK_PLATFORM_DIR_PATH}",
     # Note: fwk_platform_ot.h is the one from wireless_mcu, not the one from
     # platform/include, so include the latter one after.
@@ -232,6 +233,8 @@ middleware_sdk = {
     "${FRAMEWORK_SERVICES_DIR_PATH}/OtaSupport/Source/OtaSupport.c",
     "${FRAMEWORK_SERVICES_DIR_PATH}/SecLib_RNG/RNG.c",
     "${FRAMEWORK_SERVICES_DIR_PATH}/Sensors/sensors.c",
+    "${FRAMEWORK_SERVICES_DIR_PATH}/WorkQ/fwk_workq.c",
+    "${FRAMEWORK_SERVICES_DIR_PATH}/WorkQ/fwk_sysworkq.c",
     "${FRAMEWORK_PLATFORM_DIR_PATH}/fwk_platform_ble.c",
     "${FRAMEWORK_PLATFORM_DIR_PATH}/fwk_platform_crypto.c",
     "${FRAMEWORK_PLATFORM_DIR_PATH}/fwk_platform.c",
