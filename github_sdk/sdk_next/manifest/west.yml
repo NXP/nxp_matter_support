@@ -47,3 +47,6 @@ manifest:
       url: https://github.com/nxp-zephyr/bifrost
       revision: main
       path: repo/bifrost
+      groups:
+        - bifrost
+group-filter: [-bifrost]
