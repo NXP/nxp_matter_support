@@ -113,10 +113,17 @@ def update_nxp_sdk_next_version(nxp_sdk, force):
         logging.error("--update-only error SDK is not initialized")
         sys.exit(1)
     try:
+        # check if we are in the internal development environment
+        subprocess.run(['git', 'config', '--global', '--get-all', 'url.ssh://git@bitbucket.sw.nxp.com/mcucore/bifrost.git.insteadof'], check=True)
+        # in case of development enrironment update URL remote location
         subprocess.run(['west', 'update', 'bifrost'], cwd=nxp_sdk.sdk_target_location_abspath, check=True)
         url_wrapper_dest = "includeif.gitdir:" + str(os.path.abspath(os.path.join(nxp_sdk.sdk_target_location_abspath,'.path')).replace('\\','/'))
         url_wrapper_src = os.path.abspath(os.path.join(nxp_sdk.sdk_target_location_abspath, 'repo/bifrost/.gitconfig').replace('\\','/'))
         subprocess.run(['git', 'config', '--global', url_wrapper_dest, url_wrapper_src], cwd=nxp_sdk.sdk_target_location_abspath, check=True)
+    except (subprocess.CalledProcessError) as exception:
+        #Ignore error as we are not in internal development environment
+        pass
+    try:
         subprocess.run(['west', 'config', 'commands.allow_extensions', 'true'], cwd=nxp_sdk.sdk_target_location_abspath, check=True)
         subprocess.run(['west', 'update', '--fetch', 'smart'], cwd=nxp_sdk.sdk_target_location_abspath, check=True)
         subprocess.run(['west', 'mcuxsdk-export'], cwd=nxp_sdk.sdk_target_location_abspath, check=True)
