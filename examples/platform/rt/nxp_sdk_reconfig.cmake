@@ -265,6 +265,12 @@ if(CONFIG_BOOTLOADER_MCUBOOT)
     )
 endif()
 
+if(CONFIG_MCUX_HW_BOARD_evkcmimxrt1060)
+    mcux_add_configuration(
+        LD " -Wl,--defsym=gFlashSize_d=0x1000000 "
+    )
+endif()
+
 # Here it is required to remove the default linker script added by the SDK build system
 # and include the application linker script
 mcux_remove_armgcc_linker_script(

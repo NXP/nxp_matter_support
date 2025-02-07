@@ -179,7 +179,6 @@ template("rt_wifi") {
 
     _wifi_include_dirs = [
       # Wi-Fi
-      "${nxp_sdk_root}/middleware/wifi_nxp/incl",
       "${nxp_sdk_root}/middleware/wifi_nxp/incl/wifidriver",
       "${nxp_sdk_root}/middleware/wifi_nxp/incl/wlcmgr",
       "${nxp_sdk_root}/middleware/wifi_nxp/wifi_bt_firmware",
@@ -188,8 +187,6 @@ template("rt_wifi") {
       "${nxp_sdk_root}/middleware/wifi_nxp/wifidriver/wpa_supp_if/incl",
       "${nxp_sdk_root}/middleware/wifi_nxp/incl/port/net",
       "${nxp_sdk_root}/middleware/wifi_nxp/port/net",
-      "${nxp_sdk_root}/middleware/wifi_nxp/port/osa",
-      "${nxp_sdk_root}/middleware/wifi_nxp/incl/port/osa",
       ]
     
 
@@ -234,8 +231,6 @@ template("rt_wifi") {
       "${nxp_sdk_root}/middleware/wifi_nxp/dhcpd/dhcp-server-main.c",
       "${nxp_sdk_root}/middleware/wifi_nxp/dhcpd/dhcp-server.c",
       "${nxp_sdk_root}/middleware/wifi_nxp/dhcpd/dns-server.c",
-      "${nxp_sdk_root}/middleware/wifi_nxp/port/osa/osa_freertos.c",
-      "${nxp_sdk_root}/middleware/wifi_nxp/port/osa/osa.c",
       "${nxp_sdk_root}/middleware/wifi_nxp/wifidriver/mlan_11ac.c",
       "${nxp_sdk_root}/middleware/wifi_nxp/wifidriver/mlan_11d.c",
       "${nxp_sdk_root}/middleware/wifi_nxp/wifidriver/mlan_11h.c",
@@ -320,6 +315,9 @@ template("rt_sdk") {
       "${nxp_sdk_root}/components/mem_manager",
       "${nxp_sdk_root}/components/flash/mflash",
       "${nxp_sdk_root}/components/time_stamp",
+      "${nxp_sdk_root}/middleware/wifi_nxp/incl",
+      "${nxp_sdk_root}/middleware/wifi_nxp/port/osa",
+      "${nxp_sdk_root}/middleware/wifi_nxp/incl/port/osa",
 
       #Framework files
       "${CONN_FRAMEWORK_SERVICES_FILES_PATH}/FunctionLib",
@@ -611,6 +609,8 @@ template("rt_sdk") {
       "${rt_sdk_freertos_kernel}/stream_buffer.c",
       "${rt_sdk_freertos_kernel}/tasks.c",
       "${rt_sdk_freertos_kernel}/timers.c",
+      "${nxp_sdk_root}/middleware/wifi_nxp/port/osa/osa_freertos.c",
+      "${nxp_sdk_root}/middleware/wifi_nxp/port/osa/osa.c",
 
       #SDK components
       "${nxp_sdk_root}/components/button/fsl_component_button.c",

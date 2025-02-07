@@ -33,10 +33,8 @@ if CHIP_SDK_DEPENDENCIES
 config CHIP_SDK_DEPENDENCIES_WIFI
 	bool "SDK dependencies for Matter-over-WiFi protocol stack"
 	select MCUX_COMPONENT_middleware.wifi
-	select MCUX_COMPONENT_middleware.wifi.osa_free_rtos
 	select MCUX_COMPONENT_middleware.wifi.wifidriver
 	select MCUX_COMPONENT_middleware.wifi.net_free_rtos
-	select MCUX_COMPONENT_component.wifi_bt_module.config
 	select MCUX_COMPONENT_component.wifi_bt_module.tx_pwr_limits
 	help
 		Enable SDK components required for NXP Wi-Fi support.

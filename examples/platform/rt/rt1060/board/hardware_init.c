@@ -50,7 +50,7 @@ void BOARD_InitHardware(void)
     {
         BOARD_ConfigMPU();
         BOARD_InitBootPins();
-#if (CHIP_DEVICE_CONFIG_ENABLE_WPA || CHIP_DEVICE_CONFIG_ENABLE_THREAD || CONFIG_CHIP_WIFI)
+#if (CONFIG_CHIP_WIFI || CONFIG_NET_L2_OPENTHREAD)
         BOARD_InitUSDHCPins();
 #else
         BOARD_InitENETPins();

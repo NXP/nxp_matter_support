@@ -94,7 +94,7 @@ _stated_  |     m_text    |                                 '   ACTIVE_APP (slot
 ENTRY(Reset_Handler)
 
 FLASH_START                  = 0x60000000;
-FLASH_SIZE                   = DEFINED(gEVKCFlashSize_d) ? gEVKCFlashSize_d : 0x800000; /* 16 MB for evkc, otherwise 8 MB */
+FLASH_SIZE                   = DEFINED(gFlashSize_d) ? gFlashSize_d : 0x800000; /* 16 MB for evkc, otherwise 8 MB */
 FLASH_END                    = FLASH_START + FLASH_SIZE - 1;
 FLASH_SECTOR_SIZE            = 0x1000;  /* 4k flash sector size */
 
