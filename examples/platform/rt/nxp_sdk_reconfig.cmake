@@ -44,6 +44,7 @@ mcux_add_macro(
 
 if(CONFIG_CHIP_NVM_COMPONENT_LITTLEFS)
     mcux_add_macro(
+
         # Littlefs flags required to support littlefs file system
         LFS_THREADSAFE=1
         LFS_NO_DEBUG
@@ -63,17 +64,21 @@ if(CONFIG_CHIP_NXP_PLATFORM_RW61X)
         gPlatformDisableBleLowPower_d=1
         MBEDTLS_NIST_KW_C
     )
+
     if(CONFIG_BT)
         mcux_add_macro(
             BT_PLATFORM
         )
     endif()
+
     if(CONFIG_CHIP_LIB_SHELL)
         mcux_add_macro(
+
             # If matter CLI is enabled, move debug console to UART0
             DEBUG_CONSOLE_UART_INDEX=0
         )
     endif()
+
     mcux_add_configuration(
         CC "-march=armv8-m.main"
         CX "-march=armv8-m.main"
@@ -82,17 +87,22 @@ endif()
 
 if(CONFIG_CHIP_NXP_PLATFORM_RT1170)
     mcux_add_macro(
+
         # Required for BT over UART support on IW transceivers
         HAL_UART_DMA_ENABLE=1
+
         # Disabling BT transceiver initialization as it would be done by the fwk plat coex component
         CONTROLLER_INIT_ESCAPE=1
     )
+
     if(CONFIG_CHIP_LIB_SHELL)
         mcux_add_macro(
+
             # If matter CLI is enabled, move debug console to UART2
             DEBUG_CONSOLE_UART_INDEX=2
         )
     endif()
+
     mcux_add_configuration(
         CC "-march=armv7e-m"
         CX "-march=armv7e-m"
@@ -101,19 +111,24 @@ endif()
 
 if(CONFIG_CHIP_NXP_PLATFORM_RT1060)
     mcux_add_macro(
+
         # Required for BT over UART support on IW transceivers
         HAL_UART_DMA_ENABLE=1
+
         # Disabling BT transceiver initialization as it would be done by the fwk plat coex component
         CONTROLLER_INIT_ESCAPE=1
     )
+
     if(CONFIG_CHIP_LIB_SHELL)
         if(CONFIG_MCUX_HW_BOARD_evkcmimxrt1060)
             mcux_add_macro(
+
                 # When the CLI is enabled the debug console should be moved in UART8 for RT1060_EVKC
                 DEBUG_CONSOLE_UART_INDEX=8
             )
         else()
             mcux_add_macro(
+
                 # When the CLI is enabled the debug console should be moved in UART2 for RT1060_EVKB
                 DEBUG_CONSOLE_UART_INDEX=2
             )
@@ -121,42 +136,43 @@ if(CONFIG_CHIP_NXP_PLATFORM_RT1060)
     endif()
 endif()
 
-if (CONFIG_MCUX_COMPONENT_component.wifi_bt_module.IW61X AND CONFIG_NET_L2_OPENTHREAD)
-    #Required to use wifi_nxp fw dwnld in MoT
+if(CONFIG_MCUX_COMPONENT_component.wifi_bt_module.IW61X AND CONFIG_NET_L2_OPENTHREAD AND NOT CONFIG_CHIP_WIFI)
+    # Required to use wifi_nxp fw dwnld in MoT
     mcux_add_macro(
         SD9177
     )
 endif()
 
 if(CONFIG_MCUX_COMPONENT_component.wifi_bt_module.K32W061_transceiver)
-    # TODO add wrapper for single UART communication from bt_ble.gni
     mcux_add_macro(
         K32W061_TRANSCEIVER
         BOARD_OTW_K32W0_PIN_INIT
+
         # SDK define required for OTW support
         HAL_UART_DMA_ENABLE=1
+
+        # Required to use wifi_nxp fw dwnld in MoT
+        SD8987
+
+        # Required to override hci_uart_state in hci uart wrapper
+        EM_HAVE_STATIC_DECL=0
     )
 
-    if(CONFIG_BUILD_K32W0_OT_RCP_IMAGE AND DEFINED OT_RCP_K32W0_GENERATED_PATH)
+    if(CONFIG_CHIP_NXP_PLATFORM_RT1060 AND CONFIG_MCUX_HW_BOARD_evkbmimxrt1060)
         mcux_add_macro(
-            K32W0_RCP_BINARY_H_FILE=${OT_RCP_K32W0_GENERATED_PATH}
+
+            # Framework defines to support hdlc over UART on UART3 and a reset pin
+            SPINEL_UART_INSTANCE=3
+            SPINEL_ENABLE_RX_RTS=1
+            SPINEL_ENABLE_TX_RTS=1
+
+            # OTW configurations
+            OTW_DIO5_PIN_PORT=1
+            OTW_DIO5_PIN_NUM=26
+            OTW_RESET_PIN_PORT=1
+            OTW_RESET_PIN_NUM=27
         )
     endif()
-endif()
-
-if (CONFIG_CHIP_NXP_PLATFORM_RT1060 AND CONFIG_MCUX_HW_BOARD_evkbmimxrt1060)
-    mcux_add_macro(
-        # Framework defines to support hdlc over UART on UART3 and a reset pin
-        SPINEL_UART_INSTANCE=3
-        SPINEL_ENABLE_RX_RTS=1
-        SPINEL_ENABLE_TX_RTS=1
-
-        # OTW configurations
-        OTW_DIO5_PIN_PORT=1
-        OTW_DIO5_PIN_NUM=26
-        OTW_RESET_PIN_PORT=1
-        OTW_RESET_PIN_NUM=27
-    )
 endif()
 
 # replacing GNU99 to GNU11
@@ -172,7 +188,6 @@ mcux_add_configuration(
 # ========================================================================================
 # 2. Include Paths and Source Files
 # ========================================================================================
-
 if(CONFIG_BT)
     mcux_add_source(
         BASE_PATH ${CMAKE_BINARY_DIR}
@@ -183,7 +198,7 @@ if(CONFIG_BT)
 endif()
 
 # Add board files
-file(GLOB BOARD_FILES 
+file(GLOB BOARD_FILES
     "${NXP_MATTER_SUPPORT_DIR}/examples/platform/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/board/${board}/*.c"
     "${NXP_MATTER_SUPPORT_DIR}/examples/platform/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/board/${board}/*.h"
     "${NXP_MATTER_SUPPORT_DIR}/examples/platform/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/board/*.c"
@@ -255,9 +270,22 @@ mcux_add_configuration(
     -Wl,--wrap=_calloc_r \
 ")
 
+if(CONFIG_MCUX_COMPONENT_component.wifi_bt_module.K32W061_transceiver)
+    # Allows to wrap hci_uart functions to another implementation.
+    # The goal is to have hci and spinel encapsulated in hdlc frames.
+    # To view the content of new implementations, the code of spinel_hci_hdlc.cpp should be checked
+    mcux_add_configuration(
+        LD "\
+        -Wl,--defsym,hci_uart_write_data=__wrap_hci_uart_write_data \
+        -Wl,--wrap=hci_uart_bt_init\
+        -Wl,--wrap=hci_uart_bt_shutdown \
+        -Wl,--wrap=hci_uart_init \
+    ")
+endif()
+
 if(CONFIG_BOOTLOADER_MCUBOOT)
     # We need to reserve enough space for the bootloader (MCUBoot).
-    # CONFIG_CHIP_MCUBOOT_SIZE defines the required size in Bytes 
+    # CONFIG_CHIP_MCUBOOT_SIZE defines the required size in Bytes
     # to be reserved at the base of the flash for each platform.
     # Consequently, some sections will need to be shifted.
     mcux_add_configuration(

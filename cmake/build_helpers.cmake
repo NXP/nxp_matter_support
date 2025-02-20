@@ -244,10 +244,16 @@ function(nxp_pre_build_process)
             WORKING_DIRECTORY ${CHIP_ROOT}/third_party/openthread/ot-nxp
         )
 
+        set(OT_RCP_K32W0_GENERATED_PATH "${CHIP_ROOT}/third_party/openthread/ot-nxp/build_k32w061/ot_rcp_ble_hci_bb_single_uart_fc/bin/ot-rcp-ble-hci-bb-k32w061.elf.bin.h" CACHE PATH "k32w0 rcp binary path")
+
+        get_filename_component(OT_RCP_K32W0_GENERATED_PATH "${OT_RCP_K32W0_GENERATED_PATH}" ABSOLUTE)
+        mcux_add_macro(
+            K32W0_RCP_BINARY_H_FILE=\\\"${OT_RCP_K32W0_GENERATED_PATH}\\\"
+        )
+
         # Make sure this is run as pre-build
         add_dependencies(pre_build build_k32w0_rcp)
     endif()
 
     add_dependencies(${MCUX_SDK_PROJECT_NAME} pre_build)
-    set(OT_RCP_K32W0_GENERATED_PATH "${CHIP_ROOT}/third_party/openthread/ot-nxp/build_k32w061/ot_rcp_ble_hci_bb_single_uart_fc/bin/ot-rcp-ble-hci-bb-k32w061.elf.bin.h" CACHE INTERNAL "k32w0 rcp binary path")
 endfunction(nxp_pre_build_process)

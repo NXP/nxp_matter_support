@@ -72,7 +72,7 @@ void BOARD_InitHardware(void)
         BOARD_InitDebugConsole();
         SCB_DisableDCache();
 
-#if !CHIP_DEVICE_CONFIG_ENABLE_THREAD
+#if  !CONFIG_NET_L2_OPENTHREAD
         gpio_pin_config_t gpio_config = { kGPIO_DigitalOutput, 0, kGPIO_NoIntmode };
 #if (defined(HAL_UART_DMA_ENABLE) && (HAL_UART_DMA_ENABLE > 0U))
         DMAMUX_Type * dmaMuxBases[] = DMAMUX_BASE_PTRS;

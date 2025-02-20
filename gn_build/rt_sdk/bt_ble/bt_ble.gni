@@ -101,12 +101,12 @@ template("bt_ble_target") {
         "-Wl,--wrap=hci_uart_bt_shutdown",
         "-Wl,--wrap=hci_uart_init",
       ]
+      # 0 define EM_HAVE_STATIC_DECL
+      # so that we can do an extern of the hci_uart_state variable
+      defines += [ "EM_HAVE_STATIC_DECL=0" ]
       bt_ble_include_dirs += [
         "${nxp_sdk_root}/middleware/wireless/ethermind/port/pal",
-
-        # SDK hook to be able to undef the value of EM_HAVE_STATIC_DECL
-        # so that we can do an extern of the hci_uart_state variable
-        "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/bt_pal",
+        "${nxp_sdk_root}/middleware/wireless/ethermind/port/pal/mcux",
       ]
     } else {
       defines += [ "HAL_UART_DMA_ENABLE=1" ]
