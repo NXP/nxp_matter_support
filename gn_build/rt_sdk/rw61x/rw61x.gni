@@ -83,6 +83,13 @@ BOARDS_FILES_PATH ="${nxp_sdk_root}/examples/_boards/${board}"
 ELS_PKC_CL_PATH = "${COMPONENT_FILES_PATH}/els_pkc/"
 
 template("rw61x_sdk_drivers") {
+
+
+  forward_variables_from(invoker, ["custom_flash_driver"])
+  if (!defined(custom_flash_driver)){
+    custom_flash_driver= false
+  }
+  
   # Convert the CPU1/CPU2 fw binaries into src files
   fw_bin_path = "${COMPONENT_FILES_PATH}/conn_fwloader/fw_bin"
   fw_args = [
@@ -172,7 +179,8 @@ template("rw61x_sdk_drivers") {
       #SDK hooks
       "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/els_pkc",
     ]
-
+    
+if(!custom_flash_driver){
     _rw61x_sdk_drivers_include_dirs += [
       # XIP
       "${nxp_sdk_root}/components/flash/mflash",
@@ -181,6 +189,7 @@ template("rw61x_sdk_drivers") {
       #flash config
       "${BOARDS_FILES_PATH}/flash_config",
     ]
+}
 
     libs = []
 
@@ -429,10 +438,14 @@ template("rw61x_sdk_drivers") {
       "${nxp_sdk_root}/middleware/wireless/framework/platform/${rt_fwk_platform}/fwk_platform.c",
     ]
 
+if(!custom_flash_driver){
     sources += [
       "${nxp_sdk_root}/components/flash/mflash/${board}/mflash_drv.c",
       "${BOARDS_FILES_PATH}/flash_config/flash_config.c",
+    ]
+}
 
+    sources += [
       # fw binaries for cpu1/cpu2
       "${fw_bin_path}/A2/fw_cpu1.c",
       "${fw_bin_path}/A2/fw_cpu2_ble.c",
