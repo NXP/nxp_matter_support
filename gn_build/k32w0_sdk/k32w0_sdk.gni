@@ -377,14 +377,13 @@ template("k32w0_sdk") {
       "gOTA_UseSecLibAes=1",
       "gResetSystemReset_d=1",
 
-      # TODO: move these platform specific defines to args.gni
-      "NXP_OT_IDLE_INTERVAL=${nxp_ot_idle_interval_ms}",
-      "NXP_OT_ACTIVE_INTERVAL=${nxp_ot_active_interval_ms}",
-      "NXP_ICD_ENABLED=1",
-      "NXP_ACTIVE_MODE_THRESHOLD=${nxp_active_mode_threshold_ms}",
-      "NXP_ACTIVE_MODE_DURATION_MS=${nxp_active_mode_duration_ms}",
-      "NXP_IDLE_MODE_DURATION_SEC=${nxp_idle_mode_duration_s}",
-      "NXP_ICD_SUPPORTED_CLIENTS_PER_FABRIC=${nxp_icd_supported_clients_per_fabric}",
+      "CONFIG_CHIP_ICD_SLOW_POLL_INTERVAL=${nxp_ot_idle_interval_ms}",
+      "CONFIG_CHIP_ICD_FAST_POLLING_INTERVAL=${nxp_ot_active_interval_ms}",
+      "CONFIG_CHIP_ENABLE_ICD_SUPPORT=1",
+      "CONFIG_CHIP_ICD_ACTIVE_MODE_THRESHOLD=${nxp_active_mode_threshold_ms}",
+      "CONFIG_CHIP_ICD_ACTIVE_MODE_DURATION=${nxp_active_mode_duration_ms}",
+      "CONFIG_CHIP_ICD_IDLE_MODE_DURATION=${nxp_idle_mode_duration_s}",
+      "CONFIG_CHIP_ICD_CLIENTS_PER_FABRIC=${nxp_icd_supported_clients_per_fabric}",
     ]
 
     if (use_antenna_diversity == 1) {
