@@ -29,18 +29,30 @@
 #include LWIP_USER_CONFIG_FILE
 #endif /* LWIP_USER_CONFIG_FILE */
 
-#define LWIP_IPV4 1
-#define MEMP_NUM_NETCONN (4)
-#define NETIF_MAX_HWADDR_LEN 8U
-
 // BR specific defines
-#define LWIP_IPV6_SCOPES 1
+
+// LWIP IPv4 and IP_FORWARD are required by NAT64.
+#define LWIP_IPV4 1
+#define IP_FORWARD 1
+// NAT64 requires 3 RAW pcbs for intercepting IPv4 traffic. One pcb is needed to intercept ND packets.
+// The rest are extra space for LWIP.
+#define MEMP_NUM_RAW_PCB 7
+#define MEMP_NUM_NETCONN (4)
+// LWIP thread interface uses EUI64 type hw addresses
+#define NETIF_MAX_HWADDR_LEN 8U
+// Required by different services running over LWIP including OTBR services
 #define MAX_SOCKETS_UDP 22
 #define MEMP_NUM_UDP_PCB (MAX_SOCKETS_UDP + 2)
+// LWIP thread interface can have multiple addresses, the current number should allow
+// sufficient space
 #define LWIP_IPV6_NUM_ADDRESSES 8
+// BR requires IPv6 forwarding in LWIP
 #define LWIP_IPV6_FORWARD 1
+#define LWIP_IPV6_SCOPES 1
+// Used by BR upstream resolver to track upstream DNS servers
 #define DNS_MAX_SERVERS 4
 #define LWIP_ND6_RDNSS_MAX_DNS_SERVERS 2
+
 // Note: According to Thread Conformance v1.2.0, a Thread Border Router MUST be able to hold a Multicast Listeners Table
 //  in memory with at least seventy five (75) entries.
 #define MEMP_NUM_MLD6_GROUP 10 + 75
