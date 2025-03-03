@@ -1,4 +1,4 @@
-# Copyright 2024 NXP
+# Copyright 2024-2025 NXP
 # SPDX-License-Identifier: BSD-3-Clause
 
 # The purpose of this file is to redefine default values of configurations used when building Matter applications.
@@ -9,7 +9,7 @@ if CHIP_NXP_PLATFORM_RW61X
 # Add SDK dependencies required for RW61x
 config CHIP_SDK_DEPENDENCIES
     select MCUX_COMPONENT_driver.conn_fwloader
-    select MCUX_COMPONENT_component.mflash_offchip
+    imply MCUX_COMPONENT_component.mflash_offchip
     select MCUX_COMPONENT_middleware.freertos-kernel.cm33_non_trustzone
     select MCUX_COMPONENT_middleware.mbedtls.els_pkc.config
     select MCUX_COMPONENT_middleware.wireless.framework.platform.coex
