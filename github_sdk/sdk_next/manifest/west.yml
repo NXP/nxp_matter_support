@@ -7,7 +7,7 @@ manifest:
     projects:
         - name: mcuxsdk_manifest
           url: https://github.com/nxp-mcuxpresso/mcuxsdk-manifests
-          revision: v25.03.00-pvw2
+          revision: v25.03.00_RC1
           import:
               name-allowlist:
                   - core
@@ -48,5 +48,5 @@ manifest:
           revision: main
           path: repo/bifrost
           groups:
-          - bifrost
+              - bifrost
 group-filter: [-bifrost]
