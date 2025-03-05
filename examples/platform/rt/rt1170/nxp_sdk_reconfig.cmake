@@ -76,9 +76,8 @@ if(CONFIG_BT)
     mcux_add_source(
         BASE_PATH ${CMAKE_BINARY_DIR}
         PREINCLUDE true
-        SOURCES edgefast_bluetooth_config_Gen.h
-                edgefast_bluetooth_extension_config_Gen.h
-                edgefast_bluetooth_audio_config_Gen.h
+        SOURCES edgefast_bluetooth_config.h
+        edgefast_bluetooth_audio_config.h
     )
 endif()
 
