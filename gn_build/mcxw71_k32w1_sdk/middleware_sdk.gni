@@ -249,6 +249,7 @@ middleware_sdk = {
     # BLE HOST / BLE CONTROLLER files
     "${BLE_CONTROLLER_DIR_PATH}/src/controller_api.c",
     "${BLE_HOST_DIR_PATH}/application/common/ble_conn_manager.c",
+    "${BLE_HOST_DIR_PATH}/application/common/ble_host_tasks.c",
 
     "${BLE_HOST_DIR_PATH}/application/common/gatt_db/gatt_database.c",
     "${BLE_HOST_DIR_PATH}/hci_transport/source/hcit_generic_adapter_interface.c",
