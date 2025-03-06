@@ -7,7 +7,7 @@ manifest:
     projects:
         - name: mcuxsdk_manifest
           url: https://github.com/nxp-mcuxpresso/mcuxsdk-manifests
-          revision: v25.03.00-pvw2_RC2
+          revision: v25.03.00-pvw2
           import:
               name-allowlist:
                   - core
