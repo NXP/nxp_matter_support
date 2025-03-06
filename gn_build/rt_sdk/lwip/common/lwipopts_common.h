@@ -420,10 +420,9 @@ Some MCU allow computing and verifying the IP, UDP, TCP and ICMP checksums by ha
 
 // TODO: verify count
 
-#define LWIP_HAVE_LOOPIF (0)
 
-// TODO: not sure why this is disabled
-#define LWIP_NETIF_LOOPBACK (0)
+// Enable looback support in LWIP
+#define LWIP_NETIF_LOOPBACK (1)
 
 #ifndef MEMP_NUM_NETCONN
 #define MEMP_NUM_NETCONN (0)
