@@ -178,6 +178,11 @@ template("rt1170_sdk_drivers") {
       defines += [ "DEBUG_CONSOLE_UART_INDEX=2" ]
     }
 
+    # TODO: to be removed once defined in SDK framework
+    if (nxp_nvm_component == "nvs") {
+      defines += [ "gPlatNvsSectorSize_c=8192" ]
+    } 
+    
     cflags = []
 
     if (defined(invoker.cflags)) {

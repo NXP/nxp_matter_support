@@ -59,12 +59,6 @@ config gPlatformMonolithicApp_d
 	bool
 	default y
 
-config NVS_LOOKUP_CACHE
-	default y
-
-config NVS_LOOKUP_CACHE_SIZE
-	default 1024
-
 if CHIP_WIFI
 
 config WIFI_BOARD_RW610

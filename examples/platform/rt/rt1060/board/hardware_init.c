@@ -11,7 +11,6 @@
 #include "fsl_gpio.h"
 #include "fsl_iomuxc.h"
 #include "fsl_lpuart_edma.h"
-#include "peripherals.h"
 #include "pin_mux.h"
 
 #if (defined(K32W061_TRANSCEIVER) && (CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE || CONFIG_BT)) ||                                         \
@@ -68,7 +67,6 @@ void BOARD_InitHardware(void)
         BOARD_InitOTWPins();
 #endif
         BOARD_InitBootClocks();
-        BOARD_InitBootPeripherals();
         BOARD_InitDebugConsole();
         SCB_DisableDCache();
 

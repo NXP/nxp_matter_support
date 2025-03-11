@@ -212,8 +212,16 @@ config MCUX_COMPONENT_middleware.wifi.net_free_rtos.iperf
 
 endif # CHIP_WIFI
 
+# NVS defaults
+config NVS_LOOKUP_CACHE
+	default y
+
+config NVS_LOOKUP_CACHE_SIZE
+	default 1024
+
 config SETTINGS_NVS_SECTOR_SIZE_MULT
 	default "(((4096U) * 2u) / (4096U))"
+
 config SETTINGS_NVS_SECTOR_COUNT
 	default "((uint32_t)NV_STORAGE_SIZE / ((4096U) * 2u))"
 

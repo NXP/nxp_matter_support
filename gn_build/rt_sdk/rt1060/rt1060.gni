@@ -25,7 +25,6 @@ declare_args() {
   deviceBoardName = "MIMXRT1062"
 }
 
-
 DRIVER_FILES_PATH = "${nxp_sdk_root}/drivers"
 DRIVER_COMMON_FILES_PATH = "${DRIVER_FILES_PATH}/common"
 DRIVER_DEVICE_FILES_PATH = "${nxp_sdk_root}/devices/RT/RT1060/${deviceBoardName}/drivers"
@@ -185,6 +184,11 @@ template("rt1060_sdk_drivers") {
         defines += [ "DEBUG_CONSOLE_UART_INDEX=2" ]
       }
     }
+
+    # TODO: to be removed once defined in SDK framework
+    if (nxp_nvm_component == "nvs") {
+      defines += [ "gPlatNvsSectorSize_c=8192" ]
+    } 
 
     cflags = []
 

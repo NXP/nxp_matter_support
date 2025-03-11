@@ -62,7 +62,7 @@ declare_args() {
   nxp_use_plain_dac_key = false
 
   # Defines the NVM component supported
-  nxp_nvm_component = "littlefs"
+  nxp_nvm_component = "nvs"
 
   # Enable wear statistics for key storage
   nxp_key_storage_wear_stats = false
