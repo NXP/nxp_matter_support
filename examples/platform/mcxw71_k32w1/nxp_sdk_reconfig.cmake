@@ -75,9 +75,11 @@ mcux_add_macro(
     USE_RTOS=1
     FSL_RTOS_FREE_RTOS=1
     gMemManagerLightExtendHeapAreaUsage=0
+    MinimalHeapSize_c=0x8A00
     ENABLE_RAM_VECTOR_TABLE=1
     NO_SYSCORECLK_UPD=0
     DEBUG_SERIAL_INTERFACE_INSTANCE=0
+    BOARD_DEBUG_UART_CLK_FREQ=6000000U
     gLoggingActive_d=0
     gLogRingPlacementOffset_c=0xF000
 )

@@ -25,6 +25,7 @@ config CHIP_SDK_DEPENDENCIES
     select MCUX_COMPONENT_middleware.wireless.framework.module_info
     select MCUX_COMPONENT_middleware.wireless.framework.seclib
     select MCUX_COMPONENT_middleware.wireless.framework.lowpower
+    select MCUX_COMPONENT_middleware.wireless.framework.platform.external_flash
     select MCUX_COMPONENT_middleware.wireless.framework.ota_support if CHIP_OTA_REQUESTOR
     select MCUX_COMPONENT_middleware.wireless.ieee_802_15_4
     select MCUX_COMPONENT_middleware.mbedtls.port.sssapi_option
@@ -41,6 +42,15 @@ endchoice
 
 config gMainThreadStackSize_c
 	default 3096
+
+config gMainThreadPriority_c
+    default 5
+
+config FSL_OSA_MAIN_FUNC_ENABLE
+    default y
+
+config FSL_OSA_ALLOCATED_HEAP
+    default n
 
 # Button     
 config BUTTON_SHORT_PRESS_THRESHOLD
