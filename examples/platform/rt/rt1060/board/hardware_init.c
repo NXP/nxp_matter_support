@@ -1,5 +1,5 @@
 /*
- * Copyright 2022,2024 NXP
+ * Copyright 2022,2024-2025 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -14,9 +14,9 @@
 #include "peripherals.h"
 #include "pin_mux.h"
 
-#if (defined(K32W061_TRANSCEIVER) && (CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE || CONFIG_BT)) ||                                                        \
-    (defined(WIFI_IW416_BOARD_AW_AM510_USD) && (CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE || CONFIG_BT)) ||                                              \
-    (defined(WIFI_IW416_BOARD_AW_AM457_USD) && (CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE || CONFIG_BT)) ||                                              \
+#if (defined(K32W061_TRANSCEIVER) && (CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE || CONFIG_BT)) ||                                         \
+    (defined(WIFI_IW416_BOARD_AW_AM510_USD) && (CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE || CONFIG_BT)) ||                               \
+    (defined(WIFI_IW416_BOARD_AW_AM457_USD) && (CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE || CONFIG_BT)) ||                               \
     (defined(WIFI_IW612_BOARD_MURATA_2EL_M2) && (CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE || CONFIG_BT))
 #include "controller_hci_uart.h"
 #endif
@@ -72,7 +72,7 @@ void BOARD_InitHardware(void)
         BOARD_InitDebugConsole();
         SCB_DisableDCache();
 
-#if  !CONFIG_NET_L2_OPENTHREAD
+#if !CONFIG_NET_L2_OPENTHREAD
         gpio_pin_config_t gpio_config = { kGPIO_DigitalOutput, 0, kGPIO_NoIntmode };
 #if (defined(HAL_UART_DMA_ENABLE) && (HAL_UART_DMA_ENABLE > 0U))
         DMAMUX_Type * dmaMuxBases[] = DMAMUX_BASE_PTRS;
@@ -105,7 +105,8 @@ void BOARD_InitHardware(void)
     }
 }
 
-#if ((defined(WIFI_IW416_BOARD_AW_AM510_USD) || defined(WIFI_IW416_BOARD_AW_AM457_USD)) && (CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE || CONFIG_BT))
+#if ((defined(WIFI_IW416_BOARD_AW_AM510_USD) || defined(WIFI_IW416_BOARD_AW_AM457_USD)) &&                                         \
+     (CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE || CONFIG_BT))
 int controller_hci_uart_get_configuration(controller_hci_uart_config_t * config)
 {
     if (NULL == config)
