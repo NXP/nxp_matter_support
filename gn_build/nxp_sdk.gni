@@ -121,6 +121,16 @@ declare_args() {
 
   # Define the openthread spinel interface type chosen
   nxp_ot_spinel_interface_link = "spi"
+  
+  # transceiver lists
+  iw416_transceiver = false
+  k32w0_transceiver = false
+  w8801_transceiver = false
+  iwx12_transceiver = false
+}
+
+if (k32w0_transceiver) {
+  nxp_ot_spinel_interface_link = "hci_spinel_single_uart"
 }
 
 declare_args() {

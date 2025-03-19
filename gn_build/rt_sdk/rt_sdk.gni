@@ -26,18 +26,13 @@ declare_args() {
   # Enables Matter over Ethernet support
   chip_enable_ethernet = false
 
-  # transceiver lists
-  iw416_transceiver = false
-  k32w0_transceiver = false
+  # default path to k32w0 binary
   k32w0_transceiver_bin_path = rebase_path(
           "${chip_root}/third_party/openthread/ot-nxp/build_k32w061/ot_rcp_ble_hci_bb_single_uart_fc/bin/ot-rcp-ble-hci-bb-k32w061.elf.bin.h")
-  w8801_transceiver = false
-  iwx12_transceiver = false
 
   # Allows to enable OTW logs to see
   # firmware download logs for K32W0 transceiver
   otw_logs_enabled = false
-
 
   # KeyStorage enable only for RW61x
   #if(nxp_platform == "rt/rw61x"){
@@ -76,10 +71,6 @@ assert(nxp_sdk_root != "", "nxp_sdk_root must be specified")
 
 if (rt_platform == "rt1060") {
   nxp_transceiver_interface_detail = "WIFI_IW612_BOARD_MURATA_2EL_M2"
-}
-
-if (k32w0_transceiver) {
-  nxp_ot_spinel_interface_link = "hci_spinel_single_uart"
 }
 
 rt_sdk_freertos_kernel = "${nxp_sdk_root}/rtos/freertos/freertos-kernel"
