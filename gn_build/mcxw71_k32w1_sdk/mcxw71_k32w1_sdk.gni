@@ -111,11 +111,17 @@ template("${nxp_platform}_sdk") {
     ]
 
     if (chip_enable_openthread) {
-      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_THREAD=1" ]
+      defines += [ 
+        "CHIP_DEVICE_CONFIG_ENABLE_THREAD=1",
+        "CONFIG_NET_L2_OPENTHREAD=1" 
+      ]
     }
 
     if (chip_enable_ble) {
-      defines += [ "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=1" ]
+      defines += [ 
+        "CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE=1",
+        "CONFIG_BT=1"
+      ]
     }
 
     if (chip_enable_pw_rpc) {
