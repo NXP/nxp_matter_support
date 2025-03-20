@@ -272,6 +272,15 @@ elseif(CONFIG_NET_L2_OPENTHREAD AND NOT CONFIG_CHIP_WIFI)
         BASE_PATH ${NXP_MATTER_SUPPORT_DIR}
         INCLUDES gn_build/rt_sdk/lwip/openthread
     )
+elseif(CONFIG_CHIP_ETHERNET)
+    mcux_add_include(
+        BASE_PATH ${NXP_MATTER_SUPPORT_DIR}
+        INCLUDES gn_build/rt_sdk/lwip/ethernet
+    )
+    mcux_add_macro(
+    TOOLCHAINS iar armgcc
+    CC "-DFSL_FEATURE_PHYKSZ8081_USE_RMII50M_MODE"
+)
 endif()
 
 # ========================================================================================

@@ -21,6 +21,12 @@ config CHIP_SDK_DEPENDENCIES
 	select MCUX_COMPONENT_component.wifi_bt_module.config
 	select MCUX_COMPONENT_middleware.mbedtls
 
+config CHIP_SDK_DEPENDENCIES_ETHERNET
+	bool "SDK ethernet dependencies"
+    select MCUX_COMPONENT_driver.enet if CHIP_ETHERNET
+	select MCUX_COMPONENT_middleware.lwip.kinetis_ethernetif if CHIP_ETHERNET
+	select MCUX_COMPONENT_component.silicon_id if CHIP_ETHERNET
+
 if MCUX_COMPONENT_middleware.wireless.framework.ota_support
 choice MCUX_COMPONENT_middleware.wireless.framework.ota_support.flash_selection
 	default MCUX_COMPONENT_middleware.wireless.framework.ota_support.external_flash

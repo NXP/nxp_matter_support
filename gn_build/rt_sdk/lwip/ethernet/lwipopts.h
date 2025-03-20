@@ -37,7 +37,7 @@
 #define ENET_RXBD_NUM 9
 
 #define LWIP_ETHERNET 1
-#define LWIP_IPV4 0
+#define LWIP_IPV4 1
 
 #include "lwipopts_common.h"
 
