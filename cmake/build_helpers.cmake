@@ -161,11 +161,46 @@ endfunction(nxp_sign_app_imgtool)
 # *********************************************************************************
 # Sign application binary with MCUBoot imgtool
 # *********************************************************************************
-get_filename_component(CHIP_OTA_IMGTOOL_DIR "${CHIP_ROOT}/src/app" REALPATH)
+set(EXTRA_OTA_ARGS "")
+
+# We need to differentiate between the single-image .ota and the multi-image .ota generation,
+# which use different scripts that require different arguments.
+# Once all platforms can support the multi-image, the multi-image .ota generation will be kept as default.
+if (CONFIG_NXP_GENERATE_MULTI_IMAGE_OTA)
+    get_filename_component(CHIP_OTA_IMGTOOL_DIR "${CHIP_ROOT}/scripts/tools/nxp/ota" REALPATH)
+    
+    if(CONFIG_CHIP_OTA_ENCRYPTION)
+        list(APPEND EXTRA_OTA_ARGS --enc_enable --input_ota_key ${CONFIG_CHIP_OTA_ENCRYPTION_KEY})
+    endif()
+    
+    if(CONFIG_CHIP_OTA_FACTORY_DATA_PROCESSOR AND CONFIG_CHIP_FACTORY_DATA_BUILD AND CONFIG_CHIP_FACTORY_DATA_CERT_SOURCE_GENERATED)
+        # convert decimal VID to its hexadecimal representation to find out certification files in repository
+        math(EXPR LOCAL_VID "${CONFIG_CHIP_DEVICE_VENDOR_ID}" OUTPUT_FORMAT HEXADECIMAL)
+        string(SUBSTRING ${LOCAL_VID} 2 -1 raw_vid)
+        string(TOUPPER ${raw_vid} raw_vid_upper)
+
+        # convert decimal PID to its hexadecimal representation to find out certification files in repository
+        math(EXPR LOCAL_PID "${CONFIG_CHIP_DEVICE_PRODUCT_ID}" OUTPUT_FORMAT HEXADECIMAL)
+        string(SUBSTRING ${LOCAL_PID} 2 -1 raw_pid)
+        string(TOUPPER ${raw_pid} raw_pid_upper)
+        
+        list(APPEND EXTRA_OTA_ARGS --factory-data)
+        list(APPEND EXTRA_OTA_ARGS --cert_declaration ${APP_OUTPUT_DIR}/factory_data/Chip-Test-CD-${raw_vid_upper}-${raw_pid_upper}.der)
+        list(APPEND EXTRA_OTA_ARGS --dac_cert ${APP_OUTPUT_DIR}/factory_data/Chip-DAC-NXP-${raw_vid_upper}-${raw_pid_upper}-Cert.der)
+        list(APPEND EXTRA_OTA_ARGS --dac_key ${APP_OUTPUT_DIR}/factory_data/Chip-DAC-NXP-${raw_vid_upper}-${raw_pid_upper}-Key.der)
+        list(APPEND EXTRA_OTA_ARGS --pai_cert ${APP_OUTPUT_DIR}/factory_data/Chip-PAI-NXP-${raw_vid_upper}-${raw_pid_upper}-Cert.der)
+    endif()
+    
+    # For a multi-image  "--app-input-file" must be specified to provide the application image
+    list(APPEND EXTRA_OTA_ARGS --app-input-file ${APP_OUTPUT_DIR}/${APP_EXECUTABLE_NAME}_SIGNED.bin)
+else()
+    get_filename_component(CHIP_OTA_IMGTOOL_DIR "${CHIP_ROOT}/src/app" REALPATH)
+    list(APPEND EXTRA_OTA_ARGS ${APP_OUTPUT_DIR}/${APP_EXECUTABLE_NAME}_SIGNED.bin)
+endif()
 
 function(nxp_generate_ota_file)
     add_custom_target(chip-ota-image ALL
-        COMMAND ./ota_image_tool.py create -v ${CONFIG_CHIP_DEVICE_VENDOR_ID} -p ${CONFIG_CHIP_DEVICE_PRODUCT_ID} -vn ${CONFIG_CHIP_DEVICE_SOFTWARE_VERSION} -vs ${CONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING} -da sha256 ${APP_OUTPUT_DIR}/${APP_EXECUTABLE_NAME}_SIGNED.bin ${APP_OUTPUT_DIR}/${APP_EXECUTABLE_NAME}.ota
+        COMMAND ./ota_image_tool.py create -v ${CONFIG_CHIP_DEVICE_VENDOR_ID} -p ${CONFIG_CHIP_DEVICE_PRODUCT_ID} -vn ${CONFIG_CHIP_DEVICE_SOFTWARE_VERSION} -vs ${CONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING} -da sha256 ${EXTRA_OTA_ARGS} ${APP_OUTPUT_DIR}/${APP_EXECUTABLE_NAME}.ota
         WORKING_DIRECTORY ${CHIP_OTA_IMGTOOL_DIR}
         COMMENT "Generating ota file"
     )

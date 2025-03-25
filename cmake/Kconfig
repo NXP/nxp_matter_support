@@ -75,4 +75,10 @@ config MATTER_DEFAULT_LINKER_FILE_PATH
 	help
 		Defines the path to the linker file to use.
 
+config NXP_GENERATE_MULTI_IMAGE_OTA
+	bool "Generate a multi-image .ota file"
+	default y if CHIP_NXP_PLATFORM_RW61X || CHIP_NXP_PLATFORM_RT1170 || CHIP_NXP_PLATFORM_RT1060
+	help
+		Enables the generation of multiple images as one .ota image with NXP custom script "scripts/tools/nxp/ota/ota_image_tool.py".
+
 endif # CHIP
