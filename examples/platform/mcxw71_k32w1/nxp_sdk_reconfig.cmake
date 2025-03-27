@@ -43,6 +43,16 @@ mcux_add_configuration(
     -Wl,--defsym=__heap_size__=0 \
     -Wl,--defsym=__stack_size__=0x480 \
     -Wl,--no-warn-rwx-segments \
+    -Wl,--wrap=malloc \
+    -Wl,--wrap=free \
+    -Wl,--wrap=realloc \
+    -Wl,--wrap=calloc \
+    -Wl,--wrap=MemoryAlloc \
+    -Wl,--wrap=_malloc_r \
+    -Wl,--wrap=_realloc_r \
+    -Wl,--wrap=_free_r \
+    -Wl,--wrap=_calloc_r \
+    -Wl,--defsym=gUseNVMLink_d=1 \
 ")
 
 mcux_add_configuration(
@@ -55,7 +65,7 @@ mcux_add_macro(
     SDK_COMPONENT_INTEGRATION=1
     gSerialManagerMaxInterfaces_c=1
     gAppHighSystemClockFrequency_d=1
-    gAppLedCnt_c
+    gAppLedCnt_c=2
     USE_NBU=1
     gAspCapability_d=1
     gNvStorageIncluded_d=1
@@ -63,6 +73,7 @@ mcux_add_macro(
     gNvFragmentation_Enabled_d=1
     gAppLowpowerEnabled_d=1
     MULTICORE_APP=1
+    K32W_LOG_ENABLED
 )
 
 # TODO core defines. Check if all are needed
@@ -104,7 +115,7 @@ if(CONFIG_CHIP_SDK_DEPENDENCIES_BLE_HOST)
         BLE_HIGH_TX_POWER=0 # when enabled overwrite default tx power with following values gAdvertisingPowerLeveldBm_c and gConnectPowerLeveldBm_c
         gAdvertisingPowerLeveldBm_c=0
         gConnectPowerLeveldBm_c=0
-        gTmrStackTimers_c=6 # 3 + gAppMaxConnections_c * 2 + gL2caMaxLeCbChannels_c + gGapSimultaneousEAChainedReports_c
+        gTmrStackTimers_c=7 # 3 + gAppMaxConnections_c * 2 + gL2caMaxLeCbChannels_c + gGapSimultaneousEAChainedReports_c
     )
 endif()
 
