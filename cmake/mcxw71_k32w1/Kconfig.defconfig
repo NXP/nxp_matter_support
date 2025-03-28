@@ -66,6 +66,9 @@ config BUTTON_DOUBLE_CLICK_THRESHOLD
 config MCUX_PRJSEG_utility.debug_console_transfer_non_blocking
     default y
 
+config MCUX_PRJSEG_configure.timer_manager_enable_time_stamp
+    default y
+
 # FreeRTOS
 config MCUX_PRJSEG_middleware.freertos-kernel.generated_config
     default n
