@@ -86,7 +86,6 @@ mcux_add_macro(
     USE_RTOS=1
     FSL_RTOS_FREE_RTOS=1
     gMemManagerLightExtendHeapAreaUsage=0
-    MinimalHeapSize_c=0x8A00
     ENABLE_RAM_VECTOR_TABLE=1
     NO_SYSCORECLK_UPD=0
     DEBUG_SERIAL_INTERFACE_INSTANCE=0
@@ -94,6 +93,24 @@ mcux_add_macro(
     gLoggingActive_d=0
     gLogRingPlacementOffset_c=0xF000
 )
+
+if(CONFIG_CHIP_NXP_PLATFORM_MCXW71)
+    mcux_add_macro(
+        MinimalHeapSize_c=0x8A00
+)
+endif()
+
+if(CONFIG_CHIP_NXP_PLATFORM_MCXW72)
+    mcux_add_macro(
+        MinimalHeapSize_c=0xC000
+        DEFAULT_APP_UART=1
+        gDebugConsoleEnable_d=1
+        gUartDebugConsole_d=1
+        DebugConsole_c=1
+        gMainThreadPriority_c=5
+        gMainThreadStackSize_c=3096
+    )
+endif()
 
 # BLE configuration
 if(CONFIG_CHIP_SDK_DEPENDENCIES_BLE_HOST)
