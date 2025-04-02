@@ -254,6 +254,7 @@ mcux_add_configuration(
     -ffreestanding \
     -fno-builtin \
     -u flexspi_config \
+    -u qspiflash_config \
     -u image_vector_table \
     -u boot_data \
     -u dcd_data \
