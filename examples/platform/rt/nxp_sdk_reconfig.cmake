@@ -205,6 +205,14 @@ file(GLOB BOARD_FILES
     "${NXP_MATTER_SUPPORT_DIR}/examples/platform/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/board/*.h"
 )
 
+# Remove peripherals files if not LittleFS FileSytem
+if(NOT CONFIG_CHIP_NVM_COMPONENT_LITTLEFS)
+    list(REMOVE_ITEM BOARD_FILES 
+        "${NXP_MATTER_SUPPORT_DIR}/examples/platform/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/board/peripherals.c"
+        "${NXP_MATTER_SUPPORT_DIR}/examples/platform/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/board/peripherals.h" 
+    )
+endif()
+
 mcux_add_source(
     BASE_PATH /
     SOURCES
