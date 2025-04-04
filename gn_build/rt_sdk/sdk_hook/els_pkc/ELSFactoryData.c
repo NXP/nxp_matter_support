@@ -283,12 +283,16 @@ status_t ELS_sign_hash(uint8_t * digest, mcuxClEls_EccByte_t * ecc_signature, mc
     return STATUS_SUCCESS;
 }
 
-status_t ELS_Cipher_Aes_Ecb_Decrypt(mcuxClEls_KeyIndex_t key_index, uint8_t const * input, size_t input_length, uint8_t * output)
+status_t ELS_Cipher_Aes_Ecb(mcuxClEls_KeyIndex_t key_index, uint8_t const * input, size_t input_length, uint8_t * output,
+                            bool is_encrypt)
 {
     mcuxClEls_CipherOption_t cipher_options = {
         0U
     }; // Initialize a new configuration for the planned mcuxClEls_Cipher_Async operation.
-    cipher_options.bits.dcrpt  = MCUXCLELS_CIPHER_DECRYPT;
+    if (is_encrypt)
+        cipher_options.bits.dcrpt = MCUXCLELS_CIPHER_ENCRYPT;
+    else
+        cipher_options.bits.dcrpt = MCUXCLELS_CIPHER_DECRYPT;
     cipher_options.bits.cphmde = MCUXCLELS_CIPHERPARAM_ALGORITHM_AES_ECB;
     cipher_options.bits.cphsie = MCUXCLELS_CIPHER_STATE_IN_DISABLE;
     cipher_options.bits.cphsoe = MCUXCLELS_CIPHER_STATE_OUT_DISABLE;
