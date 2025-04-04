@@ -286,7 +286,8 @@ status_t import_die_int_wrapped_key_into_els(const uint8_t * wrapped_key, size_t
                                              mcuxClEls_KeyProp_t key_properties, mcuxClEls_KeyIndex_t * index_output);
 status_t ELS_sign_hash(uint8_t * digest, mcuxClEls_EccByte_t * ecc_signature, mcuxClEls_EccSignOption_t * sign_options,
                        mcuxClEls_KeyIndex_t key_index);
-status_t ELS_Cipher_Aes_Ecb_Decrypt(mcuxClEls_KeyIndex_t key_index, uint8_t const * input, size_t input_length, uint8_t * output);
+status_t ELS_Cipher_Aes_Ecb(mcuxClEls_KeyIndex_t key_index, uint8_t const * input, size_t input_length, uint8_t * output,
+                            bool is_encrypt);
 
 status_t import_plain_key_into_els(const uint8_t * plain_key, size_t plain_key_size, mcuxClEls_KeyProp_t key_properties,
                                    mcuxClEls_KeyIndex_t * index_output);
