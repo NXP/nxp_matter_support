@@ -101,7 +101,12 @@ if(CONFIG_CHIP_NXP_PLATFORM_MCXW71)
 endif()
 
 if(CONFIG_CHIP_NXP_PLATFORM_MCXW72)
+    # TODO: The SSSAPI component's dependencies should be relocated into
+    # the component's makefiles.
     mcux_add_macro(
+        MBEDTLS_NXP_SSSAPI
+        MBEDTLS_THREADING_C
+        MBEDTLS_THREADING_ALT
         MinimalHeapSize_c=0xC000
         DEFAULT_APP_UART=1
         gDebugConsoleEnable_d=1
@@ -110,6 +115,16 @@ if(CONFIG_CHIP_NXP_PLATFORM_MCXW72)
         gMainThreadPriority_c=5
         gMainThreadStackSize_c=3096
     )
+
+    # TODO: The SSSAPI component's dependencies should be relocated into
+    # the component's makefiles.
+    mcux_add_include(
+        BASE_PATH ${SdkRootDirPath}
+        INCLUDES
+        middleware/mbedtls/include
+        middleware/mbedtls/port/sssapi
+    )
+
 endif()
 
 # BLE configuration
