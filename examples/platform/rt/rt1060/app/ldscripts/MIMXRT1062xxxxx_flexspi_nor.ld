@@ -141,7 +141,7 @@ m_app_trailer_size                  = m_flash_sector_size;
 m_padding_size                      = m_flash_sector_size;
 
 /* Maximum number of sectors per slot */
-m_app_max_sectors                   = DEFINED(gEVKCFlashSize_d) ? 0x400 : 0x300; /* 4 MB for evkc, otherwise 2 MB / m_sector_size */
+m_app_max_sectors                   = DEFINED(gFlashSize_d) ? 0x400 : 0x300; /* 4 MB for evkc, otherwise 3 MB / m_sector_size */
 
 /* The active image section contains the mcuboot header + active app + trailer 
  * Note that an empty sector (padding) must be kept at the end of the active image section,
