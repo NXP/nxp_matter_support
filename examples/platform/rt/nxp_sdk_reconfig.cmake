@@ -136,6 +136,14 @@ if(CONFIG_CHIP_NXP_PLATFORM_RT1060)
     endif()
 endif()
 
+if(CONFIG_CHIP_NXP_PLATFORM_RT1060 OR CONFIG_CHIP_NXP_PLATFORM_RT1170)
+    mcux_add_macro(
+        # Needed as MCU boot uses remapping, image trailers
+        # are expected at a different offset than when it uses swap mode.
+        gPlatformMcuBootUseRemap_d=1
+    )
+endif()
+
 if(CONFIG_MCUX_COMPONENT_component.wifi_bt_module.IW61X AND CONFIG_NET_L2_OPENTHREAD AND NOT CONFIG_CHIP_WIFI)
     # Required to use wifi_nxp fw dwnld in MoT
     mcux_add_macro(
