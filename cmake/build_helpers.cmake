@@ -63,31 +63,12 @@ function(nxp_get_sdk_path platform sdk_path_variable)
 endfunction()
 
 # Set the NXP SDK path
-if(CONFIG_CHIP_BUILD_APP_WITH_GN)
-    if(CONFIG_CHIP_NXP_PLATFORM STREQUAL "k32w0")
-        nxp_get_sdk_path("k32w0" NXP_K32W0_SDK_ROOT)
-        message(STATUS "NXP_K32W0_SDK_ROOT is set to : ${NXP_K32W0_SDK_ROOT}")
-    else()
-        nxp_get_sdk_path("common" NXP_SDK_ROOT)
-        message(STATUS "NXP_SDK_ROOT is set to : ${NXP_SDK_ROOT}")
-    endif()
-else() # SDK 3.0 build system
-    set(NXP_SDK_ROOT ${SdkRootDirPath})
-endif()
+set(NXP_SDK_ROOT ${SdkRootDirPath})
 
-# Define output variable based on the build system used
-if(CONFIG_CHIP_BUILD_APP_WITH_GN)
-    if(NOT DEFINED gn_build)
-        set(gn_build ${CMAKE_BINARY_DIR}/out/debug CACHE INTERNAL "Path to the GN build output")
-    endif()
-
-    set(APP_OUTPUT_DIR ${gn_build})
-    set(APP_EXECUTABLE_NAME ${PROJECT_NAME})
-else() # SDK 3.0 build system
-    set(APP_OUTPUT_DIR ${CMAKE_BINARY_DIR})
-    set(APP_EXECUTABLE_NAME app)
-    set(APP_EXECUTABLE_SUFFIX .elf)
-endif()
+# Define output variable
+set(APP_OUTPUT_DIR ${CMAKE_BINARY_DIR})
+set(APP_EXECUTABLE_NAME app)
+set(APP_EXECUTABLE_SUFFIX .elf)
 
 # *********************************************************************************
 # Build example application with GN and Ninja
@@ -122,46 +103,26 @@ endif()
 
 get_filename_component(MCUBOOT_OPENSOURCE_DIR "${NXP_SDK_ROOT}/middleware/mcuboot_opensource" REALPATH)
 
-if(CONFIG_CHIP_BUILD_APP_WITH_GN)
-    get_filename_component(MCUBOOT_EXAMPLE_DIR "${NXP_SDK_ROOT}/examples/${CONFIG_BOARD_NAME}/ota_examples/mcuboot_opensource/${CONFIG_CORE_FOLDER}" REALPATH)
-else()
-    get_filename_component(MCUBOOT_EXAMPLE_DIR "${NXP_SDK_ROOT}/examples/ota_examples/mcuboot_opensource" REALPATH)
-endif()
+get_filename_component(MCUBOOT_EXAMPLE_DIR "${NXP_SDK_ROOT}/examples/ota_examples/mcuboot_opensource" REALPATH)
 
 function(nxp_generate_mcuboot)
-    if(CONFIG_CHIP_BUILD_APP_WITH_GN)
+    if(DEFINED core_id)
         add_custom_target(build_mcuboot ALL
-            COMMAND chmod +x build_${CONFIG_MCUBOOT_BUILD_TYPE}.sh
             COMMAND export ARMGCC_DIR=${ARMGCC_DIR}
-            COMMAND ./build_${CONFIG_MCUBOOT_BUILD_TYPE}.sh
-            WORKING_DIRECTORY ${MCUBOOT_EXAMPLE_DIR}/armgcc
+            COMMAND west build -d ${CMAKE_CURRENT_BINARY_DIR}/mcuboot -b ${board} ${MCUBOOT_EXAMPLE_DIR} -Dcore_id=${core_id} -DCONF_FILE=${NXP_MATTER_SUPPORT_DIR}/cmake/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/bootloader.conf
+            WORKING_DIRECTORY ${SdkRootDirPath}
             COMMENT "Generating MCUBoot binary"
         )
-        add_dependencies(build_mcuboot build_app_with_gn)
-        add_custom_command(
-            TARGET build_mcuboot POST_BUILD
-            COMMAND arm-none-eabi-objcopy -O binary ${MCUBOOT_EXAMPLE_DIR}/armgcc/${CONFIG_MCUBOOT_BUILD_TYPE}/mcuboot_opensource.elf ${gn_build}/mcuboot_opensource.bin
-            COMMENT "Copying mcuboot binary to example outputs folder"
+    else()
+        add_custom_target(build_mcuboot ALL
+            COMMAND export ARMGCC_DIR=${ARMGCC_DIR}
+            COMMAND west build -d ${CMAKE_CURRENT_BINARY_DIR}/mcuboot -b ${board} ${MCUBOOT_EXAMPLE_DIR} -DCONF_FILE=${NXP_MATTER_SUPPORT_DIR}/cmake/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/bootloader.conf
+            WORKING_DIRECTORY ${SdkRootDirPath}
+            COMMENT "Generating MCUBoot binary"
         )
-    else() # SDK Next Gen build system
-        if(DEFINED core_id)
-            add_custom_target(build_mcuboot ALL
-                COMMAND export ARMGCC_DIR=${ARMGCC_DIR}
-                COMMAND west build -d ${CMAKE_CURRENT_BINARY_DIR}/mcuboot -b ${board} ${MCUBOOT_EXAMPLE_DIR} -Dcore_id=${core_id} -DCONF_FILE=${NXP_MATTER_SUPPORT_DIR}/cmake/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/bootloader.conf
-                WORKING_DIRECTORY ${SdkRootDirPath}
-                COMMENT "Generating MCUBoot binary"
-            )
-        else()
-            add_custom_target(build_mcuboot ALL
-                COMMAND export ARMGCC_DIR=${ARMGCC_DIR}
-                COMMAND west build -d ${CMAKE_CURRENT_BINARY_DIR}/mcuboot -b ${board} ${MCUBOOT_EXAMPLE_DIR} -DCONF_FILE=${NXP_MATTER_SUPPORT_DIR}/cmake/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/bootloader.conf
-                WORKING_DIRECTORY ${SdkRootDirPath}
-                COMMENT "Generating MCUBoot binary"
-            )
-        endif()
-
-        add_dependencies(build_mcuboot app)
     endif()
+
+    add_dependencies(build_mcuboot app)
 endfunction(nxp_generate_mcuboot)
 
 # *********************************************************************************
@@ -193,11 +154,8 @@ function(nxp_sign_app_imgtool bin_sections_to_remove)
         COMMENT "Sign the application binary with imgtool.py"
     )
 
-    if(CONFIG_CHIP_BUILD_APP_WITH_GN)
-        add_dependencies(sign_application build_app_with_gn)
-    else()
-        add_dependencies(sign_application app)
-    endif()
+    add_dependencies(sign_application app)
+
 endfunction(nxp_sign_app_imgtool)
 
 # *********************************************************************************
