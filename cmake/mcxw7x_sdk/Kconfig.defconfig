@@ -52,6 +52,9 @@ config FSL_OSA_MAIN_FUNC_ENABLE
 config FSL_OSA_ALLOCATED_HEAP
     default n
 
+config MCUX_PRJSEG_component.osa_interface.osa_macro_used
+    default n if !NXP_USE_LOW_POWER
+
 # Button     
 config BUTTON_SHORT_PRESS_THRESHOLD
     default "200U"
@@ -64,7 +67,7 @@ config BUTTON_DOUBLE_CLICK_THRESHOLD
 
 # Debug console
 config MCUX_PRJSEG_utility.debug_console_transfer_non_blocking
-    default y
+    default y if CHIP_LIB_SHELL || LOG
 
 config MCUX_PRJSEG_configure.timer_manager_enable_time_stamp
     default y
