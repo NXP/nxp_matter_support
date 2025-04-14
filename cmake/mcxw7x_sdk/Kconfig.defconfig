@@ -67,7 +67,10 @@ config BUTTON_DOUBLE_CLICK_THRESHOLD
 
 # Debug console
 config MCUX_PRJSEG_utility.debug_console_transfer_non_blocking
-    default y if CHIP_LIB_SHELL || LOG
+    default y
+
+config SERIAL_MANAGER_NON_BLOCKING_MODE
+    default y
 
 config MCUX_PRJSEG_configure.timer_manager_enable_time_stamp
     default y
@@ -83,6 +86,12 @@ config NVS_LOOKUP_CACHE
 
 config NVS_LOOKUP_CACHE_SIZE
 	default 1024
+
+config SETTINGS_NVS_SECTOR_SIZE_MULT
+	default "(((8192u) * 1u) / (8192u))"
+
+config SETTINGS_NVS_SECTOR_COUNT
+	default "((uint32_t)NV_STORAGE_SIZE / ((8192u) * 1u))"
 
 choice MCUX_COMPONENT_component.mem_manager_selection
     default MCUX_COMPONENT_component.mem_manager_light

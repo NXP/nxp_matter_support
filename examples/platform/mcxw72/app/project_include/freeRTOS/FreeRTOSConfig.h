@@ -74,6 +74,7 @@ extern uint32_t SystemCoreClock;
 #define configUSE_ALTERNATIVE_API 0 /* Deprecated! */
 #define configQUEUE_REGISTRY_SIZE 8
 #define configUSE_QUEUE_SETS 0
+#define configFRTOS_MEMORY_SCHEME 4
 /* make sure that Thread task can interrupt lengthy Matter
  * processing in case priority inversion occurs
  */
