@@ -184,6 +184,7 @@ core_sdk = {
     "DEFAULT_APP_UART=1",
     "gLoggingActive_d=0",
     "gLogRingPlacementOffset_c=0xF000",
+    "MCUXPRESSO_SDK",
   ]
 
   if (nxp_device == "MCXW716C") {

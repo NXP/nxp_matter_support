@@ -193,7 +193,6 @@ middleware_sdk = {
       # Not sure if these flags are actually used or needed
       "osCustomStartup=1",
       "CHIP_ENABLE_OPENTHREAD=1",
-      "configFRTOS_MEMORY_SCHEME=4",
     ]
   }
 
