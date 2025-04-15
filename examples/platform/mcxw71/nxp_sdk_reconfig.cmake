@@ -60,6 +60,8 @@ mcux_add_configuration(
     -Wl,--wrap=_free_r \
     -Wl,--wrap=_calloc_r \
     -Wl,--defsym=gUseNVMLink_d=1 \
+    -Wl,--defsym=lp_ram_lower_limit=0x04000000 \
+    -Wl,--defsym=lp_ram_upper_limit=0x2001C000 \
 ")
 
 mcux_add_configuration(
@@ -165,6 +167,20 @@ mcux_add_macro(
     SSS_CONFIG_FILE=\\\"fsl_sss_config_elemu.h\\\"
     SSCP_CONFIG_FILE=\\\"fsl_sscp_config_elemu.h\\\"
 )
+
+if (CONFIG_CHIP_FACTORY_DATA)
+    mcux_add_configuration(
+        LD "-Wl,--defsym=gUseFactoryData_d=1"
+    )
+    mcux_add_macro(
+        gHwParamsAppFactoryDataExtension_d=1
+    )
+    if(CONFIG_CHIP_NXP_PLATFORM_MCXW71)
+        mcux_add_macro(
+            gHwParamsProdDataPlacement_c=gHwParamsProdDataMainFlashMode_c
+        )
+    endif()
+endif()
 
 # ========================================================================================
 # 2. Include Paths and Source Files
