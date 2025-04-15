@@ -171,7 +171,7 @@ template("${nxp_platform}_sdk") {
         # Set this value to keep backwards compatibility. Please check fwk_config.h
         # for the other values which aim to move factory data in IFR0.
         defines += [
-          "gHwParamsProdDataPlacement_c=gHwParamsProdDataMainFlash_c"
+          "gHwParamsProdDataPlacement_c=gHwParamsProdDataMainFlashMode_c"
         ]
       }
     }
