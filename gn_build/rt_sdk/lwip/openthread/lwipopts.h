@@ -36,6 +36,8 @@
 #define PBUF_POOL_SIZE 20
 #define NETIF_MAX_HWADDR_LEN 8U
 
+#define LWIP_HAVE_LOOPIF (0)
+
 #include "lwipopts_common.h"
 
 #endif /* __LWIPOPTS_H__ */
