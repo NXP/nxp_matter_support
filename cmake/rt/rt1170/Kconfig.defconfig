@@ -8,6 +8,7 @@ if CHIP_NXP_PLATFORM_RT1170
 
 config CHIP_SDK_DEPENDENCIES
 	select MCUX_COMPONENT_driver.lpuart_edma
+	select MCUX_COMPONENT_driver.gpt
 	select MCUX_COMPONENT_component.igpio_adapter
 
 # SDK defaults
@@ -19,6 +20,10 @@ endchoice
 # sdmmc
 choice MCUX_COMPONENT_middleware.sdmmc.host.usdhc.selection
 	default MCUX_COMPONENT_middleware.sdmmc.host.usdhc.non_blocking
+endchoice
+
+choice MCUX_DEPENDENCY_COMPONENT_component.timer_manager_DEPEND_component.timer.selection
+	default MCUX_DEPENDENCY_COMPONENT_component.timer_manager_DEPEND_component.timer_manager_pit
 endchoice
 
 # FreeRTOS
