@@ -146,9 +146,22 @@ endif()
 
 if(CONFIG_MCUX_COMPONENT_component.wifi_bt_module.IW61X AND CONFIG_NET_L2_OPENTHREAD AND NOT CONFIG_CHIP_WIFI)
     # Required to use wifi_nxp fw dwnld in MoT
+    # edgefast is forcing the usage of a dedicated wifi_config.h when wifi is disabled, the one from matter cannot be used.
+    # Therefore flags coming from components/wifi_bt_module/incl/wifi_bt_module_config.h are not defined and need to manually set.
+    
     mcux_add_macro(
         SD9177
     )
+    if(CONFIG_CHIP_NXP_PLATFORM_RT1170)
+        mcux_add_macro(
+            WIFI_BT_USE_USD_INTERFACE
+        )
+    endif()
+    if(CONFIG_CHIP_NXP_PLATFORM_RT1060)
+        mcux_add_macro(
+            WIFI_BT_USE_M2_INTERFACE
+        )
+    endif()
 endif()
 
 if(CONFIG_MCUX_COMPONENT_component.wifi_bt_module.K32W061_transceiver)
