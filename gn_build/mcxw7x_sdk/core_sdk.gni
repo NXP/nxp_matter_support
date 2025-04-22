@@ -126,7 +126,6 @@ core_sdk = {
     "${COMPONENT_OSA_DIR_PATH}/config",
     "${COMPONENT_PANIC_DIR_PATH}",
     "${COMPONENT_POWER_MGR_DIR_PATH}/core",
-    "${COMPONENT_POWER_MGR_DIR_PATH}/devices/KW45B41Z83",
     "${COMPONENT_RESET_DIR_PATH}",
     "${COMPONENT_RPMSG_DIR_PATH}",
     "${COMPONENT_SERIAL_MGR_DIR_PATH}",
@@ -147,6 +146,7 @@ core_sdk = {
   } else if (nxp_device == "MCXW716C")  {
     core_include_dirs += [
       "${DEVICES_DIR_PATH}/../periph2",
+      "${COMPONENT_POWER_MGR_DIR_PATH}/devices/KW45B41Z83",
     ]
   }
 
