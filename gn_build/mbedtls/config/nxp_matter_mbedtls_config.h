@@ -108,8 +108,46 @@
 #define MBEDTLS_SSL_PROTO_TLS1_2
 #define MBEDTLS_SSL_PROTO_DTLS
 #define MBEDTLS_SSL_TLS_C
+
+#ifdef MBEDTLS_MCUX_USE_ELS
+/* Enable PSA */
+#define MBEDTLS_PSA_BUILTIN_ALG_SHA_256 1
+#define MBEDTLS_PSA_CRYPTO_C
+#define MBEDTLS_PSA_CRYPTO_CONFIG
+
+#define MBEDTLS_ENTROPY_FORCE_SHA256
+
+/* need to be defined to 0, else config_psa.h will define it to 1 and ecp.h will define wrong MBEDTLS_ECP_MAX_BITS_MIN value*/
+#define MBEDTLS_PSA_ACCEL_ECC_SECP_R1_521 0
+#define MBEDTLS_PSA_ACCEL_ECC_BRAINPOOL_P_R1_512 0
+#define MBEDTLS_PSA_ACCEL_ECC_BRAINPOOL_P_R1_384 0
+#define MBEDTLS_PSA_ACCEL_ECC_SECP_R1_384 0
+#endif /* MBEDTLS_MCUX_USE_ELS */
+
 #endif // CONFIG_NET_L2_OPENTHREAD
 
+#if !defined(MBEDTLS_PLATFORM_STD_CALLOC) && !defined(MBEDTLS_PLATFORM_STD_FREE)
+#if defined(USE_RTOS) && defined(SDK_OS_FREE_RTOS)
+#include "FreeRTOS.h"
+
+#ifdef MBEDTLS_MCUX_USE_ELS
+/* Allows to align with RT configuration to have mbedtls allocation redirected to freeRTOS functions for both Matter over Wi-Fi and Matter over Thread */
+void *pvPortCalloc(size_t num, size_t size); /*Calloc for HEAP3.*/
+
+#define MBEDTLS_PLATFORM_MEMORY
+#define MBEDTLS_PLATFORM_STD_CALLOC pvPortCalloc
+#define MBEDTLS_PLATFORM_STD_FREE vPortFree
+
+#endif /* USE_RTOS*/
+#endif /* !defined(MBEDTLS_PLATFORM_STD_CALLOC) && !defined(MBEDTLS_PLATFORM_STD_FREE) */
+
+#endif /* MBEDTLS_MCUX_USE_ELS */
+
+#if defined CRYPTO_USE_DRIVER_CAAM || ( defined(FSL_FEATURE_SOC_DCP_COUNT) && (FSL_FEATURE_SOC_DCP_COUNT > 0))
+#ifdef MBEDTLS_SHA512_C
+#undef MBEDTLS_SHA512_C /* RT1060  HW crypto module does not support SDH512, therefore it is mandatory to disable it otherwise crypto operation would be done in software (example: ecp_drbg_seed). To align all RT configs it would be also disabled on RT1170 */
+#endif
+#endif
 /*
  * These configs are required if OPENTHREAD_CONFIG_BORDER_AGENT_ENABLE \
  * || OPENTHREAD_CONFIG_COMMISSIONER_ENABLE || OPENTHREAD_CONFIG_COAP_SECURE_API_ENABLE
@@ -171,6 +209,8 @@
 #define MBEDTLS_ECP_FIXED_POINT_OPTIM      0 /**< Enable fixed-point speed-up */
 #define MBEDTLS_ENTROPY_MAX_SOURCES        1 /**< Maximum number of sources supported */
 
+/* Not required to be enabled for MCXW platform as calloc and free would be register dynamically during Matter boot.
+For RTs such confis are enabled in KSDK_mbedtls_config,h and for RW it has already been defined above */
 //#define MBEDTLS_PLATFORM_STD_CALLOC      pvPortMalloc /**< Default allocator to use, can be undefined */
 //#define MBEDTLS_PLATFORM_STD_FREE        vPortFree /**< Default free to use, can be undefined */
 
