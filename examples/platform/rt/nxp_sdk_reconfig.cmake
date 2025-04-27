@@ -79,6 +79,13 @@ if(CONFIG_CHIP_NXP_PLATFORM_RW61X)
         )
     endif()
 
+    if(CONFIG_CHIP_APP_BUTTON_REGISTRATION_APP_ONLY)
+        # An app button would be registered by the Matter app so set the number of ButtonCnt to 1
+        mcux_add_macro(
+            gAppButtonCnt_c=1
+        )
+    endif()
+
     mcux_add_configuration(
         CC "-march=armv8-m.main"
         CX "-march=armv8-m.main"

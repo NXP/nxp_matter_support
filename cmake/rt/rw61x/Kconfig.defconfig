@@ -16,7 +16,6 @@ config CHIP_SDK_DEPENDENCIES
 	select CHIP_SDK_DEPENDENCIES_ETHERNET if CHIP_ETHERNET
 	select MCUX_COMPONENT_component.phyksz8081 if CHIP_ETHERNET
 	select MCUX_COMPONENT_component.lpc_gpio_adapter if CHIP_ETHERNET
-	select MCUX_COMPONENT_component.button if CHIP_APP_BUTTON_REGISTRATION_APP_BLE
 
 # SDK defaults
 
