@@ -187,6 +187,7 @@ core_sdk = {
     "USE_SDK_OSA=0",
     "DEBUG_SERIAL_INTERFACE_INSTANCE=0",
     "BOARD_DEBUG_UART_CLK_FREQ=6000000U",
+    "DEFAULT_APP_UART=1",
     "gLoggingActive_d=0",
     "gLogRingPlacementOffset_c=0xF000",
   ]
@@ -198,27 +199,33 @@ core_sdk = {
       "CPU_MCXW716CMFTA",
       "K32W1480_SERIES"
     ]
+
+    # When CLI is enabled configure the SerialManager parameters
+    if (nxp_enable_matter_cli) {
+      core_defines += [
+        "BOARD_APP_UART_CLK_FREQ=6000000",
+        "gAppUseSerialManager_c=1"
+      ]
+    }
   } else if (nxp_device == "MCXW727C") {
     core_defines += [
       "CPU_MCXW727CMFTA_cm33_core0",
     ]
+
+    # When no Matter CLI is present, move device log on the default (UART1)
+    # serial port
+    if (!nxp_enable_matter_cli) {
+      core_defines += [ "BOARD_DEBUG_UART_INSTANCE=1" ]
+    }
+
     if (chip_logging || nxp_enable_matter_cli) {
       core_defines += [
         "gDebugConsoleEnable_d=1",
         "DEBUG_CONSOLE_TRANSFER_NON_BLOCKING",
         "DebugConsole_c=1",
-        "DEFAULT_APP_UART=1",
       ]
     }
-  }
 
-  if (nxp_enable_matter_cli && nxp_device != "MCXW727C") {
-    core_defines += [
-      "gDebugConsoleEnable_d=1",
-      "DebugConsole_c=0",
-      "DEFAULT_APP_UART=1",
-      "BOARD_APP_UART_CLK_FREQ=6000000U",
-    ]
   }
 
   if (nxp_device == "MCXW727C") {
