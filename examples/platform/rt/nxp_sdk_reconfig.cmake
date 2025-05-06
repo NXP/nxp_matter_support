@@ -202,9 +202,16 @@ mcux_remove_configuration(
 )
 
 mcux_add_configuration(
-    CC " -Wno-maybe-uninitialized -Wno-unused-variable -Wno-address -std=gnu11 -save-temps"
-    CX " -std=gnu++17 -Wno-maybe-uninitialized -Wno-unused-variable -Wno-address -save-temps"
+    CC " -Wno-maybe-uninitialized -Wno-unused-variable -Wno-address -std=gnu11"
+    CX " -std=gnu++17 -Wno-maybe-uninitialized -Wno-unused-variable -Wno-address"
 )
+
+if(CONFIG_NXP_GENERATE_PREPROCESS_FILES)
+    mcux_add_configuration(
+        CC "-save-temps"
+        CX "-save-temps"
+    )
+endif()
 
 # ========================================================================================
 # 2. Include Paths and Source Files

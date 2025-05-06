@@ -29,9 +29,16 @@ mcux_remove_configuration(
 )
 
 mcux_add_configuration(
-    CC " -std=gnu11 -save-temps"
-    CX " -std=gnu++17 -save-temps"
+    CC " -std=gnu11"
+    CX " -std=gnu++17"
 )
+
+if(CONFIG_NXP_GENERATE_PREPROCESS_FILES)
+    mcux_add_configuration(
+        CC "-save-temps"
+        CX "-save-temps"
+    )
+endif()
 
 # Components configuration
 mcux_add_macro(

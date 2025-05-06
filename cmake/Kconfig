@@ -81,4 +81,9 @@ config NXP_GENERATE_MULTI_IMAGE_OTA
 	help
 		Enables the generation of multiple images as one .ota image with NXP custom script "scripts/tools/nxp/ota/ota_image_tool.py".
 
+config NXP_GENERATE_PREPROCESS_FILES
+	bool "Generate preprocessed source files"
+	help
+		Enables to generate and keep the preprocessed source files (e.g, .i or .ii files) during the build. Useful for debugging macro expansion and include paths.
+
 endif # CHIP
