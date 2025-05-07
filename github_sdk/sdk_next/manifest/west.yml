@@ -18,7 +18,6 @@ manifest:
                   - mcux-sdk-middleware-sdmmc
                   - fatfs
                   - ethermind
-                  - mcux-sdk-middleware-connectivity-framework
                   - mbedtls
                   - lwip
                   - littlefs
@@ -43,6 +42,10 @@ manifest:
                   - usb
                   - mcuboot_opensource
               path-prefix: repo
+        - name: mcux-sdk-middleware-connectivity-framework
+          url: https://github.com/nxp-mcuxpresso/mcuxsdk-middleware-connectivity-framework
+          revision: fe4ff8e39fbfda6f4c657a6df67a266cb06ed0fc
+          path: repo/mcuxsdk/middleware/wireless/framework
         - name: bifrost
           url: https://github.com/nxp-zephyr/bifrost
           revision: main
