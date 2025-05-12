@@ -103,7 +103,8 @@ mcux_add_macro(
 
 if(CONFIG_CHIP_NXP_PLATFORM_MCXW71)
     mcux_add_macro(
-        MinimalHeapSize_c=0x8A00
+        # Temporary workaround, allocate more heap
+        MinimalHeapSize_c=0x9200
 )
 endif()
 
@@ -114,7 +115,8 @@ if(CONFIG_CHIP_NXP_PLATFORM_MCXW72)
         MBEDTLS_NXP_SSSAPI
         MBEDTLS_THREADING_C
         MBEDTLS_THREADING_ALT
-        MinimalHeapSize_c=0xC000
+        # Temporary workaround, allocate more heap
+        MinimalHeapSize_c=0xC800
         DEFAULT_APP_UART=1
         gDebugConsoleEnable_d=1
         gUartDebugConsole_d=1
