@@ -16,7 +16,8 @@
 #if (defined(K32W061_TRANSCEIVER) && (CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE || CONFIG_BT)) ||                                         \
     (defined(WIFI_IW416_BOARD_AW_AM510_USD) && (CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE || CONFIG_BT)) ||                               \
     (defined(WIFI_IW416_BOARD_AW_AM457_USD) && (CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE || CONFIG_BT)) ||                               \
-    (defined(WIFI_IW612_BOARD_MURATA_2EL_M2) && (CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE || CONFIG_BT))
+    (defined(WIFI_IW612_BOARD_MURATA_2EL_M2) && (CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE || CONFIG_BT))||                               \
+    (defined(WIFI_IW610_BOARD_MURATA_2LL_M2) && (CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE || CONFIG_BT))
 #include "controller_hci_uart.h"
 #endif
 
@@ -57,7 +58,7 @@ void BOARD_InitHardware(void)
 
 #if (defined(WIFI_IW416_BOARD_MURATA_1XK_USD) || defined(WIFI_88W8987_BOARD_MURATA_1ZM_USD))
         BOARD_InitMurataModulePins();
-#elif (defined(WIFI_IW612_BOARD_MURATA_2EL_M2))
+#elif (defined(WIFI_IW612_BOARD_MURATA_2EL_M2) || defined(WIFI_IW610_BOARD_MURATA_2LL_M2))
         BOARD_InitPinsM2();
         BOARD_InitM2SPIPins();
         BOARD_InitM2I2CPins();
@@ -142,7 +143,8 @@ int controller_hci_uart_get_configuration(controller_hci_uart_config_t * config)
     config->enableTxCTS     = 1u;
     return 0;
 }
-#elif (defined(WIFI_IW612_BOARD_MURATA_2EL_M2) && (CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE || CONFIG_BT))
+#elif (defined(WIFI_IW612_BOARD_MURATA_2EL_M2) && (CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE || CONFIG_BT))||                               \
+      (defined(WIFI_IW610_BOARD_MURATA_2LL_M2) && (CHIP_DEVICE_CONFIG_ENABLE_CHIPOBLE || CONFIG_BT))
 int controller_hci_uart_get_configuration(controller_hci_uart_config_t * config)
 {
     if (NULL == config)
