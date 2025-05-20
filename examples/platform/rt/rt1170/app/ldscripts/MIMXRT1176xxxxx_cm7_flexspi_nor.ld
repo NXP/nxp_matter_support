@@ -91,7 +91,7 @@ _stated_  |     m_text    |                                 '   ACTIVE_APP (slot
 ENTRY(Reset_Handler)
 
 FLASH_START       = 0x30000000;
-FLASH_SIZE        = 0x1000000; /* 16 MBytes */
+FLASH_SIZE        = 0x4000000; /* 64 MBytes */
 FLASH_END         = FLASH_START + FLASH_SIZE - 1;
 FLASH_SECTOR_SIZE = 0x1000;  /* 4k flash sector size */
 
@@ -251,30 +251,53 @@ SECTIONS
   {
     . = ALIGN(4);
     *(EXCLUDE_FILE(
-        /* Exclude flash and frequently executed functions from XIP */
+        *port.c.o*
+        *portasm.c.o*
+        *queue.c.o*
+        *timers.c.o*
+        *tasks.c.o*
+        *inet_chksum.c.o*
+        *ip4.c.o*
+        *pbuf.c.o*
+        *sys_arch.c.o*
+        *tcp_out.c.o*
+        *tcp_in.c.o*
+        *mlan_11n_rxreorder.c.o*
+        *mlan_wmm.c.o*
+        *wifi.c.o*
+        *wifi-imu.c.o*
+        *fsl_adapter_rfimu.c.o*
+        *fsl_cache.c.o*
+        *fsl_os_abstraction_free_rtos.c.o*
+        *nvs.c.o*
+        *fwk_nvs_flash.c.o*
+        *fwk_nvs_ExternalFlash.c.o*
+        *settings.c.o*
+        *settings_init.c.o*
+        *settings_nvs.c.o*
+        *settings_store.c.o*
+        *fwk_platform_extflash.c.o*
+        *FunctionLib.c.o*
+        *fsl_memcpy.S.o*
         *fsl_adapter_flexspi_nor_flash.c.o*
         *mflash_drv.c.o*
         *fsl_flexspi.c.o*
-    ) .text)                 /* .text sections (code) */
+      ) .text*)              /* .text* sections (code) */
     *(EXCLUDE_FILE(
-        /* Exclude flash and frequently executed functions from XIP */
+        *nvs.c.o*
+        *fwk_nvs_flash.c.o*
+        *fwk_nvs_ExternalFlash.c.o*
+        *settings.c.o*
+        *settings_init.c.o*
+        *settings_nvs.c.o*
+        *settings_store.c.o*
+        *fwk_platform_extflash.c.o*
+        *FunctionLib.c.o*
+        *fsl_memcpy.S.o*
         *fsl_adapter_flexspi_nor_flash.c.o*
         *mflash_drv.c.o*
         *fsl_flexspi.c.o*
-    ) .text*)                 /* .text sections (code) */
-    *(EXCLUDE_FILE(
-        /* Exclude flash and frequently executed functions from XIP */
-        *fsl_adapter_flexspi_nor_flash.c.o*
-        *mflash_drv.c.o*
-        *fsl_flexspi.c.o*
-    ) .rodata)
-    *(EXCLUDE_FILE(
-        /* Exclude flash and frequently executed functions from XIP */
-        *fsl_adapter_flexspi_nor_flash.c.o*
-        *mflash_drv.c.o*
-        *fsl_flexspi.c.o*
-    ) .rodata*)
-    *(.rodata)               /* .rodata sections (constants, strings, etc.) */
+      ) .rodata*)
     *(.rodata*)              /* .rodata* sections (constants, strings, etc.) */
     *(.glue_7)               /* glue arm to thumb code */
     *(.glue_7t)              /* glue thumb to arm code */
@@ -469,9 +492,37 @@ SECTIONS
     __ram_function_start__ = .;
     *(CodeQuickAccess)
     /* Explicit placement of flash and frequently executed functions in RAM */
-    *fsl_adapter_flexspi_nor_flash.c.o*(.text .text* .rodata .rodata*)
-    *mflash_drv.c.o*(.text .text* .rodata .rodata*)
-    *fsl_flexspi.c.o*(.text .text* .rodata .rodata*)
+    *port.c.o*(.text*)
+    *portasm.c.o*(.text*)
+    *queue.c.o*(.text*)
+    *timers.c.o*(.text*)
+    *tasks.c.o*(.text*)
+    *inet_chksum.c.o*(.text*)
+    *ip4.c.o*(.text*)
+    *pbuf.c.o*(.text*)
+    *sys_arch.c.o*(.text*)
+    *tcp_out.c.o*(.text*)
+    *tcp_in.c.o*(.text*)
+    *mlan_11n_rxreorder.c.o*(.text*)
+    *mlan_wmm.c.o*(.text*)
+    *wifi.c.o*(.text*)
+    *wifi-imu.c.o*(.text*)
+    *fsl_adapter_rfimu.c.o*(.text*)
+    *fsl_cache.c.o*(.text*)
+    *fsl_os_abstraction_free_rtos.c.o*(.text*)
+    *nvs.c.o*( .text* .rodata*)
+    *fwk_nvs_flash.c.o*(.text* .rodata*)
+    *fwk_nvs_ExternalFlash.c.o*(.text* .rodata*)
+    *settings.c.o*(.text* .rodata*)
+    *settings_init.c.o*(.text* .rodata*)
+    *settings_nvs.c.o*(.text* .rodata*)
+    *settings_store.c.o*(.text* .rodata*)
+    *fwk_platform_extflash.c.o*(.text* .rodata*)
+    *FunctionLib.c.o*(.text* .rodata*)
+    *fsl_memcpy.S.o*(.text* .rodata*)
+    *fsl_adapter_flexspi_nor_flash.c.o*(.text* .rodata*)
+    *mflash_drv.c.o*(.text* .rodata*)
+    *fsl_flexspi.c.o*(.text* .rodata*)
     . = ALIGN(128);
     __ram_function_end__ = .;
   } > m_qacode
