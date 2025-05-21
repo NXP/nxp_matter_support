@@ -31,6 +31,9 @@
 
 // BR specific defines
 
+// BR requires more TCPIP stack size compared to WIFI or Thread only devices
+#define TCPIP_THREAD_STACKSIZE 1536
+
 // LWIP IPv4 and IP_FORWARD are required by NAT64.
 #define LWIP_IPV4 1
 #define IP_FORWARD 1

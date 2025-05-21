@@ -554,7 +554,9 @@ Some MCU allow computing and verifying the IP, UDP, TCP and ICMP checksums by ha
 #endif
 #endif
 
+#ifndef TCPIP_THREAD_STACKSIZE
 #define TCPIP_THREAD_STACKSIZE 1024
+#endif
 #define TCPIP_THREAD_PRIO 8
 
 /**
