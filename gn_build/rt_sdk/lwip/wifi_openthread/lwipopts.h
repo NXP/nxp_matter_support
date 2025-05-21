@@ -29,6 +29,9 @@
 #include LWIP_USER_CONFIG_FILE
 #endif /* LWIP_USER_CONFIG_FILE */
 
+// BR requires more TCPIP stack size compared to WIFI or Thread only devices
+#define TCPIP_THREAD_STACKSIZE 1536
+
 #define LWIP_IPV4 1
 #define MEMP_NUM_NETCONN (4)
 #define NETIF_MAX_HWADDR_LEN 8U
