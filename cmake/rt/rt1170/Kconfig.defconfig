@@ -31,6 +31,11 @@ choice MCUX_MISC_middleware.freertos-kernel.dynamic_allocator.selection
 	default MCUX_COMPONENT_middleware.freertos-kernel.heap_4
 endchoice
 
+# Enable IW61X transceiver by default
+choice MCUX_DEPENDENCY_COMPONENT_component.wifi_bt_module.selection
+	default MCUX_COMPONENT_component.wifi_bt_module.IW61X
+endchoice
+
 #IW612 transceiver module type
 if MCUX_COMPONENT_component.wifi_bt_module.IW61X
 choice IW61X_MDOULE
