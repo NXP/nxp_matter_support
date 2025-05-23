@@ -66,16 +66,11 @@ class NxpSdk:
             logging.error("SDK west config file : %s does not exist", westFilePath)
             sys.exit(1)
 
-def NxpSdk_k32w0():
-    sdk = NxpSdk('k32w0', 'github_sdk/k32w0')
-    return sdk
-
 def NxpSdk_common():
     sdk = NxpSdk('common', 'github_sdk/sdk_next')
     return sdk
 
 ALL_PLATFORM_SDK = [
-    NxpSdk_k32w0(),
     NxpSdk_common(),
 ]
 
