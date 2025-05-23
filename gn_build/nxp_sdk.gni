@@ -121,6 +121,9 @@ declare_args() {
 
   # Define the openthread spinel interface type chosen
   nxp_ot_spinel_interface_link = "spi"
+
+  # Define the openthread project lib config file
+  nxp_ot_lib_config_file = "OpenThreadProjectLibConfig.h"
   
   # transceiver lists
   iw416_transceiver = false
