@@ -121,6 +121,9 @@ declare_args() {
 
   # Enable low power support
   nxp_use_low_power = false
+
+  # Define the openthread project lib config file
+  nxp_ot_lib_config_file = "OpenThreadProjectLibConfig.h"
 }
 
 declare_args() {
