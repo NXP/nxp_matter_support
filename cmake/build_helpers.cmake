@@ -247,6 +247,52 @@ function(nxp_pre_build_process)
         # Make sure this is run as pre-build
         add_dependencies(pre_build build_k32w0_rcp)
     endif()
+    
+    # Print build information
+    nxp_print_build_info()
 
     add_dependencies(${MCUX_SDK_PROJECT_NAME} pre_build)
 endfunction(nxp_pre_build_process)
+
+# *********************************************************************************
+# Print build information
+# *********************************************************************************
+function(nxp_print_build_info)
+
+# Get the transceiver name
+set(TRANSCEIVER_NAME "none")
+if(CONFIG_MCUX_COMPONENT_component.wifi_bt_module.IW416)
+    set(TRANSCEIVER_NAME "IW416")
+elseif(CONFIG_MCUX_COMPONENT_component.wifi_bt_module.IW61X)
+    set(TRANSCEIVER_NAME "IW61X")
+elseif(CONFIG_MCUX_COMPONENT_component.wifi_bt_module.88W8801)
+    set(TRANSCEIVER_NAME "88W8801")
+elseif(CONFIG_MCUX_COMPONENT_component.wifi_bt_module.K32W061_transceiver)
+    set(TRANSCEIVER_NAME "K32W061")
+endif()
+
+#Get the connectivity mode
+set(CONNECTIVITY_MODE "none")
+if(CONFIG_CHIP_WIFI AND CONFIG_NET_L2_OPENTHREAD)
+    set(CONNECTIVITY_MODE "WiFi + Thread")
+elseif(CONFIG_CHIP_WIFI AND NOT CONFIG_NET_L2_OPENTHREAD)
+    set(CONNECTIVITY_MODE "WiFi")
+elseif(NOT CONFIG_CHIP_WIFI AND CONFIG_NET_L2_OPENTHREAD)
+    set(CONNECTIVITY_MODE "Thread")
+elseif(CONFIG_CHIP_ETHERNET)
+    set(CONNECTIVITY_MODE "Ethernet")
+endif()
+
+# Print application build information
+message(STATUS "")
+message(STATUS "=======================================")
+message(STATUS " Matter Application Build Info")
+message(STATUS "---------------------------------------")
+message(STATUS " Target Board : ${board}")
+message(STATUS " Transceiver: ${TRANSCEIVER_NAME}")
+message(STATUS " Connectivity Mode : ${CONNECTIVITY_MODE}") # e.g., WiFi / Thread / WiFi + Thread
+message(STATUS " Build Type : ${CMAKE_BUILD_TYPE}") # e.g., Debug / Release
+message(STATUS "=======================================")
+message(STATUS "")
+
+endfunction(nxp_print_build_info)
