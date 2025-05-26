@@ -74,15 +74,12 @@ mcux_add_macro(
     SDK_COMPONENT_INTEGRATION=1
     gSerialManagerMaxInterfaces_c=1
     gAppHighSystemClockFrequency_d=1
-    gAppLedCnt_c=2
     USE_NBU=1
     gAspCapability_d=1
     gNvStorageIncluded_d=1
     gUnmirroredFeatureSet_d=1
     gNvFragmentation_Enabled_d=1
-    gAppLowpowerEnabled_d=1
     MULTICORE_APP=1
-    K32W_LOG_ENABLED
 )
 
 # TODO core defines. Check if all are needed
@@ -110,6 +107,29 @@ if(CONFIG_CHIP_NXP_PLATFORM_MCXW71)
 )
 endif()
 
+if(CONFIG_NXP_USE_LOW_POWER)
+    mcux_add_macro(
+        nxp_use_low_power=1
+        K32W_LOG_ENABLED=0
+        gUartDebugConsole_d=0
+        cPWR_UsePowerDownMode=1
+        gAppLowpowerEnabled_d=1
+    )
+else()
+    mcux_add_macro(
+        gAppLedCnt_c=2
+        K32W_LOG_ENABLED
+    )
+    if(CONFIG_CHIP_NXP_PLATFORM_MCXW72)
+        mcux_add_macro(
+            DEFAULT_APP_UART=1
+            gDebugConsoleEnable_d=1
+            gUartDebugConsole_d=1
+            DebugConsole_c=1
+        )
+    endif()
+endif()
+
 if(CONFIG_CHIP_NXP_PLATFORM_MCXW72)
     # TODO: The SSSAPI component's dependencies should be relocated into
     # the component's makefiles.
@@ -119,10 +139,6 @@ if(CONFIG_CHIP_NXP_PLATFORM_MCXW72)
         MBEDTLS_THREADING_ALT
         # Temporary workaround, allocate more heap
         MinimalHeapSize_c=0xC800
-        DEFAULT_APP_UART=1
-        gDebugConsoleEnable_d=1
-        gUartDebugConsole_d=1
-        DebugConsole_c=1
         gMainThreadPriority_c=5
         gMainThreadStackSize_c=3096
     )
