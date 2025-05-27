@@ -72,4 +72,8 @@ config WIFI_BOARD_RW610
 
 endif
 
+config FLASH_LOAD_OFFSET
+	default 0x20000 if CHIP_OTA_REQUESTOR
+	default 0x400
+
 endif # CHIP_NXP_PLATFORM_RW61X

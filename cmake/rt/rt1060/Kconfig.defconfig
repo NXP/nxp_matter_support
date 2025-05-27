@@ -43,4 +43,7 @@ choice IW61X_MDOULE
 endchoice
 endif
 
+config FLASH_LOAD_OFFSET
+	default 0x40000 if CHIP_OTA_REQUESTOR
+
 endif # CHIP_NXP_PLATFORM_RT1060
