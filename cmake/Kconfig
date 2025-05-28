@@ -71,7 +71,7 @@ config MATTER_DEFAULT_LINKER_FILE_PATH
 	default "$(CHIP_ROOT)/third_party/nxp/nxp_matter_support/examples/platform/rt/rw61x/app/ldscripts/RW610_flash.ld" if CHIP_NXP_PLATFORM_RW61X
 	default "$(CHIP_ROOT)/third_party/nxp/nxp_matter_support/examples/platform/rt/rt1170/app/ldscripts/MIMXRT1176xxxxx_cm7_flexspi_nor.ld" if CHIP_NXP_PLATFORM_RT1170
 	default "$(CHIP_ROOT)/third_party/nxp/nxp_matter_support/examples/platform/rt/rt1060/app/ldscripts/MIMXRT1062xxxxx_flexspi_nor.ld" if CHIP_NXP_PLATFORM_RT1060
-	default "${SdkRootDirPath}/examples/_boards/${board}/wireless_examples/linker/gcc/connectivity.ld" if CHIP_NXP_PLATFORM_K32W1 || CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+	default "${SdkRootDirPath}/examples/_boards/${board}/wireless_examples/linker/gcc/connectivity.ld" if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
 	help
 		Defines the path to the linker file to use.
 
