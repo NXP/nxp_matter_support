@@ -25,9 +25,7 @@ import("${nxp_sdk_build_root}/nxp_sdk.gni")
 assert(nxp_sdk_root != "", "nxp_sdk_root must be specified")
 
 core_sdk = {
-  if (nxp_device == "K32W1480") {
-    DEVICES_DIR_PATH = "${nxp_sdk_root}/devices/Wireless/K32W/${nxp_device}"
-  } else if (nxp_device == "MCXW716C" || nxp_device == "MCXW727C") {
+  if (nxp_device == "MCXW716C" || nxp_device == "MCXW727C") {
     # Maybe create gn args for SOC portofolio (MCX) and SOC series (MCXW)
     DEVICES_DIR_PATH = "${nxp_sdk_root}/devices/MCX/MCXW/${nxp_device}"
   }
@@ -150,10 +148,6 @@ core_sdk = {
     core_include_dirs += [
       "${DEVICES_DIR_PATH}/../periph2",
     ]
-  } else if (nxp_device == "K32W1480") {
-    core_include_dirs += [
-      "${DEVICES_DIR_PATH}/../periph1",
-    ]
   }
 
   if (nxp_nvm_component != "fwk_nvm") {
@@ -192,9 +186,7 @@ core_sdk = {
     "gLogRingPlacementOffset_c=0xF000",
   ]
 
-  if (nxp_device == "K32W1480") {
-    core_defines += [ "CPU_K32W1480VFTA" ]
-  } else if (nxp_device == "MCXW716C") {
+  if (nxp_device == "MCXW716C") {
     core_defines += [
       "CPU_MCXW716CMFTA",
       "K32W1480_SERIES"

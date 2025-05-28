@@ -40,7 +40,7 @@ group("nxp_mbedtls") {
   public_deps = [ ":mbedtls" ]
 }
 
-config("mbedtls_k32w1_config") {
+config("mbedtls_mcxw7x_config") {
   
   defines = [
     "MBEDTLS_CONFIG_FILE=<sssapi_mbedtls_config.h>",
@@ -86,7 +86,7 @@ mbedtls_target("mbedtls") {
     ]
   }
 
-  public_configs = [ ":mbedtls_k32w1_config" ]
+  public_configs = [ ":mbedtls_mcxw7x_config" ]
 
   public_deps = [
     "${openthread_root}/src/core:libopenthread_core_headers"

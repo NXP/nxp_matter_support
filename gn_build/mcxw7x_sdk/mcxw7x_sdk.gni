@@ -44,10 +44,10 @@ assert(!((nxp_use_smu2_static && !chip_openthread_ftd) ||
 forward_variables_from(core_sdk, "*")
 forward_variables_from(middleware_sdk, "*")
 
-# Defines an k32w1 SDK build target.
+# Defines an mcxw7x SDK build target.
 #
 # Parameters:
-#   nxp_sdk_root - The location of the k32w1 SDK.
+#   nxp_sdk_root - The location of the mcxw7x SDK.
 #   sources - Extra source files to build.
 template("${nxp_platform}_sdk") {
 
@@ -71,17 +71,13 @@ template("${nxp_platform}_sdk") {
     _sdk_include_dirs += core_include_dirs
     _sdk_include_dirs += middleware_include_dirs
 
-    _sdk_include_dirs += [
-      "${openthread_nxp_root}/third_party/k32w1_sdk",
-    ]
-
     if (nxp_device == "MCXW727C") {
       _sdk_include_dirs += [
         "${openthread_nxp_root}/third_party/mcxw72_sdk",
       ]
     } else {
       _sdk_include_dirs += [
-        "${openthread_nxp_root}/third_party/k32w1_sdk",
+        "${openthread_nxp_root}/third_party/mcxw71_sdk",
       ]
     }
 
