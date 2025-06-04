@@ -249,11 +249,20 @@ if(NOT CONFIG_CHIP_NVM_COMPONENT_LITTLEFS)
 endif()
 
 mcux_add_source(
-    BASE_PATH /
-    SOURCES
-    ${BOARD_FILES}
-    ${NXP_MATTER_SUPPORT_DIR}/gn_build/rt_sdk/transceiver/wifi_config.h
+    BASE_PATH ${NXP_MATTER_SUPPORT_DIR}
+    gn_build/rt_sdk/transceiver/wifi_config.h
 )
+
+foreach(BOARD_FILE IN LISTS BOARD_FILES)
+    #Extract file name and directory path to be usable by mcux cmake function
+    get_filename_component(BOARD_DIR_PATH "${BOARD_FILE}" DIRECTORY)
+    get_filename_component(BOARD_FILE_NAME "${BOARD_FILE}" NAME)
+    mcux_add_source(
+        BASE_PATH ${BOARD_DIR_PATH}
+        SOURCES
+        ${BOARD_FILE_NAME}
+    )
+endforeach()
 
 mcux_add_include(
     BASE_PATH ${NXP_MATTER_SUPPORT_DIR}
@@ -366,10 +375,14 @@ mcux_remove_armgcc_linker_script(
     LINKER devices/${soc_portfolio}/${soc_series}/${device}/gcc/${CONFIG_MCUX_TOOLCHAIN_LINKER_DEVICE_PREFIX}_ram.ld
 )
 
+#Extract file name and directory path to be usable by mcux cmake function
+get_filename_component(MATTER_DEFAULT_LINKER_FILE_PATH "${CONFIG_MATTER_DEFAULT_LINKER_FILE_PATH}" DIRECTORY)
+get_filename_component(MATTER_DEFAULT_LINKER_FILE_NAME "${CONFIG_MATTER_DEFAULT_LINKER_FILE_PATH}" NAME)
+
 mcux_add_armgcc_linker_script(
     TARGETS debug release flash_debug flash_release
-    BASE_PATH /
-    LINKER ${CONFIG_MATTER_DEFAULT_LINKER_FILE_PATH}
+    BASE_PATH ${MATTER_DEFAULT_LINKER_FILE_PATH}
+    LINKER ${MATTER_DEFAULT_LINKER_FILE_NAME}
 )
 
 # ========================================================================================

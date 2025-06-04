@@ -239,10 +239,14 @@ mcux_remove_armgcc_linker_script(
     LINKER devices/${soc_portfolio}/${soc_series}/${device}/gcc/${CONFIG_MCUX_TOOLCHAIN_LINKER_DEVICE_PREFIX}_ram.ld
 )
 
+#Extract file name and directory path to be usable by mcux cmake function
+get_filename_component(MATTER_DEFAULT_LINKER_FILE_PATH "${CONFIG_MATTER_DEFAULT_LINKER_FILE_PATH}" DIRECTORY)
+get_filename_component(MATTER_DEFAULT_LINKER_FILE_NAME "${CONFIG_MATTER_DEFAULT_LINKER_FILE_PATH}" NAME)
+
 mcux_add_armgcc_linker_script(
     TARGETS debug release flash_debug flash_release
-    BASE_PATH /
-    LINKER ${CONFIG_MATTER_DEFAULT_LINKER_FILE_PATH}
+    BASE_PATH ${MATTER_DEFAULT_LINKER_FILE_PATH}
+    LINKER ${MATTER_DEFAULT_LINKER_FILE_NAME}
 )
 
 # ========================================================================================
