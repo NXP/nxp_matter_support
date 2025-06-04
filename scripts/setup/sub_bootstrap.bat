@@ -58,7 +58,7 @@ goto env_setup
 
 @REM The Pigweed environment ("//build_overrides/pigweed_environment.gni") is
 @REM always imported by GN build system, so we need to ensure it exists.
-IF NOT EXIST "%CHIP_ROOT_PATH%\scripts\setup\zap.version" (
+IF NOT EXIST "%CHIP_ROOT_PATH%\build_overrides\pigweed_environment.gni" (
     type nul > "%CHIP_ROOT_PATH%\build_overrides\pigweed_environment.gni"
     echo Creating empty build_overrides/pigweed_environment.gni file in %CHIP_ROOT_PATH% source tree.
 )
