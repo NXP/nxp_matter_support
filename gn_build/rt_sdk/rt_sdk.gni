@@ -682,7 +682,7 @@ template("rt_sdk") {
     }
 
     if (iwx12_transceiver) {
-      sources += [ "${CONN_FRAMEWORK_FILES_PATH}/platform/imx_rt/iw612/fwk_platform_coex.c" ]
+      sources += [ "${CONN_FRAMEWORK_FILES_PATH}/platform/imx_rt/iw61x/fwk_platform_coex.c" ]
     }
 
     if (k32w0_transceiver) {
