@@ -108,15 +108,13 @@ get_filename_component(MCUBOOT_EXAMPLE_DIR "${NXP_SDK_ROOT}/examples/ota_example
 function(nxp_generate_mcuboot)
     if(DEFINED core_id)
         add_custom_target(build_mcuboot ALL
-            COMMAND export ARMGCC_DIR=${ARMGCC_DIR}
-            COMMAND west build -d ${CMAKE_CURRENT_BINARY_DIR}/mcuboot -b ${board} ${MCUBOOT_EXAMPLE_DIR} -Dcore_id=${core_id} -DCONF_FILE=${NXP_MATTER_SUPPORT_DIR}/cmake/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/bootloader.conf
+            COMMAND ${CMAKE_COMMAND} -E env ARMGCC_DIR=${ARMGCC_DIR} west build -d ${CMAKE_CURRENT_BINARY_DIR}/mcuboot -b ${board} ${MCUBOOT_EXAMPLE_DIR} -Dcore_id=${core_id} -DCONF_FILE=${NXP_MATTER_SUPPORT_DIR}/cmake/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/bootloader.conf
             WORKING_DIRECTORY ${SdkRootDirPath}
             COMMENT "Generating MCUBoot binary"
         )
     else()
         add_custom_target(build_mcuboot ALL
-            COMMAND export ARMGCC_DIR=${ARMGCC_DIR}
-            COMMAND west build -d ${CMAKE_CURRENT_BINARY_DIR}/mcuboot -b ${board} ${MCUBOOT_EXAMPLE_DIR} -DCONF_FILE=${NXP_MATTER_SUPPORT_DIR}/cmake/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/bootloader.conf
+            COMMAND ${CMAKE_COMMAND} -E env ARMGCC_DIR=${ARMGCC_DIR} west build -d ${CMAKE_CURRENT_BINARY_DIR}/mcuboot -b ${board} ${MCUBOOT_EXAMPLE_DIR} -DCONF_FILE=${NXP_MATTER_SUPPORT_DIR}/cmake/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/bootloader.conf
             WORKING_DIRECTORY ${SdkRootDirPath}
             COMMENT "Generating MCUBoot binary"
         )
@@ -200,7 +198,7 @@ endif()
 
 function(nxp_generate_ota_file)
     add_custom_target(chip-ota-image ALL
-        COMMAND ./ota_image_tool.py create -v ${CONFIG_CHIP_DEVICE_VENDOR_ID} -p ${CONFIG_CHIP_DEVICE_PRODUCT_ID} -vn ${CONFIG_CHIP_DEVICE_SOFTWARE_VERSION} -vs ${CONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING} -da sha256 ${EXTRA_OTA_ARGS} ${APP_OUTPUT_DIR}/${APP_EXECUTABLE_NAME}.ota
+        COMMAND ${Python3_EXECUTABLE} ota_image_tool.py create -v ${CONFIG_CHIP_DEVICE_VENDOR_ID} -p ${CONFIG_CHIP_DEVICE_PRODUCT_ID} -vn ${CONFIG_CHIP_DEVICE_SOFTWARE_VERSION} -vs ${CONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING} -da sha256 ${EXTRA_OTA_ARGS} ${APP_OUTPUT_DIR}/${APP_EXECUTABLE_NAME}.ota
         WORKING_DIRECTORY ${CHIP_OTA_IMGTOOL_DIR}
         COMMENT "Generating ota file"
     )
