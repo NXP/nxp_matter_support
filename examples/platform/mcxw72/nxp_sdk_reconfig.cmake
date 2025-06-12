@@ -1,1 +1,1 @@
-../mcxw71_k32w1/nxp_sdk_reconfig.cmake
+../mcxw71/nxp_sdk_reconfig.cmake
