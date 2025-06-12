@@ -140,6 +140,7 @@ endif()
 if(CONFIG_CHIP_SDK_DEPENDENCIES_BLE_HOST)
     mcux_add_macro(
         gAppMaxConnections_c=1
+        MAX_PLATFORM_SUPPORTED_CONNECTIONS=1
         gUseHciTransportDownward_d=1
         gL2caMaxLeCbChannels_c=2
         gGapSimultaneousEAChainedReports_c=0
