@@ -86,6 +86,7 @@ middleware_sdk = {
     "${MBEDTLS_DIR_PATH}/port/sssapi",
 
     # Multicore / Rpmsg directories
+    "${MULTICORE_DIR_PATH}/mcmgr/inc",
     "${MULTICORE_DIR_PATH}/mcmgr/src",
     "${MULTICORE_RPMSG_DIR_PATH}/lib/include",
     "${MULTICORE_RPMSG_DIR_PATH}/lib/include/environment/freertos",
@@ -98,12 +99,14 @@ middleware_sdk = {
 
   if (nxp_device == "MCXW716C") {
     middleware_include_dirs += [
+      "${MULTICORE_DIR_PATH}/mcmgr/inc/platform/mcxw716",
       "${MULTICORE_RPMSG_DIR_PATH}/lib/include/platform/mcxw71x",
       "${FRAMEWORK_PLATFORM_DIR_PATH}/../kw45_k32w1_mcxw71",
       "${FRAMEWORK_PLATFORM_DIR_PATH}/../kw45_k32w1_mcxw71/configs",
     ]
   } else if (nxp_device == "MCXW727C") {
     middleware_include_dirs += [
+      "${MULTICORE_DIR_PATH}/mcmgr/inc/platform/mcxw727",
       "${MULTICORE_RPMSG_DIR_PATH}/lib/include/platform/mcxw72x",
       "${FRAMEWORK_PLATFORM_DIR_PATH}/../kw47_mcxw72",
       "${FRAMEWORK_PLATFORM_DIR_PATH}/../kw47_mcxw72/configs",
@@ -138,10 +141,16 @@ middleware_sdk = {
   }
 
   if(nxp_multiple_ble_connections) {
-    middleware_defines = [ "gAppMaxConnections_c=3" ]
+    middleware_defines = [
+      "gAppMaxConnections_c=3",
+      "MAX_PLATFORM_SUPPORTED_CONNECTIONS=3"
+    ]
   }
   else {
-    middleware_defines = [ "gAppMaxConnections_c=1" ]
+    middleware_defines = [
+      "gAppMaxConnections_c=1",
+      "MAX_PLATFORM_SUPPORTED_CONNECTIONS=1"
+      ]
   }
 
   middleware_defines += [
@@ -244,8 +253,9 @@ middleware_sdk = {
     "${BLE_CONTROLLER_DIR_PATH}/src/controller_api.c",
     "${BLE_HOST_DIR_PATH}/application/common/ble_conn_manager.c",
     "${BLE_HOST_DIR_PATH}/application/common/ble_host_tasks.c",
-
     "${BLE_HOST_DIR_PATH}/application/common/gatt_db/gatt_database.c",
+    "${BLE_HOST_DIR_PATH}/application/common/matter/ble_init.c",
+
     "${BLE_HOST_DIR_PATH}/hci_transport/source/hcit_generic_adapter_interface.c",
     "${BLE_HOST_DIR_PATH}/host/config/ble_globals.c",
     "${BLE_HOST_DIR_PATH}/port/fwk_generic_list.c",
@@ -294,7 +304,6 @@ middleware_sdk = {
       "${MULTICORE_DIR_PATH}/mcmgr/src/mcmgr_internal_core_api_mcxw716_ext.c",
       "${MULTICORE_RPMSG_DIR_PATH}/lib/rpmsg_lite/porting/platform/mcxw71x/rpmsg_platform.c",
       "${MULTICORE_RPMSG_DIR_PATH}/lib/rpmsg_lite/porting/platform/mcxw71x/rpmsg_platform_ext.c",
-      "${BLE_HOST_DIR_PATH}/application/common/matter/ble_init.c",
     ]
   } else if (nxp_device == "MCXW727C") {
     middleware_sources += [
@@ -302,7 +311,6 @@ middleware_sdk = {
       "${MULTICORE_DIR_PATH}/mcmgr/src/mcmgr_internal_core_api_mcxw727_ext.c",
       "${MULTICORE_RPMSG_DIR_PATH}/lib/rpmsg_lite/porting/platform/mcxw72x/rpmsg_platform.c",
       "${MULTICORE_RPMSG_DIR_PATH}/lib/rpmsg_lite/porting/platform/mcxw72x/rpmsg_platform_ext.c",
-      "${BLE_HOST_DIR_PATH}/application/common/matter/ble_init.c",
     ]
   }
 

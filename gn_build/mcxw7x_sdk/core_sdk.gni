@@ -189,7 +189,7 @@ core_sdk = {
   if (nxp_device == "MCXW716C") {
     core_defines += [
       "CPU_MCXW716CMFTA",
-      "K32W1480_SERIES"
+      "MCXW716C_SERIES"
     ]
 
     # When CLI is enabled configure the SerialManager parameters
@@ -202,6 +202,7 @@ core_sdk = {
   } else if (nxp_device == "MCXW727C") {
     core_defines += [
       "CPU_MCXW727CMFTA_cm33_core0",
+      "MCXW727C_cm33_core0_SERIES"
     ]
 
     # When no Matter CLI is present, move device log on the default (UART1)
