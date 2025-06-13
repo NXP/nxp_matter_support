@@ -10,7 +10,6 @@ manifest:
           revision: v25.03.00
           import:
               name-allowlist:
-                  - core
                   - freertos-kernel
                   - mcux-freertos-drivers
                   - mcux-devices-wireless
@@ -42,6 +41,11 @@ manifest:
                   - usb
                   - mcuboot_opensource
               path-prefix: repo
+        - name: core
+          url: https://github.com/nxp-mcuxpresso/mcuxsdk-core
+          revision: a5301c9fb9bb811cf1c0152af76e220e10efac32
+          path: repo/mcuxsdk/
+          west-commands: scripts/west_commands.yml
         - name: mcux-sdk-middleware-connectivity-framework
           url: https://github.com/nxp-mcuxpresso/mcuxsdk-middleware-connectivity-framework
           revision: fe4ff8e39fbfda6f4c657a6df67a266cb06ed0fc
