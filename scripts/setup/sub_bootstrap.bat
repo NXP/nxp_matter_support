@@ -189,10 +189,29 @@ IF EXIST "%ZAP_INSTALL_PATH%\" (
 
 echo ZAP_INSTALL_PATH is %ZAP_INSTALL_PATH%
 
-call "%SDK_PATH%\mcux-env.cmd"
+setlocal EnableDelayedExpansion
 
-REM Add ZAP_INSTALL_PATH and VENV_PATH\Scripts to PATH for this session
-echo set "PATH=%ZAP_INSTALL_PATH%;%VENV_PATH%\Scripts;%%PATH%%" > temp_env.bat
-echo set "ZEPHYR_BASE=%ZEPHYR_BASE%" >> temp_env.bat
+call "%SDK_PATH%\mcux-env.cmd"
+echo set "ZEPHYR_BASE=%ZEPHYR_BASE%" > temp_env.bat
+
+REM Add virtual env path and Zap path to PATH only if not already added
+set "foundEnvPath=false"
+set "foundEnvZapPath=false"
+
+FOR %%A IN ("%PATH:;=" "%") DO (
+    IF /I "%%~A"=="%VENV_PATH%\Scripts" (
+        set "foundEnvPath=true"
+    ) ELSE IF /I "%%~A"=="%ZAP_INSTALL_PATH%" (
+        set "foundEnvZapPath=true"
+    )
+)
+
+IF "!foundEnvPath!"=="false" (
+    echo set "PATH=%VENV_PATH%\Scripts;%%PATH%%" >> temp_env.bat
+)
+
+IF "!foundEnvZapPath!"=="false" (
+    echo set "PATH=%ZAP_INSTALL_PATH%;%%PATH%%" >> temp_env.bat
+)
 
 west mcuxsdk-export
