@@ -122,6 +122,13 @@ IF NOT EXIST "%SDK_PATH%\scripts\requirements.txt" (
     exit /b 1
 )
 
+REM Check if py_matter_idl file exist
+IF NOT EXIST "scripts\py_matter_idl" (
+    echo ERROR: y_matter_idl not found in <matter_repo>\scripts.
+    exit /b 1
+)
+
+
 REM Run mcux-env.cmd
 IF NOT EXIST "%SDK_PATH%\mcux-env.cmd" (
     echo ERROR: mcux-env.cmd not found in %SDK_PATH%.
@@ -152,17 +159,16 @@ IF NOT DEFINED VIRTUAL_ENV (
     exit /b 1
 )
 
-REM Install requirements from requirements.txt
+REM Install requirements from SDK requirements.txt
 pip install -r "%SDK_PATH%\scripts\requirements.txt"
+REM Install Matter requirement from py_matter_idl
+pip install -e "scripts\py_matter_idl"
 
 REM Install additional packages if requirements-matter.txt is missing
 IF "%REQUIREMENTS_FILE%"=="" (
     echo Installing additional packages...
     pip install crc>=7.0.0 jsonschema>=4.17.0
-) ELSE (
-    echo Installing requirements from requirements-matter.txt...
-    pip install -r "%REQUIREMENTS_FILE%"
-)
+) 
 
 :end
 
@@ -181,7 +187,7 @@ IF EXIST "%ZAP_INSTALL_PATH%\" (
 ) ELSE (
     REM Download ZAP tool if not found
     echo ZAP not found, downloading...
-    call "%python%" scripts\tools\zap\zap_download.py --sdk-root . --extract-root .zap
+    call python scripts\tools\zap\zap_download.py --sdk-root . --extract-root .zap
     pushd "%CD%\.zap\zap-%zap_version%"
     SET "ZAP_INSTALL_PATH=%CD%\.zap\zap-%zap_version%"
     popd
