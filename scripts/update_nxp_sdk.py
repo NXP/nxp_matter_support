@@ -19,6 +19,7 @@
 import argparse
 import logging
 import os
+import platform
 import shutil
 import subprocess
 import sys
@@ -26,6 +27,7 @@ import yaml
 from dataclasses import dataclass
 
 NXP_MATTER_SUPPORT_ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+is_windows = (platform.system() == "Windows")
 
 
 @dataclass(init=False)
@@ -37,38 +39,52 @@ class NxpSdk:
     sdk_manifest_name: str
     sdk_storage_location_abspath: str
     sdk_storage_location_relativepath_from_root: str
+    westFilePath: str
 
-    def __init__(self, name, sdk_target_relative_path):
+    def __init__(self, name):
         self.sdk_name = name
-        self.sdk_target_location_abspath = os.path.join(NXP_MATTER_SUPPORT_ROOT, sdk_target_relative_path)
-        self.sdk_target_location_relativepath_from_root = sdk_target_relative_path
-        self.sdk_manifest_path = os.path.abspath(os.path.join(self.sdk_target_location_abspath , 'manifest'))
+        self.sdk_target_location_abspath = ""
+        self.sdk_target_location_relativepath_from_root = 'github_sdk/sdk_next'
+        self.sdk_target_location_abspath = os.path.abspath(os.path.join(
+            NXP_MATTER_SUPPORT_ROOT, self.sdk_target_location_relativepath_from_root))
+        self.sdk_manifest_path = os.path.abspath(os.path.join(self.sdk_target_location_abspath, 'manifest'))
         self.sdk_manifest_name = 'west.yml'
         self.get_sdk_storage_location()
 
     def get_sdk_storage_location(self):
-        westFilePath = os.path.abspath(os.path.join(self.sdk_manifest_path, self.sdk_manifest_name))
-        if (os.path.exists(westFilePath)):
-            westStream = open(westFilePath, 'r')
+        self.westFilePath = os.path.abspath(os.path.join(self.sdk_manifest_path, self.sdk_manifest_name))
+        if (os.path.exists(self.westFilePath)):
+            westStream = open(self.westFilePath, 'r')
             west = yaml.load(westStream, Loader=yaml.SafeLoader)
             westStream.close()
             try:
                 path_prefix = west["manifest"]["projects"][0]["import"]["path-prefix"]
-                #In case of sdk_next SDK, all SDK modules would be stored in mcuxsdk folder therefore add it to path_prefix
+                # In case of sdk_next SDK, all SDK modules would be stored in mcuxsdk folder therefore add it to path_prefix
                 if ("sdk_next" in self.sdk_target_location_relativepath_from_root):
                     path_prefix = os.path.join(path_prefix, 'mcuxsdk')
-                self.sdk_storage_location_relativepath_from_root = os.path.join(NXP_MATTER_SUPPORT_ROOT, self.sdk_target_location_relativepath_from_root , path_prefix)
-                self.sdk_storage_location_abspath = os.path.abspath(self.sdk_storage_location_relativepath_from_root)
+                # In case of windows allows clone the SDK at the root of Matter repository to reduce path lenght has much as possible
+                if (is_windows):
+                    self.sdk_storage_location_relativepath_from_root = os.path.join(
+                        NXP_MATTER_SUPPORT_ROOT, '..', '..', '..', f'sdk')
+                    self.sdk_storage_location_abspath = os.path.abspath(os.path.join(
+                        self.sdk_storage_location_relativepath_from_root, path_prefix))
+                    self.sdk_target_location_abspath = os.path.abspath(self.sdk_storage_location_relativepath_from_root)
+                else:
+                    self.sdk_storage_location_relativepath_from_root = os.path.join(
+                        NXP_MATTER_SUPPORT_ROOT, self.sdk_target_location_relativepath_from_root, path_prefix)
+                    self.sdk_storage_location_abspath = os.path.abspath(self.sdk_storage_location_relativepath_from_root)
             except (KeyError) as exception:
                 logging.error("Wrong west file format %s", exception)
                 sys.exit(1)
         else:
-            logging.error("SDK west config file : %s does not exist", westFilePath)
+            logging.error("SDK west config file : %s does not exist", self.westFilePath)
             sys.exit(1)
 
+
 def NxpSdk_common():
-    sdk = NxpSdk('common', 'github_sdk/sdk_next')
+    sdk = NxpSdk('common')
     return sdk
+
 
 ALL_PLATFORM_SDK = [
     NxpSdk_common(),
@@ -94,13 +110,27 @@ def init_nxp_sdk_version(nxp_sdk, force):
             sys.exit(1)
         shutil.rmtree(west_path)
 
-    command = ['west', 'init', '-l', nxp_sdk.sdk_manifest_path, '--mf', nxp_sdk.sdk_manifest_name]
-    subprocess.run(command, check=True)
+    if (is_windows):
+        # As for Windows sdk would be cloned at the root of Matter repo
+        # manifest file need to be copied to allow west init command to work at the target location
+        if not os.path.exists(nxp_sdk.sdk_target_location_abspath):
+            os.makedirs(nxp_sdk.sdk_target_location_abspath)
+        manifest_new_path = os.path.abspath(os.path.join(nxp_sdk.sdk_target_location_abspath, 'manifest'))
+        command = ['west', 'init', '-l',
+                   manifest_new_path, '--mf', nxp_sdk.sdk_manifest_name]
+        if not os.path.exists(manifest_new_path):
+            os.makedirs(manifest_new_path)
+        shutil.copy(nxp_sdk.westFilePath, manifest_new_path)
+        subprocess.run(command, check=True)
+    else:
+        command = ['west', 'init', '-l', nxp_sdk.sdk_manifest_path, '--mf', nxp_sdk.sdk_manifest_name]
+        subprocess.run(command, check=True)
     # In case of SDK next architecture a dedicated update process is required
     if ("sdk_next" not in nxp_sdk.sdk_target_location_relativepath_from_root):
         update_nxp_sdk_version(nxp_sdk, force)
     else:
         update_nxp_sdk_next_version(nxp_sdk, force)
+
 
 def update_nxp_sdk_next_version(nxp_sdk, force):
     print("Update SDK in " + nxp_sdk.sdk_target_location_abspath)
@@ -109,14 +139,18 @@ def update_nxp_sdk_next_version(nxp_sdk, force):
         sys.exit(1)
     try:
         # check if we are in the internal development environment
-        subprocess.run(['git', 'config', '--global', '--get-all', 'url.ssh://git@bitbucket.sw.nxp.com/mcucore/bifrost.git.insteadof'], check=True)
+        subprocess.run(['git', 'config', '--global', '--get-all',
+                       'url.ssh://git@bitbucket.sw.nxp.com/mcucore/bifrost.git.insteadof'], check=True)
         # in case of development enrironment update URL remote location
         subprocess.run(['west', 'update', 'bifrost'], cwd=nxp_sdk.sdk_target_location_abspath, check=True)
-        url_wrapper_dest = "includeif.gitdir:" + str(os.path.abspath(os.path.join(nxp_sdk.sdk_target_location_abspath,'.path')).replace('\\','/'))
-        url_wrapper_src = os.path.abspath(os.path.join(nxp_sdk.sdk_target_location_abspath, 'repo/bifrost/.gitconfig').replace('\\','/'))
-        subprocess.run(['git', 'config', '--global', url_wrapper_dest, url_wrapper_src], cwd=nxp_sdk.sdk_target_location_abspath, check=True)
+        url_wrapper_dest = "includeif.gitdir:" + \
+            str(os.path.abspath(os.path.join(nxp_sdk.sdk_target_location_abspath, '.path')).replace('\\', '/'))
+        url_wrapper_src = os.path.abspath(os.path.join(nxp_sdk.sdk_target_location_abspath,
+                                          'repo/bifrost/.gitconfig').replace('\\', '/'))
+        subprocess.run(['git', 'config', '--global', url_wrapper_dest, url_wrapper_src],
+                       cwd=nxp_sdk.sdk_target_location_abspath, check=True)
     except (subprocess.CalledProcessError) as exception:
-        #Ignore error as we are not in internal development environment
+        # Ignore error as we are not in internal development environment
         pass
     try:
         subprocess.run(['west', 'config', 'commands.allow_extensions', 'true'], cwd=nxp_sdk.sdk_target_location_abspath, check=True)
