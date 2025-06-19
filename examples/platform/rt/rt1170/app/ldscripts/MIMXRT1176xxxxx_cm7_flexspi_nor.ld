@@ -549,13 +549,13 @@ SECTIONS
     __END_BSS = .;
   } > m_data
 
-  .heap (NOLOAD):
+ .heap (NOLOAD) :
   {
     . = ALIGN(8);
     __end__ = .;
     PROVIDE(end = .);
     __HeapBase = .;
-    . += HEAP_SIZE;
+    KEEP(*(.heap*))
     __HeapLimit = .;
     __heap_limit = .; /* Add for _sbrk */
   } > m_data
