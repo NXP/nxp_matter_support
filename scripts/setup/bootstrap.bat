@@ -22,7 +22,7 @@ IF "%~1"=="" (
 )
 
 :default_sdk_path
-SET "SDK_PATH=third_party\nxp\nxp_matter_support\github_sdk\sdk_next\repo\mcuxsdk"
+SET "SDK_PATH=sdk\repo\mcuxsdk"
 
 :run_sub_bootstrap
 echo SDK PATH = "%SDK_PATH%
