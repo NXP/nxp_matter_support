@@ -130,7 +130,7 @@ function(nxp_sign_app_imgtool bin_sections_to_remove)
     string(REPLACE " " ";" bin_sections_to_remove ${bin_sections_to_remove})
     add_custom_command(
         OUTPUT ${APP_OUTPUT_DIR}/${APP_EXECUTABLE_NAME}.bin
-        COMMAND arm-none-eabi-objcopy ${bin_sections_to_remove} -O binary ${APP_OUTPUT_DIR}/${APP_EXECUTABLE_NAME}${APP_EXECUTABLE_SUFFIX} ${APP_OUTPUT_DIR}/${APP_EXECUTABLE_NAME}.bin
+        COMMAND ${ARMGCC_DIR}/bin/arm-none-eabi-objcopy ${bin_sections_to_remove} -O binary ${APP_OUTPUT_DIR}/${APP_EXECUTABLE_NAME}${APP_EXECUTABLE_SUFFIX} ${APP_OUTPUT_DIR}/${APP_EXECUTABLE_NAME}.bin
         COMMENT "Converting the application .elf into binary"
     )
 
