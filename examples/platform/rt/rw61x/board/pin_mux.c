@@ -40,6 +40,10 @@ void BOARD_InitPins(void)
     IO_MUX_SetPinMux(IO_MUX_GPIO21);
     IO_MUX_SetPinMux(IO_MUX_GPIO55);
 #endif
+#if CONFIG_CHIP_SE05X
+    /* Initialize FC1_I2C_8_9 functionality on pin GPIO_9, GPIO_8 (pin M4_M6) */
+    IO_MUX_SetPinMux(IO_MUX_FC1_I2C_8_9);
+#endif
 }
 
 void BOARD_InitPinButton0(void)

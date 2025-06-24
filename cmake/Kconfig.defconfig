@@ -28,3 +28,7 @@ config MCUX_HAS_PRJSEG_project.use_hw_app
 choice MCUX_PRJSEG_project.hw_app_sel
     default MCUX_PRJSEG_project.hw_app_customize_folder
 endchoice
+
+config MCUX_COMPONENT_SIMW_LIB_MODULE
+   default y if CHIP_SE05X
+   default n

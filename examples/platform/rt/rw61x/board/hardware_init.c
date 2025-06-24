@@ -81,7 +81,10 @@ void BOARD_InitHardware(void)
 #if CONFIG_CHIP_ETHERNET
     BOARD_InitModuleClock();
 #endif
-
+#if CONFIG_CHIP_SE05X
+    /* clock for i2c */
+    CLOCK_AttachClk(kSFRO_to_FLEXCOMM1);
+#endif
     CLOCK_EnableClock(kCLOCK_Flexspi);
     RESET_ClearPeripheralReset(kFLEXSPI_RST_SHIFT_RSTn);
 
