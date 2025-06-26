@@ -49,7 +49,7 @@ declare_args() {
   # This mode allows to protect the matter factory dataset with a AES key protected in the secure element
   nxp_enable_secure_whole_factory_data = false
 
-  # Enable EdgeLock 2Go secure DAC key and certificate provisionning 
+  # Enable EdgeLock 2Go secure DAC key and certificate provisionning
   nxp_enable_secure_EL2GO_factory_data = false
 
   # Enable OTA multi-image processor for factory data OTA
@@ -124,7 +124,7 @@ declare_args() {
 
   # Define the openthread project lib config file
   nxp_ot_lib_config_file = "OpenThreadProjectLibConfig.h"
-  
+
   # transceiver lists
   iw416_transceiver = false
   k32w0_transceiver = false
@@ -143,12 +143,11 @@ declare_args() {
 if (nxp_is_sdk_package || getenv("NXP_SDK_ROOT") != "") {
   nxp_sdk_root = getenv("NXP_SDK_ROOT")
 } else if (host_os == "win") {
-  # On Windows, the bootstrap script creates a symbolic link to the
-  # actual github SDK path using mklink. This is mandatory in order to
-  # build reference applications, because of the long paths limitation.
-  nxp_sdk_root = "C:/NXP/sdk/sdk_next/repo/mcuxsdk"
+  # On Windows, assume that by default sdk would be cloned in <matter_root>/sdk/mcuxsdk
+  nxp_sdk_root = "${nxp_sdk_matter_support_root}/../../../sdk/repo/mcuxsdk"
 } else {
-  nxp_sdk_root = "${nxp_sdk_matter_support_root}/github_sdk/sdk_next/repo/mcuxsdk"
+  nxp_sdk_root =
+      "${nxp_sdk_matter_support_root}/github_sdk/sdk_next/repo/mcuxsdk"
 }
 
 assert(nxp_platform != "", "nxp_platform should be defined")
