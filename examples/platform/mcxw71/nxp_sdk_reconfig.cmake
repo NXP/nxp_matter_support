@@ -113,7 +113,9 @@ mcux_add_macro(
     gMemManagerLightExtendHeapAreaUsage=0
     ENABLE_RAM_VECTOR_TABLE=1
     NO_SYSCORECLK_UPD=0
+    DEFAULT_APP_UART=1
     DEBUG_SERIAL_INTERFACE_INSTANCE=0
+    BOARD_APP_UART_CLK_FREQ=6000000
     BOARD_DEBUG_UART_CLK_FREQ=6000000U
     gLoggingActive_d=0
     gLogRingPlacementOffset_c=0xF000
@@ -141,7 +143,6 @@ else()
     )
     if(CONFIG_CHIP_NXP_PLATFORM_MCXW72)
         mcux_add_macro(
-            DEFAULT_APP_UART=1
             gDebugConsoleEnable_d=1
             gUartDebugConsole_d=1
             DebugConsole_c=1
