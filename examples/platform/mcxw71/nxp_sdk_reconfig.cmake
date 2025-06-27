@@ -33,6 +33,20 @@ mcux_add_configuration(
     CX " -std=gnu++17"
 )
 
+if((CMAKE_BUILD_TYPE STREQUAL "debug") AND (CONFIG_CHIP_NXP_PLATFORM_MCXW71))
+    # MCXW71 doesn't have enough memory to afford "-O0" optimization level
+    # in debug mode therefore we have to switch it to something which has
+    # a lower memory footprint, like "-Og"
+    mcux_remove_configuration(
+        CC "-O0"
+        CX "-O0"
+    )
+    mcux_add_configuration(
+        CC "-Og"
+        CX "-Og"
+    )
+endif()
+
 if(CONFIG_NXP_GENERATE_PREPROCESS_FILES)
     mcux_add_configuration(
         CC "-save-temps"
