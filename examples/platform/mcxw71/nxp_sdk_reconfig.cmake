@@ -121,33 +121,21 @@ mcux_add_macro(
     gLogRingPlacementOffset_c=0xF000
 )
 
+if(CONFIG_CHIP_LIB_SHELL)
+    mcux_add_macro(
+        -DgAppUseSerialManager_c=1
+    )
+else()
+    mcux_add_macro(
+        BOARD_DEBUG_UART_INSTANCE=1
+    )
+endif()
+
 if(CONFIG_CHIP_NXP_PLATFORM_MCXW71)
     mcux_add_macro(
         # Temporary workaround, allocate more heap
         MinimalHeapSize_c=0x9200
-)
-endif()
-
-if(CONFIG_NXP_USE_LOW_POWER)
-    mcux_add_macro(
-        nxp_use_low_power=1
-        K32W_LOG_ENABLED=0
-        gUartDebugConsole_d=0
-        cPWR_UsePowerDownMode=1
-        gAppLowpowerEnabled_d=1
     )
-else()
-    mcux_add_macro(
-        gAppLedCnt_c=2
-        K32W_LOG_ENABLED
-    )
-    if(CONFIG_CHIP_NXP_PLATFORM_MCXW72)
-        mcux_add_macro(
-            gDebugConsoleEnable_d=1
-            gUartDebugConsole_d=1
-            DebugConsole_c=1
-        )
-    endif()
 endif()
 
 if(CONFIG_CHIP_NXP_PLATFORM_MCXW72)
@@ -172,6 +160,28 @@ if(CONFIG_CHIP_NXP_PLATFORM_MCXW72)
         middleware/mbedtls/port/sssapi
     )
 
+endif()
+
+if(CONFIG_NXP_USE_LOW_POWER)
+    mcux_add_macro(
+        nxp_use_low_power=1
+        K32W_LOG_ENABLED=0
+        gUartDebugConsole_d=0
+        cPWR_UsePowerDownMode=1
+        gAppLowpowerEnabled_d=1
+    )
+else()
+    mcux_add_macro(
+        gAppLedCnt_c=2
+        K32W_LOG_ENABLED
+    )
+    if(CONFIG_CHIP_NXP_PLATFORM_MCXW72)
+        mcux_add_macro(
+            gDebugConsoleEnable_d=1
+            gUartDebugConsole_d=1
+            DebugConsole_c=1
+        )
+    endif()
 endif()
 
 # BLE configuration
