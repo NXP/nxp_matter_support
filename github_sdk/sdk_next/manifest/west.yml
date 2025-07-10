@@ -17,7 +17,6 @@ manifest:
                   - mcux-sdk-middleware-sdmmc
                   - fatfs
                   - ethermind
-                  - mcux-sdk-middleware-connectivity-framework
                   - mbedtls
                   - lwip
                   - littlefs
@@ -47,6 +46,10 @@ manifest:
           revision: 746a3f564410d2aefca11c0dc689201af51a62e7
           path: repo/mcuxsdk/
           west-commands: scripts/west_commands.yml
+        - name: framework
+          url: https://github.com/nxp-mcuxpresso/mcuxsdk-middleware-connectivity-framework.git
+          revision: aef9906340f6b5855f069e7952f401a8c8c41b96
+          path: repo/mcuxsdk/middleware/wireless/framework/
         - name: bifrost
           url: https://github.com/nxp-zephyr/bifrost
           revision: main
