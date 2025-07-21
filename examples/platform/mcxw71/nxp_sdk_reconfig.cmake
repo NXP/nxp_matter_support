@@ -185,14 +185,43 @@ endif()
 
 # BLE configuration
 if(CONFIG_CHIP_SDK_DEPENDENCIES_BLE_HOST)
+    if (CONFIG_CHIP_NXP_MULTIPLE_BLE_CONNECTIONS)
+        mcux_add_macro(
+            gAppMaxConnections_c=3
+            MAX_PLATFORM_SUPPORTED_CONNECTIONS=3
+        )
+    else()
+        mcux_add_macro(
+            gAppMaxConnections_c=1
+            MAX_PLATFORM_SUPPORTED_CONNECTIONS=1
+        )
+    endif()
+
+    if (CONFIG_CHIP_NXP_BLE_PAIRING)
+        mcux_add_macro(
+            gAppUsePairing_d=1
+            gCentralInitiatedPairing_d=1
+        )
+    else()
+        mcux_add_macro(
+            gAppUsePairing_d=0
+        )
+    endif()
+
+    if (CONFIG_CHIP_NXP_BLE_BONDING)
+        mcux_add_macro(
+            gAppUseBonding_d=1
+        )
+    else()
+        mcux_add_macro(
+            gAppUseBonding_d=0
+        )
+    endif()
+
     mcux_add_macro(
-        gAppMaxConnections_c=1
-        MAX_PLATFORM_SUPPORTED_CONNECTIONS=1
         gUseHciTransportDownward_d=1
         gL2caMaxLeCbChannels_c=2
         gGapSimultaneousEAChainedReports_c=0
-        gAppUseBonding_d=0
-        gAppUsePairing_d=0
         gAppUsePrivacy_d=0
         gGattUseUpdateDatabaseCopyProc_c=0
         gBleBondIdentityHeaderSize_c=56
@@ -256,6 +285,24 @@ mcux_add_source(
     SOURCES
     examples/platform/common/ble/ble_function_mux.c
 )
+
+# Include app_preinclude_common.h to get BleBond size macros
+if (CONFIG_CHIP_NXP_MULTIPLE_BLE_CONNECTIONS)
+    mcux_add_include(
+        BASE_PATH ${SdkRootDirPath}/middleware/wireless/bluetooth
+        INCLUDES
+        boards/${board}
+    )
+    mcux_add_source(
+        BASE_PATH ${SdkRootDirPath}
+        SOURCES middleware/wireless/bluetooth/boards/${board}/app_preinclude_common.h
+    )
+    mcux_add_source(
+        BASE_PATH ${NXP_MATTER_SUPPORT_DIR}
+        SOURCES
+        examples/platform/common/ble/ble_nvm_bonding.c
+    )
+endif()
 
 mcux_add_include(
     BASE_PATH ${SdkRootDirPath}
