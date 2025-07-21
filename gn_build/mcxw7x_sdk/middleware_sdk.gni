@@ -99,6 +99,7 @@ middleware_sdk = {
 
   if (nxp_device == "MCXW716C") {
     middleware_include_dirs += [
+      "${BLE_HOST_DIR_PATH}/boards/frdmmcxw71",
       "${MULTICORE_DIR_PATH}/mcmgr/inc/platform/mcxw716",
       "${MULTICORE_RPMSG_DIR_PATH}/lib/include/platform/mcxw71x",
       "${FRAMEWORK_PLATFORM_DIR_PATH}/../kw45_k32w1_mcxw71",
@@ -106,6 +107,7 @@ middleware_sdk = {
     ]
   } else if (nxp_device == "MCXW727C") {
     middleware_include_dirs += [
+      "${BLE_HOST_DIR_PATH}/boards/mcxw72evk",
       "${MULTICORE_DIR_PATH}/mcmgr/inc/platform/mcxw727",
       "${MULTICORE_RPMSG_DIR_PATH}/lib/include/platform/mcxw72x",
       "${FRAMEWORK_PLATFORM_DIR_PATH}/../kw47_mcxw72",
@@ -143,14 +145,19 @@ middleware_sdk = {
   if(nxp_multiple_ble_connections) {
     middleware_defines = [
       "gAppMaxConnections_c=3",
-      "MAX_PLATFORM_SUPPORTED_CONNECTIONS=3"
+      "MAX_PLATFORM_SUPPORTED_CONNECTIONS=3",
+      "gAppUsePairing_d=1",
+      "gCentralInitiatedPairing_d=1",
+      "gAppUseBonding_d=1",
     ]
   }
   else {
     middleware_defines = [
       "gAppMaxConnections_c=1",
-      "MAX_PLATFORM_SUPPORTED_CONNECTIONS=1"
-      ]
+      "MAX_PLATFORM_SUPPORTED_CONNECTIONS=1",
+      "gAppUsePairing_d=0",
+      "gAppUseBonding_d=0",
+    ]
   }
 
   middleware_defines += [
@@ -171,8 +178,6 @@ middleware_sdk = {
     "gL2caMaxLeCbChannels_c=2",
     "gGapSimultaneousEAChainedReports_c=0",
     "gTmrStackTimers_c= 3 + gAppMaxConnections_c * 2 + gL2caMaxLeCbChannels_c + gGapSimultaneousEAChainedReports_c",
-    "gAppUseBonding_d=0",
-    "gAppUsePairing_d=0",
     "gAppUsePrivacy_d=0",
     "gGattUseUpdateDatabaseCopyProc_c=0",
     "gBleBondIdentityHeaderSize_c=56",
