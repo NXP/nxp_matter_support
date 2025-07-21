@@ -24,6 +24,19 @@
 #define smpEdiv 0x1F99
 #define mcEncryptionKeySize_c 16
 
+/* SMP Data */
+gapPairingParameters_t gPairingParameters = {
+    .withBonding = gAppUseBonding_d,
+    .securityModeAndLevel = gSecurityMode_1_Level_4_c,
+    .maxEncryptionKeySize = mcEncryptionKeySize_c,
+    .localIoCapabilities = gIoKeyboardDisplay_c,
+    .oobAvailable = FALSE,
+    .centralKeys = gNoKeys_c,
+    .peripheralKeys = gNoKeys_c,
+    .leSecureConnectionSupported = TRUE,
+    .useKeypressNotifications = FALSE,
+};
+
 /* LTK */
 static uint8_t smpLtk[gcSmpMaxLtkSize_c] = { 0xD6, 0x93, 0xE8, 0xA4, 0x23, 0x55, 0x48, 0x99,
                                              0x1D, 0x77, 0x61, 0xE6, 0x63, 0x2B, 0x10, 0x8E };
@@ -49,11 +62,26 @@ gapSmpKeys_t gSmpKeys = {
     .ediv      = smpEdiv,
 };
 
+/* Device Security Requirements */
+static gapSecurityRequirements_t  deviceSecurity = {
+    .securityModeLevel = gSecurityMode_1_Level_3_c,
+    .authorization = FALSE,
+    .minimumEncryptionKeySize = mcEncryptionKeySize_c
+};
+
+gapDeviceSecurityRequirements_t deviceSecurityRequirements = {
+    .pSecurityRequirements          = &deviceSecurity,
+    .cNumServices                   = 1,
+    .aServiceSecurityRequirements   = NULL
+};
+
 /*******************************************************************************
  * Functions needed by the BLE stack
  ******************************************************************************/
-void App_NvmRead(uint8_t mEntryIdx, void * pBondHeader, void * pBondDataDynamic, void * pBondDataStatic, void * pBondDataDeviceInfo,
-                 void * pBondDataDescriptor, uint8_t mDescriptorIndex)
+ #if gAppUseBonding_d == 0
+
+void App_NvmRead(uint8_t mEntryIdx, void * pBondHeader, void * pBondDataDynamic, void * pBondDataStatic,
+                                        void * pBondDataDeviceInfo, void * pBondDataDescriptor, uint8_t mDescriptorIndex)
 {
     NOT_USED(mEntryIdx);
     NOT_USED(pBondHeader);
@@ -65,7 +93,7 @@ void App_NvmRead(uint8_t mEntryIdx, void * pBondHeader, void * pBondDataDynamic,
 }
 
 void App_NvmWrite(uint8_t mEntryIdx, void * pBondHeader, void * pBondDataDynamic, void * pBondDataStatic,
-                  void * pBondDataDeviceInfo, void * pBondDataDescriptor, uint8_t mDescriptorIndex)
+                                        void * pBondDataDeviceInfo, void * pBondDataDescriptor, uint8_t mDescriptorIndex)
 {
     NOT_USED(mEntryIdx);
     NOT_USED(pBondHeader);
@@ -80,3 +108,5 @@ void App_NvmErase(uint8_t mEntryIdx)
 {
     NOT_USED(mEntryIdx);
 }
+
+#endif /* gAppUseBonding_d == 0*/
