@@ -30,7 +30,6 @@ manifest:
                   - secure-subsystem
                   - wifi_nxp
                   - wpa_supplicant-rtos
-                  - fw_bin
                   - mcu-sdk-components
                   - mcu-sdk-examples
                   - els_pkc
@@ -50,6 +49,10 @@ manifest:
           url: https://github.com/nxp-mcuxpresso/mcuxsdk-middleware-connectivity-framework
           revision: fe4ff8e39fbfda6f4c657a6df67a266cb06ed0fc
           path: repo/mcuxsdk/middleware/wireless/framework
+        - name: fw_bin
+          url: https://github.com/NXP/wifi_nb_fw
+          revision: 95b9a6a4ff72218189fda3a74ea4cb4131188f33
+          path: repo/mcuxsdk/components/conn_fwloader/fw_bin
         - name: bifrost
           url: https://github.com/nxp-zephyr/bifrost
           revision: main
