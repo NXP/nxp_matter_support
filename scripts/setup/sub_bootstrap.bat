@@ -63,7 +63,7 @@ IF NOT EXIST "scripts\setup\zap.version" (
 )
 
 REM Check if pigweed_environment.gni exists
-IF NOT EXIST "build_overrides\pigweed_environment.gni" (
+IF NOT EXIST "%CHIP_ROOT_PATH%\build_overrides\pigweed_environment.gni" (
     echo ERROR: pigweed_environment.gni not found in build_overrides.
     exit /b 1
 )
@@ -123,8 +123,8 @@ IF NOT EXIST "%SDK_PATH%\scripts\requirements.txt" (
 )
 
 REM Check if py_matter_idl file exist
-IF NOT EXIST "scripts\py_matter_idl" (
-    echo ERROR: y_matter_idl not found in <matter_repo>\scripts.
+IF NOT EXIST "%CHIP_ROOT_PATH%\scripts\py_matter_idl" (
+    echo ERROR: py_matter_idl not found in %CHIP_ROOT_PATH%\scripts.
     exit /b 1
 )
 
@@ -162,7 +162,7 @@ IF NOT DEFINED VIRTUAL_ENV (
 REM Install requirements from SDK requirements.txt
 pip install -r "%SDK_PATH%\scripts\requirements.txt"
 REM Install Matter requirement from py_matter_idl
-pip install -e "scripts\py_matter_idl"
+pip install -e "%CHIP_ROOT_PATH%\scripts\py_matter_idl"
 
 REM Install additional packages if requirements-matter.txt is missing
 IF "%REQUIREMENTS_FILE%"=="" (
@@ -173,7 +173,7 @@ IF "%REQUIREMENTS_FILE%"=="" (
 :end
 
 REM Read zap version from file
-FOR /F "usebackq delims=" %%F IN ("scripts\setup\zap.version") DO SET zap_version=%%F
+FOR /F "usebackq delims=" %%F IN ("%CHIP_ROOT_PATH%\scripts\setup\zap.version") DO SET zap_version=%%F
 
 REM Build the full path
 SET "ZAP_INSTALL_PATH=%CD%\.zap\zap-%zap_version%"
@@ -187,7 +187,7 @@ IF EXIST "%ZAP_INSTALL_PATH%\" (
 ) ELSE (
     REM Download ZAP tool if not found
     echo ZAP not found, downloading...
-    call python scripts\tools\zap\zap_download.py --sdk-root . --extract-root .zap
+    call python %CHIP_ROOT_PATH%\scripts\tools\zap\zap_download.py --sdk-root %CHIP_ROOT_PATH% --extract-root %CD%\.zap
     pushd "%CD%\.zap\zap-%zap_version%"
     SET "ZAP_INSTALL_PATH=%CD%\.zap\zap-%zap_version%"
     popd
