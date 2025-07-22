@@ -88,8 +88,10 @@ config configCHECK_FOR_STACK_OVERFLOW
 config configTIMER_TASK_PRIORITY
 	default "(configMAX_PRIORITIES - 3)"
 
+# In case of BR feature support, FreeRTOS heap size should be bigger to enable TBR cluster
+# Additionnaly in the context of OTBR support the freeRTOS heap should be big enough to allow to handle a large number of  mDNS packets
 config configTOTAL_HEAP_SIZE
-	default 174080 if CHIP_WIFI && NET_L2_OPENTHREAD
+	default 256000 if CHIP_WIFI && NET_L2_OPENTHREAD
 	default 129024
 
 config configMINIMAL_STACK_SIZE
