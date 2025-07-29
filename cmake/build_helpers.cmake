@@ -220,18 +220,41 @@ function(nxp_pre_build_process)
         # TODO : use k32w0 SDK cloned from nxp_matter_support repo instead,
         # once it is supported by the OT RCP build of k32w0.
         # nxp_get_sdk_path("k32w0" NXP_K32W0_SDK_ROOT)
+        
+        # Define a temp directory outside the main workspace
+        if(WIN32)
+            set(WEST_TEMP_DIR "C:/k32w0_west_temp")
+        else()
+            set(WEST_TEMP_DIR "/tmp/k32w0_west_temp")
+        endif()
+        file(MAKE_DIRECTORY ${WEST_TEMP_DIR})
 
-        # Set up the k32w061 SDK inside ot-nxp repo
+        # Copy only the manifest and west.yml
+        file(COPY 
+            ${CHIP_ROOT}/third_party/openthread/ot-nxp/third_party/k32w061_sdk/repo/manifest 
+            DESTINATION ${WEST_TEMP_DIR})
+
+        if(WIN32)
+            set(UNSET_ZEPHYR_COMMAND powershell -Command "Remove-Item Env:ZEPHYR_BASE")
+        else()
+            set(UNSET_ZEPHYR_COMMAND unset ZEPHYR_BASE)
+        endif()
+
+        # Setup the west workspace for k32w061 SDK in the temp directory
         add_custom_command(
-            OUTPUT ${CHIP_ROOT}/third_party/openthread/ot-nxp/third_party/k32w061_sdk/.west
-            COMMAND unset ZEPHYR_BASE && rm -rf .west && west init -l manifest --mf west.yml && west update
-            WORKING_DIRECTORY ${CHIP_ROOT}/third_party/openthread/ot-nxp/third_party/k32w061_sdk/repo
+            OUTPUT ${WEST_TEMP_DIR}/.west
+            COMMAND ${UNSET_ZEPHYR_COMMAND} 
+            COMMAND ${CMAKE_COMMAND} -E remove_directory .west
+            COMMAND west init -l manifest --mf west.yml
+            COMMAND west update
+            WORKING_DIRECTORY ${WEST_TEMP_DIR}
         )
 
         # Build the k32w061 OT RCP image
         add_custom_target(build_k32w0_rcp ALL
-            COMMAND ./script/build_k32w061 ot_rcp_ble_hci_bb_single_uart_fc
-            DEPENDS ${CHIP_ROOT}/third_party/openthread/ot-nxp/third_party/k32w061_sdk/.west
+            COMMAND ${CMAKE_COMMAND} -E env NXP_K32W0_SDK_ROOT=${WEST_TEMP_DIR}/core SDK_RELEASE=ON 
+                ./script/build_k32w061 ot_rcp_ble_hci_bb_single_uart_fc
+            DEPENDS ${WEST_TEMP_DIR}/.west
             WORKING_DIRECTORY ${CHIP_ROOT}/third_party/openthread/ot-nxp
         )
 
