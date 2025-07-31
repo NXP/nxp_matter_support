@@ -57,7 +57,7 @@ goto env_setup
 :env_setup
 
 REM Check if the script is being run from the <matter_repo>
-IF NOT EXIST "scripts\setup\zap.version" (
+IF NOT EXIST "%CHIP_ROOT_PATH%\scripts\setup\zap.version" (
     echo ERROR: This script must be run from the <matter_repo> directory.
     exit /b 1
 )
