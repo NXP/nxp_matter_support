@@ -51,7 +51,7 @@ manifest:
           path: repo/mcuxsdk/middleware/wireless/framework
         - name: fw_bin
           url: https://github.com/NXP/wifi_nb_fw
-          revision: 95b9a6a4ff72218189fda3a74ea4cb4131188f33
+          revision: 315af93c1b2e516d75a9c3db91dd74ec03e49716
           path: repo/mcuxsdk/components/conn_fwloader/fw_bin
         - name: bifrost
           url: https://github.com/nxp-zephyr/bifrost
