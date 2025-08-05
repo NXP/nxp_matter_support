@@ -1,0 +1,16 @@
+# Copyright 2025 NXP
+# SPDX-License-Identifier: BSD-3-Clause
+
+# The purpose of this file is to define common Matter Kconfig project segments for NXP platforms.
+
+config MCUX_PRJSEG_module.board.matter.board
+	bool "Enable board files"
+	default y
+	help
+		Enables the inclusion of board files in the application build.
+
+config MCUX_PRJSEG_module.board.matter.peripherals
+	bool "Enable peripherals in board files"
+	default y if CHIP_NVM_COMPONENT_LITTLEFS
+	help
+		Enables the inclusion of board peripheral files.

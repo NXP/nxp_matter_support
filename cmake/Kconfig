@@ -7,6 +7,7 @@ if CHIP
 
 # Include SDK dependencies Kconfig
 rsource "Kconfig.sdk.common"
+rsource "../examples/platform/project_segments/Kconfig.prjseg"
 
 config MATTER_APP_DEFAULT_BOARD_FILES
     bool "Use default board files"

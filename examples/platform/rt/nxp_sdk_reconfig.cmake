@@ -233,6 +233,9 @@ endif()
 # ========================================================================================
 # 2. Include Paths and Source Files
 # ========================================================================================
+# Add board files
+include(${NXP_MATTER_SUPPORT_DIR}/examples/platform/project_segments/rt/prjseg.cmake)
+
 if(CONFIG_BT)
     mcux_add_source(
         BASE_PATH ${CMAKE_BINARY_DIR}
@@ -242,43 +245,9 @@ if(CONFIG_BT)
     )
 endif()
 
-# Add board files
-file(GLOB BOARD_FILES
-    "${NXP_MATTER_SUPPORT_DIR}/examples/platform/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/board/${board}/*.c"
-    "${NXP_MATTER_SUPPORT_DIR}/examples/platform/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/board/${board}/*.h"
-    "${NXP_MATTER_SUPPORT_DIR}/examples/platform/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/board/*.c"
-    "${NXP_MATTER_SUPPORT_DIR}/examples/platform/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/board/*.h"
-)
-
-# Remove peripherals files if not LittleFS FileSytem
-if(NOT CONFIG_CHIP_NVM_COMPONENT_LITTLEFS)
-    list(REMOVE_ITEM BOARD_FILES 
-        "${NXP_MATTER_SUPPORT_DIR}/examples/platform/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/board/peripherals.c"
-        "${NXP_MATTER_SUPPORT_DIR}/examples/platform/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/board/peripherals.h" 
-    )
-endif()
-
 mcux_add_source(
     BASE_PATH ${NXP_MATTER_SUPPORT_DIR}
     gn_build/rt_sdk/transceiver/wifi_config.h
-)
-
-foreach(BOARD_FILE IN LISTS BOARD_FILES)
-    #Extract file name and directory path to be usable by mcux cmake function
-    get_filename_component(BOARD_DIR_PATH "${BOARD_FILE}" DIRECTORY)
-    get_filename_component(BOARD_FILE_NAME "${BOARD_FILE}" NAME)
-    mcux_add_source(
-        BASE_PATH ${BOARD_DIR_PATH}
-        SOURCES
-        ${BOARD_FILE_NAME}
-    )
-endforeach()
-
-mcux_add_include(
-    BASE_PATH ${NXP_MATTER_SUPPORT_DIR}
-    INCLUDES
-    examples/platform/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/board/${board}
-    examples/platform/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/board
 )
 
 # Include config files for lwip and wifi

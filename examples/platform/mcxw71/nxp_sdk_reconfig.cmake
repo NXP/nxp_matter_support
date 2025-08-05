@@ -260,25 +260,8 @@ endif()
 # ========================================================================================
 # 2. Include Paths and Source Files
 # ========================================================================================
-
-mcux_add_source(
-    BASE_PATH ${SdkRootDirPath}/examples/_common/project_segments/wireless/wireless_mcu
-    SOURCES
-    board.c
-    app_common/app_services_init.c
-    app_common/hardware_init.c
-    components/board_comp.c
-    dcdc/board_dcdc.c
-    ext_flash/board_extflash.c
-    low_power/board_lp.c
-)
-
-mcux_add_source(
-    BASE_PATH ${SdkRootDirPath}/examples/_boards/${board}/wireless_examples
-    SOURCES
-    clock_config.c
-    pin_mux.c
-)
+# Add board files
+include(${NXP_MATTER_SUPPORT_DIR}/examples/platform/project_segments/mcxw7x/prjseg.cmake)
 
 mcux_add_source(
     BASE_PATH ${NXP_MATTER_SUPPORT_DIR}
@@ -303,18 +286,6 @@ if (CONFIG_CHIP_NXP_MULTIPLE_BLE_CONNECTIONS)
         examples/platform/common/ble/ble_nvm_bonding.c
     )
 endif()
-
-mcux_add_include(
-    BASE_PATH ${SdkRootDirPath}
-    INCLUDES
-    examples/_boards/${board}/wireless_examples
-    examples/_common/project_segments/wireless/wireless_mcu
-    examples/_common/project_segments/wireless/wireless_mcu/app_common
-    examples/_common/project_segments/wireless/wireless_mcu/components
-    examples/_common/project_segments/wireless/wireless_mcu/dcdc
-    examples/_common/project_segments/wireless/wireless_mcu/ext_flash
-    examples/_common/project_segments/wireless/wireless_mcu/low_power
-)
 
 mcux_add_include(
     BASE_PATH ${CHIP_ROOT}
