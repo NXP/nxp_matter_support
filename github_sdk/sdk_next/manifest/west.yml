@@ -24,6 +24,7 @@ manifest:
                   - bluetooth
                   - edgefast_bt_ble
                   - ieee-802.15.4
+                  - XCVR
                   - mcux-sdk-middleware-multicore
                   - usb
                   - rpmsg-lite
