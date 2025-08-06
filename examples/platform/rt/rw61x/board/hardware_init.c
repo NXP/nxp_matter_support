@@ -87,9 +87,9 @@ void BOARD_InitHardware(void)
 #if CONFIG_SE05X_HOST_GPIO_RW61X
     GPIO_PortInit(GPIO, 0);
 
-    gpio_pin_config_t gpio_config = { kGPIO_DigitalOutput, 0U };
+    gpio_pin_config_t se05x_gpio_config = { kGPIO_DigitalOutput, 0U };
     /* Initialize GPIO functionality on pin PIO0_27 (pin C5)  */
-    GPIO_PinInit(GPIO, 0U, 27U, &gpio_config);
+    GPIO_PinInit(GPIO, 0U, 27U, &se05x_gpio_config);
     GPIO_PinWrite(GPIO, 0U, 27U, 0U);
 #endif
 #endif
