@@ -238,4 +238,7 @@ For RTs such confis are enabled in KSDK_mbedtls_config,h and for RW it has alrea
 /* Undef this flag to make sure to use hardware entropy */
 #undef MBEDTLS_NO_DEFAULT_ENTROPY_SOURCES
 
+/* Disable self test as the SSSAPI implementation has build issues. */
+#undef MBEDTLS_SELF_TEST
+
 #endif // NXP_MATTER_MBEDTLS_CONFIG_H
