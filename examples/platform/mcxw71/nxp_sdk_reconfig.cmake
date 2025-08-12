@@ -120,6 +120,26 @@ mcux_add_macro(
     gLogRingPlacementOffset_c=0xF000
 )
 
+# MbedTLS configuration
+mcux_add_macro(
+    MBEDTLS_USER_CONFIG_FILE=\\\"nxp_matter_mbedtls_config.h\\\"
+)
+mcux_add_include(
+    BASE_PATH ${NXP_MATTER_SUPPORT_DIR}
+    INCLUDES
+    gn_build/mbedtls/config
+)
+# MCXW71 and MCXW72 platforms do not support full crypto acceleration via mbedtls
+mcux_remove_macro(
+    MBEDTLS_NXP_ELE200
+)
+# MCXW72 does support, however, accelerating the AES CCM
+if(CONFIG_CHIP_NXP_PLATFORM_MCXW72)
+    mcux_add_macro(
+        MBEDTLS_CCM_ALT
+    )
+endif()
+
 if(CONFIG_CHIP_LIB_SHELL)
     mcux_add_macro(
         -DgAppUseSerialManager_c=1
@@ -138,27 +158,12 @@ if(CONFIG_CHIP_NXP_PLATFORM_MCXW71)
 endif()
 
 if(CONFIG_CHIP_NXP_PLATFORM_MCXW72)
-    # TODO: The SSSAPI component's dependencies should be relocated into
-    # the component's makefiles.
     mcux_add_macro(
-        MBEDTLS_NXP_SSSAPI
-        MBEDTLS_THREADING_C
-        MBEDTLS_THREADING_ALT
         # Temporary workaround, allocate more heap
         MinimalHeapSize_c=0xC800
         gMainThreadPriority_c=5
         gMainThreadStackSize_c=3096
     )
-
-    # TODO: The SSSAPI component's dependencies should be relocated into
-    # the component's makefiles.
-    mcux_add_include(
-        BASE_PATH ${SdkRootDirPath}
-        INCLUDES
-        middleware/mbedtls/include
-        middleware/mbedtls/port/sssapi
-    )
-
 endif()
 
 if(CONFIG_NXP_USE_LOW_POWER)
@@ -242,6 +247,13 @@ mcux_add_macro(
     SSS_CONFIG_FILE=\\\"fsl_sss_config_elemu.h\\\"
     SSCP_CONFIG_FILE=\\\"fsl_sscp_config_elemu.h\\\"
 )
+# The MCXW72 platform is using the threading implementation from SSS
+if(CONFIG_CHIP_NXP_PLATFORM_MCXW72)
+    mcux_add_macro(
+        MBEDTLS_THREADING_C
+        MBEDTLS_THREADING_ALT
+    )
+endif()
 
 if (CONFIG_CHIP_FACTORY_DATA)
     mcux_add_configuration(
@@ -319,9 +331,6 @@ mcux_add_include(
 mcux_add_include(
     BASE_PATH ${CHIP_ROOT}
     INCLUDES
-
-    # Temporary path for mbedtls config file location
-    .
 
     # Temporary path for gatt_uuid128.h file
     third_party/nxp/nxp_matter_support/examples/platform/common/ble
