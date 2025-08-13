@@ -54,9 +54,11 @@ SCRIPT_NAME=$(basename "${BASH_SOURCE[0]}")
 
 VENV_PATH="$(pwd)/venv"
 
+# The Pigweed environment ("//build_overrides/pigweed_environment.gni") is
+# always imported by GN build system, so we need to ensure it exists.
 if [[ ! -f "$CHIP_ROOT_PATH/build_overrides/pigweed_environment.gni" ]]; then
-  echo "ERROR: pigweed_environment.gni not found in build_overrides."
-  return 1
+  touch "$CHIP_ROOT_PATH/build_overrides/pigweed_environment.gni"
+  echo "💡Creating empty build_overrides/pigweed_environment.gni file in $CHIP_ROOT_PATH source tree."
 fi
 
 command -v gn >/dev/null 2>&1 || { echo >&2 "ERROR: gn is not available in the PATH."; return 1; }
