@@ -96,6 +96,8 @@ template("${nxp_platform}_sdk") {
     defines += core_defines
     defines += middleware_defines
 
+    defines += ["CONFIG_PRIVATE_ECC_KEY_BLOB_SIZE=120"]
+
     defines += [
       "CONFIG_CHIP_ICD_SLOW_POLL_INTERVAL=${nxp_ot_idle_interval_ms}",
       "CONFIG_CHIP_ICD_FAST_POLLING_INTERVAL=${nxp_ot_active_interval_ms}",

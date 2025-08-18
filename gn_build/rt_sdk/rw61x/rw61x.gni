@@ -222,6 +222,8 @@ if(!custom_flash_driver){
       "gPlatformMonolithicApp_d=1",
     ]
 
+    defines += ["CONFIG_PRIVATE_ECC_KEY_BLOB_SIZE=48"]
+
     if (rw610_mbedtls_port_els_pkc) {
       defines += [
         # needed to compile els_pkc port for mbedtls
