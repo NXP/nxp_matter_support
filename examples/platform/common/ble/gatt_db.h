@@ -6,8 +6,8 @@
  */
 
 /* This solution is temporary until we switch to using dynamic gatt_db api. */
-#ifdef EXTRA_GATT_DB_HEADER
-#include EXTRA_GATT_DB_HEADER
+#ifdef CONFIG_CHIP_APP_EXTRA_GATT_DB_HEADER
+#include CONFIG_CHIP_APP_EXTRA_GATT_DB_HEADER
 #endif
 
 PRIMARY_SERVICE(service_gatt, gBleSig_GenericAttributeProfile_d)
