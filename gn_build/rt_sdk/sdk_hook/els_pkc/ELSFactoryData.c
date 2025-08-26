@@ -7,6 +7,16 @@
 
 #include "ELSFactoryData.h"
 
+#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
+#include "els_pkc_mbedtls.h"
+
+#define ELS_MUTEX_UNLOCK() (void) mcux_els_mutex_unlock()
+#define ELS_MUTEX_LOCK() (void) mcux_els_mutex_lock()
+#else
+#define ELS_MUTEX_UNLOCK()
+#define ELS_MUTEX_LOCK()
+#endif /* defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT) */
+
 void write_uint32_msb_first(uint8_t * pos, uint32_t data)
 {
     pos[0] = ((data) >> 24) & 0xFF;
@@ -45,18 +55,22 @@ uint32_t get_required_keyslots(mcuxClEls_KeyProp_t prop)
 bool els_is_active_keyslot(mcuxClEls_KeyIndex_t keyIdx)
 {
     mcuxClEls_KeyProp_t key_properties;
+    ELS_MUTEX_LOCK();
     key_properties.word.value = ((const volatile uint32_t *) (&ELS->ELS_KS0))[keyIdx];
+    ELS_MUTEX_UNLOCK();
     return key_properties.bits.kactv;
 }
 
 status_t els_enable()
 {
+    ELS_MUTEX_LOCK();
     PLOG_INFO("Enabling ELS...");
     MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(result, token, mcuxClEls_Enable_Async());
 
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_Enable_Async) != token) || (MCUXCLELS_STATUS_OK_WAIT != result))
     {
         PLOG_ERROR("mcuxClEls_Enable_Async failed: 0x%08x", result);
+        ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
     MCUX_CSSL_FP_FUNCTION_CALL_END();
@@ -66,22 +80,27 @@ status_t els_enable()
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_WaitForOperation) != token) || (MCUXCLELS_STATUS_OK != result))
     {
         PLOG_ERROR("mcuxClEls_WaitForOperation failed: 0x%08x", result);
+        ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
     MCUX_CSSL_FP_FUNCTION_CALL_END();
+    ELS_MUTEX_UNLOCK();
     return STATUS_SUCCESS;
 }
 
 status_t els_get_key_properties(mcuxClEls_KeyIndex_t key_index, mcuxClEls_KeyProp_t * key_properties)
 {
+    ELS_MUTEX_LOCK();
     MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(result, token, mcuxClEls_GetKeyProperties(key_index, key_properties));
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_GetKeyProperties) != token) || (MCUXCLELS_STATUS_OK != result))
     {
         PLOG_ERROR("mcuxClEls_GetKeyProperties failed: 0x%08lx", result);
+        ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
 
     MCUX_CSSL_FP_FUNCTION_CALL_END();
+    ELS_MUTEX_UNLOCK();
     return STATUS_SUCCESS;
 }
 
@@ -120,11 +139,14 @@ status_t els_derive_key(mcuxClEls_KeyIndex_t src_key_index, mcuxClEls_KeyProp_t 
         return STATUS_ERROR_GENERIC;
     }
 
+    ELS_MUTEX_LOCK();
+
     MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(result, token, mcuxClEls_Ckdf_Sp800108_Async(src_key_index, *dst_key_index, key_prop, dd));
 
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_Ckdf_Sp800108_Async) != token) || (MCUXCLELS_STATUS_OK_WAIT != result))
     {
         PLOG_ERROR("mcuxClEls_Ckdf_Sp800108_Async failed: 0x%08x", result);
+        ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
     MCUX_CSSL_FP_FUNCTION_CALL_END();
@@ -133,19 +155,23 @@ status_t els_derive_key(mcuxClEls_KeyIndex_t src_key_index, mcuxClEls_KeyProp_t 
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_WaitForOperation) != token) || (MCUXCLELS_STATUS_OK != result))
     {
         PLOG_ERROR("mcuxClEls_WaitForOperation failed: 0x%08x", result);
+        ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
     MCUX_CSSL_FP_FUNCTION_CALL_END();
+    ELS_MUTEX_UNLOCK();
     return STATUS_SUCCESS;
 }
 
 status_t els_delete_key(mcuxClEls_KeyIndex_t key_index)
 {
+    ELS_MUTEX_LOCK();
     MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(result, token, mcuxClEls_KeyDelete_Async(key_index));
 
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_KeyDelete_Async) != token) || (MCUXCLELS_STATUS_OK_WAIT != result))
     {
         PLOG_ERROR("mcuxClEls_KeyDelete_Async failed: 0x%08x", result);
+        ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
     MCUX_CSSL_FP_FUNCTION_CALL_END();
@@ -154,9 +180,11 @@ status_t els_delete_key(mcuxClEls_KeyIndex_t key_index)
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_WaitForOperation) != token) || (MCUXCLELS_STATUS_OK != result))
     {
         PLOG_ERROR("mcuxClEls_WaitForOperation failed: 0x%08x", result);
+        ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
     MCUX_CSSL_FP_FUNCTION_CALL_END();
+    ELS_MUTEX_UNLOCK();
     return STATUS_SUCCESS;
 }
 
@@ -174,11 +202,15 @@ status_t els_import_key(const uint8_t * wrapped_key, size_t wrapped_key_size, mc
 
     mcuxClEls_KeyImportOption_t options;
     options.bits.kfmt = MCUXCLELS_KEYIMPORT_KFMT_RFC3394;
+
+    ELS_MUTEX_LOCK();
+
     MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(
         result, token, mcuxClEls_KeyImport_Async(options, wrapped_key, wrapped_key_size, unwrap_key_index, *dst_key_index));
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_KeyImport_Async) != token) || (MCUXCLELS_STATUS_OK_WAIT != result))
     {
         PLOG_ERROR("mcuxClEls_KeyImport_Async failed: 0x%08lx", result);
+        ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
     MCUX_CSSL_FP_FUNCTION_CALL_END();
@@ -187,9 +219,11 @@ status_t els_import_key(const uint8_t * wrapped_key, size_t wrapped_key_size, mc
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_WaitForOperation) != token) || (MCUXCLELS_STATUS_OK != result))
     {
         PLOG_ERROR("mcuxClEls_WaitForOperation failed: 0x%08lx", result);
+        ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
     MCUX_CSSL_FP_FUNCTION_CALL_END();
+    ELS_MUTEX_UNLOCK();
     return STATUS_SUCCESS;
 }
 
@@ -207,6 +241,8 @@ status_t els_keygen(mcuxClEls_KeyIndex_t key_index, uint8_t * public_key, size_t
     status = els_get_key_properties(key_index, &key_properties);
     STATUS_SUCCESS_OR_EXIT_MSG("get_key_properties failed: 0x%08x", status);
 
+    ELS_MUTEX_LOCK();
+
     MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(
         result, token,
         mcuxClEls_EccKeyGen_Async(key_gen_options, (mcuxClEls_KeyIndex_t) 0, key_index, key_properties, NULL, &public_key[0]));
@@ -214,6 +250,7 @@ status_t els_keygen(mcuxClEls_KeyIndex_t key_index, uint8_t * public_key, size_t
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_EccKeyGen_Async) != token) || (MCUXCLELS_STATUS_OK_WAIT != result))
     {
         PRINTF("Css_EccKeyGen_Async failed: 0x%08lx\r\n", result);
+        ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
     MCUX_CSSL_FP_FUNCTION_CALL_END();
@@ -222,9 +259,11 @@ status_t els_keygen(mcuxClEls_KeyIndex_t key_index, uint8_t * public_key, size_t
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_WaitForOperation) != token) || (MCUXCLELS_STATUS_OK != result))
     {
         PRINTF("Css_EccKeyGen_Async WaitForOperation failed: 0x%08lx\r\n", result);
+        ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
     MCUX_CSSL_FP_FUNCTION_CALL_END();
+    ELS_MUTEX_UNLOCK();
 exit:
     return status;
 }
@@ -257,6 +296,7 @@ exit:
 status_t ELS_sign_hash(uint8_t * digest, mcuxClEls_EccByte_t * ecc_signature, mcuxClEls_EccSignOption_t * sign_options,
                        mcuxClEls_KeyIndex_t key_index)
 {
+    ELS_MUTEX_LOCK();
     MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(result, token,
                                      mcuxClEls_EccSign_Async(       // Perform signature generation.
                                          *sign_options,             // Set the prepared configuration.
@@ -269,6 +309,7 @@ status_t ELS_sign_hash(uint8_t * digest, mcuxClEls_EccByte_t * ecc_signature, mc
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_EccSign_Async) != token) || (MCUXCLELS_STATUS_OK_WAIT != result))
     {
         PLOG_ERROR("mcuxClEls_EccSign_Async failed. token: 0x%08x, result: 0x%08x", token, result);
+        ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
     MCUX_CSSL_FP_FUNCTION_CALL_END();
@@ -277,9 +318,11 @@ status_t ELS_sign_hash(uint8_t * digest, mcuxClEls_EccByte_t * ecc_signature, mc
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_WaitForOperation) != token) || (MCUXCLELS_STATUS_OK != result))
     {
         PLOG_ERROR("mcuxClEls_WaitForOperation failed. token: 0x%08x, result: 0x%08x", token, result);
+        ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
     MCUX_CSSL_FP_FUNCTION_CALL_END();
+    ELS_MUTEX_UNLOCK();
     return STATUS_SUCCESS;
 }
 
@@ -298,12 +341,15 @@ status_t ELS_Cipher_Aes_Ecb(mcuxClEls_KeyIndex_t key_index, uint8_t const * inpu
     cipher_options.bits.cphsoe = MCUXCLELS_CIPHER_STATE_OUT_DISABLE;
     cipher_options.bits.extkey = MCUXCLELS_CIPHER_INTERNAL_KEY;
 
+    ELS_MUTEX_LOCK();
+
     MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(result, token,
                                      mcuxClEls_Cipher_Async(cipher_options, key_index, NULL, 0, input, input_length, NULL, output));
 
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_Cipher_Async) != token) || (MCUXCLELS_STATUS_OK_WAIT != result))
     {
         PRINTF("mcuxClEls_Cipher_Async failed: 0x%x\r\n", result);
+        ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
     MCUX_CSSL_FP_FUNCTION_CALL_END();
@@ -312,9 +358,11 @@ status_t ELS_Cipher_Aes_Ecb(mcuxClEls_KeyIndex_t key_index, uint8_t const * inpu
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_WaitForOperation) != token) || (MCUXCLELS_STATUS_OK != result))
     {
         PRINTF("mcuxClEls_WaitForOperation failed: 0x%x\r\n", result);
+        ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
     MCUX_CSSL_FP_FUNCTION_CALL_END();
+    ELS_MUTEX_UNLOCK();
 
     return STATUS_SUCCESS;
 }
@@ -339,6 +387,7 @@ static status_t els_generate_keypair(mcuxClEls_KeyIndex_t * dst_key_index, uint8
         PLOG_ERROR("no free keyslot found");
         return STATUS_ERROR_GENERIC;
     }
+    ELS_MUTEX_LOCK();
 
     MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(
         result, token,
@@ -346,6 +395,7 @@ static status_t els_generate_keypair(mcuxClEls_KeyIndex_t * dst_key_index, uint8
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_EccKeyGen_Async) != token) || (MCUXCLELS_STATUS_OK_WAIT != result))
     {
         PLOG_ERROR("mcuxClEls_EccKeyGen_Async failed: 0x%08x", result);
+        ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
     MCUX_CSSL_FP_FUNCTION_CALL_END();
@@ -354,21 +404,25 @@ static status_t els_generate_keypair(mcuxClEls_KeyIndex_t * dst_key_index, uint8
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_WaitForOperation) != token) || (MCUXCLELS_STATUS_OK != result))
     {
         PLOG_ERROR("mcuxClEls_WaitForOperation failed: 0x%08x", result);
+        ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
     MCUX_CSSL_FP_FUNCTION_CALL_END();
 
     *public_key_size = 64;
+    ELS_MUTEX_UNLOCK();
     return STATUS_SUCCESS;
 }
 
 static status_t els_get_random(unsigned char * out, size_t out_size)
 {
+    ELS_MUTEX_LOCK();
     /* Get random IV for sector metadata encryption. */
     MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(result, token, mcuxClCss_Rng_DrbgRequest_Async(out, out_size));
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClCss_Rng_DrbgRequest_Async) != token) || (MCUXCLELS_STATUS_OK_WAIT != result))
     {
         PRINTF("mcuxClCss_Rng_DrbgRequest_Async failed: 0x%08lx\r\n", result);
+        ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
     MCUX_CSSL_FP_FUNCTION_CALL_END();
@@ -377,9 +431,11 @@ static status_t els_get_random(unsigned char * out, size_t out_size)
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_WaitForOperation) != token) || (MCUXCLELS_STATUS_OK != result))
     {
         PRINTF("Css_EccKeyGen_Async WaitForOperation failed: 0x%08lx\r\n", result);
+        ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
     MCUX_CSSL_FP_FUNCTION_CALL_END();
+    ELS_MUTEX_UNLOCK();
     return STATUS_SUCCESS;
 }
 
@@ -576,13 +632,14 @@ static status_t els_perform_key_agreement(mcuxClEls_KeyIndex_t keypair_index, mc
         PLOG_ERROR("no free keyslot found");
         return STATUS_ERROR_GENERIC;
     }
-
+    ELS_MUTEX_LOCK();
     MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(result, token,
                                      mcuxClEls_EccKeyExchange_Async(keypair_index, public_key, *dst_key_index, shared_secret_prop));
 
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_EccKeyExchange_Async) != token) || (MCUXCLELS_STATUS_OK_WAIT != result))
     {
         PLOG_ERROR("mcuxClEls_EccKeyExchange_Async failed: 0x%08x", result);
+        ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
     MCUX_CSSL_FP_FUNCTION_CALL_END();
@@ -591,9 +648,12 @@ static status_t els_perform_key_agreement(mcuxClEls_KeyIndex_t keypair_index, mc
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_WaitForOperation) != token) || (MCUXCLELS_STATUS_OK != result))
     {
         PLOG_ERROR("mcuxClEls_WaitForOperation failed: 0x%08x", result);
+        ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
     MCUX_CSSL_FP_FUNCTION_CALL_END();
+
+    ELS_MUTEX_UNLOCK();
 
     return STATUS_SUCCESS;
 }
@@ -601,7 +661,9 @@ static status_t els_perform_key_agreement(mcuxClEls_KeyIndex_t keypair_index, mc
 static inline uint32_t els_get_key_size(mcuxClEls_KeyIndex_t keyIdx)
 {
     mcuxClEls_KeyProp_t key_properties;
+    ELS_MUTEX_LOCK();
     key_properties.word.value = ((const volatile uint32_t *) (&ELS->ELS_KS0))[keyIdx];
+    ELS_MUTEX_UNLOCK();
     return (key_properties.bits.ksize == MCUXCLELS_KEYPROPERTY_KEY_SIZE_256) ? (256U / 8U) : (128U / 8U);
 }
 
@@ -615,10 +677,13 @@ static status_t els_export_key(mcuxClEls_KeyIndex_t src_key_index, mcuxClEls_Key
 
     *els_key_out_blob_size = required_blob_size;
 
+    ELS_MUTEX_LOCK();
+
     MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(result, token, mcuxClEls_KeyExport_Async(wrap_key_index, src_key_index, els_key_out_blob));
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_KeyExport_Async) != token) || (MCUXCLELS_STATUS_OK_WAIT != result))
     {
         PLOG_ERROR("mcuxClEls_KeyExport_Async failed: 0x%08lx", result);
+        ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
     MCUX_CSSL_FP_FUNCTION_CALL_END();
@@ -627,9 +692,11 @@ static status_t els_export_key(mcuxClEls_KeyIndex_t src_key_index, mcuxClEls_Key
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_WaitForOperation) != token) || (MCUXCLELS_STATUS_OK != result))
     {
         PLOG_ERROR("mcuxClEls_WaitForOperation failed: 0x%08lx", result);
+        ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
     MCUX_CSSL_FP_FUNCTION_CALL_END();
+    ELS_MUTEX_UNLOCK();
     return STATUS_SUCCESS;
 }
 
@@ -1084,10 +1151,13 @@ static status_t cmac_verify(const uint8_t * data, size_t data_size, mcuxClEls_Ke
     options.bits.finalize   = MCUXCLELS_CMAC_FINALIZE_ENABLE;
     options.bits.extkey     = MCUXCLELS_CMAC_EXTERNAL_KEY_DISABLE;
 
+    ELS_MUTEX_LOCK();
+
     MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(result, token, mcuxClEls_Cmac_Async(options, key_index, NULL, 0, data, data_size, pCmac));
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_Cmac_Async) != token) || (MCUXCLELS_STATUS_OK_WAIT != result))
     {
         PLOG_ERROR("mcuxClEls_Cmac_Async failed: 0x%x\r\n", result);
+        ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
     MCUX_CSSL_FP_FUNCTION_CALL_END();
@@ -1096,9 +1166,11 @@ static status_t cmac_verify(const uint8_t * data, size_t data_size, mcuxClEls_Ke
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_WaitForOperation) != token) || (MCUXCLELS_STATUS_OK != result))
     {
         PLOG_ERROR("mcuxClEls_Cmac_Async LimitedWaitForOperation failed: 0x%x", result);
+        ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
     MCUX_CSSL_FP_FUNCTION_CALL_END();
+    ELS_MUTEX_UNLOCK();
 
     return STATUS_SUCCESS;
 }
@@ -1157,12 +1229,14 @@ exit:
 static status_t derive_aes_key(mcuxClEls_KeyIndex_t parent_key_idx, mcuxClEls_KeyIndex_t key_idx, uint8_t * derivation_data,
                                mcuxClEls_KeyProp_t key_properties)
 {
+    ELS_MUTEX_LOCK();
     MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(result, token,
                                      mcuxClEls_Ckdf_Sp800108_Async(parent_key_idx, key_idx, key_properties, derivation_data));
 
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_Ckdf_Sp800108_Async) != token) || (MCUXCLELS_STATUS_OK_WAIT != result))
     {
         PLOG_ERROR("mcuxClEls_Ckdf_Sp800108_Async failed: 0x%08x\r\n", result);
+        ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
     MCUX_CSSL_FP_FUNCTION_CALL_END();
@@ -1171,9 +1245,11 @@ static status_t derive_aes_key(mcuxClEls_KeyIndex_t parent_key_idx, mcuxClEls_Ke
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_WaitForOperation) != token) || (MCUXCLELS_STATUS_OK != result))
     {
         PLOG_ERROR("mcuxClEls_WaitForOperation failed: 0x%08x\r\n", result);
+        ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
     MCUX_CSSL_FP_FUNCTION_CALL_END();
+    ELS_MUTEX_UNLOCK();
     return STATUS_SUCCESS;
 }
 
@@ -1341,6 +1417,8 @@ static status_t decrypt_external_blob(const uint8_t * enc_data, size_t enc_data_
     // We use CSS in a mode where it will not output its state, so casting away
     // the const is safe here.
     uint8_t * state = (uint8_t *) iv;
+
+    ELS_MUTEX_LOCK();
     MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(
         result, token,
         mcuxClEls_Cipher_Async(cipher_options, tfmKekKeyIdx, NULL, (size_t) 0u, enc_data, enc_data_size, state, plain_data));
@@ -1348,6 +1426,7 @@ static status_t decrypt_external_blob(const uint8_t * enc_data, size_t enc_data_
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_Cipher_Async) != token) || (MCUXCLELS_STATUS_OK_WAIT != result))
     {
         PLOG_ERROR("mcuxClEls_Cipher_Async failed: 0x%x\r\n", result);
+        ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
     MCUX_CSSL_FP_FUNCTION_CALL_END();
@@ -1356,9 +1435,11 @@ static status_t decrypt_external_blob(const uint8_t * enc_data, size_t enc_data_
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_WaitForOperation) != token) || (MCUXCLELS_STATUS_OK != result))
     {
         PLOG_ERROR("mcuxClEls_Cipher_Async LimitedWaitForOperation failed: 0x%x", result);
+        ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
     MCUX_CSSL_FP_FUNCTION_CALL_END();
+    ELS_MUTEX_UNLOCK();
 
     *plain_data_size = enc_data_size;
     status           = unpad_iso7816d4(plain_data, plain_data_size);
