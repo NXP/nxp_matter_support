@@ -7,9 +7,10 @@ manifest:
     projects:
         - name: mcuxsdk_manifest
           url: https://github.com/nxp-mcuxpresso/mcuxsdk-manifests
-          revision: v25.06.00
+          revision: v25.09.00_RC1
           import:
               name-allowlist:
+                  - core
                   - freertos-kernel
                   - mcux-freertos-drivers
                   - mcux-devices-wireless
@@ -41,16 +42,8 @@ manifest:
                   - erpc
                   - usb
                   - mcuboot_opensource
+                  - mcux-sdk-middleware-connectivity-framework
               path-prefix: repo
-        - name: core
-          url: https://github.com/nxp-mcuxpresso/mcuxsdk-core
-          revision: 746a3f564410d2aefca11c0dc689201af51a62e7
-          path: repo/mcuxsdk/
-          west-commands: scripts/west_commands.yml
-        - name: framework
-          url: https://github.com/nxp-mcuxpresso/mcuxsdk-middleware-connectivity-framework.git
-          revision: aef9906340f6b5855f069e7952f401a8c8c41b96
-          path: repo/mcuxsdk/middleware/wireless/framework/
         - name: bifrost
           url: https://github.com/nxp-zephyr/bifrost
           revision: main
