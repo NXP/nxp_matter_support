@@ -144,9 +144,16 @@ function(nxp_sign_app_imgtool bin_sections_to_remove)
         set(CONFIG_MCUBOOT_ADDITIONAL_ARGS "")
     endif()
 
+    # Note on Signature Compatibility :
+    # Starting from MCUboot version 2.2, the default signature algorithm has changed to ECDSA-P256.
+    # Matter images are now signed using ECDSA by default (app_SIGNED.bin).
+    # To ensure compatibility with older MCUboot versions (prior to 2.2), we also provide RSA-signed images named app_SIGNED_RSA.bin.
+    # These RSA-signed images should only be used with MCUboot builds that have RSA support enabled, which was the default behavior in versions before 2.2.
     add_custom_target(sign_application ALL
-        COMMAND ${Python3_EXECUTABLE} imgtool.py sign --key ${MCUBOOT_OPENSOURCE_DIR}/boot/nxp_mcux_sdk/keys/sign-rsa2048-priv.pem --align 4 --header-size ${CONFIG_CHIP_MCUBOOT_HEADER_SIZE} --pad-header
+        COMMAND ${Python3_EXECUTABLE} imgtool.py sign --key ${MCUBOOT_OPENSOURCE_DIR}/boot/nxp_mcux_sdk/keys/sign-ecdsa-p256-priv.pem --align 4 --header-size ${CONFIG_CHIP_MCUBOOT_HEADER_SIZE} --pad-header
         --slot-size ${CONFIG_CHIP_MCUBOOT_SLOT_SIZE} --max-sectors ${CONFIG_CHIP_MCUBOOT_MAX_SECTORS} --version ${CONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING} ${CONFIG_MCUBOOT_ADDITIONAL_ARGS} ${APP_OUTPUT_DIR}/${APP_EXECUTABLE_NAME}.bin ${APP_OUTPUT_DIR}/${APP_EXECUTABLE_NAME}_SIGNED.bin
+        COMMAND ${Python3_EXECUTABLE} imgtool.py sign --key ${MCUBOOT_OPENSOURCE_DIR}/boot/nxp_mcux_sdk/keys/sign-rsa2048-priv.pem --align 4 --header-size ${CONFIG_CHIP_MCUBOOT_HEADER_SIZE} --pad-header
+        --slot-size ${CONFIG_CHIP_MCUBOOT_SLOT_SIZE} --max-sectors ${CONFIG_CHIP_MCUBOOT_MAX_SECTORS} --version ${CONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING} ${CONFIG_MCUBOOT_ADDITIONAL_ARGS} ${APP_OUTPUT_DIR}/${APP_EXECUTABLE_NAME}.bin ${APP_OUTPUT_DIR}/${APP_EXECUTABLE_NAME}_SIGNED_RSA.bin
         WORKING_DIRECTORY ${MCUBOOT_OPENSOURCE_DIR}/scripts
         DEPENDS ${APP_OUTPUT_DIR}/${APP_EXECUTABLE_NAME}.bin
         COMMENT "Sign the application binary with imgtool.py"
