@@ -202,6 +202,24 @@ if(CONFIG_CHIP_SDK_DEPENDENCIES_BLE_HOST)
         )
     endif()
 
+    if (CONFIG_CHIP_SDK_DEPENDENCIES_BLE_HOST_CS)
+        mcux_add_macro(
+            gAppRasDataTransfer_d=1
+            gAppRunAlgo_d=1
+            gcGapMaximumActiveConnections_c=gAppMaxConnections_c
+            gGattCaching_d=0
+            gBLE_ChannelSounding_d=1
+            gAppIsPeripheral_d=1
+            gRasRREQ_d=1
+            gAppUseRADEAlgorithm_d=0
+            gAppUseCDEAlgorithm_d=1
+            gBLE42_d=1
+            gBLE50_d=1
+            gBLE51_d=1
+            gBLE52_d=1
+        )
+    endif()
+
     if (CONFIG_CHIP_NXP_BLE_PAIRING)
         mcux_add_macro(
             gAppUsePairing_d=1
@@ -309,6 +327,38 @@ mcux_add_include(
     # Temporary path for FreeRTOS config file
     third_party/nxp/nxp_matter_support/examples/platform/${CONFIG_CHIP_NXP_PLATFORM_FOLDER_NAME}/app/project_include/freeRTOS
 )
+
+if (CONFIG_CHIP_SDK_DEPENDENCIES_BLE_HOST_CS)
+    mcux_add_include(
+        BASE_PATH ${SdkRootDirPath}/middleware/wireless/bluetooth_cs
+        INCLUDES
+        application/common/lcl
+        profiles/ranging
+        host/interface
+        localization/lcl/pde/algo/interface
+    )
+    mcux_add_source(
+        BASE_PATH ${SdkRootDirPath}/middleware/wireless/bluetooth_cs
+        SOURCES
+        application/common/lcl/app_localization.c
+        application/common/lcl/app_localization_algo.c
+        application/common/lcl/ranging_client.c
+        profiles/ranging/ranging_service.c
+
+    )
+    mcux_add_library(
+        BASE_PATH ${SdkRootDirPath}/middleware/wireless/bluetooth_cs
+        LIBS host/lib/lib_channel_sounding_gcc.a
+        DSP DSP
+        FPU SP_FPU
+        TOOLCHAINS mcux armgcc
+    )
+    mcux_add_library(
+        BASE_PATH ${SdkRootDirPath}/middleware/wireless/bluetooth_cs
+        LIBS localization/lib/lib_lcl_algo_cm33_gcc.a
+        TOOLCHAINS mcux armgcc
+    )
+endif()
 
 # ========================================================================================
 # 3. Linker Configurations
