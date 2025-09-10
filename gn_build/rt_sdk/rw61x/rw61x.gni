@@ -23,7 +23,6 @@ import("${nxp_sdk_build_root}/${nxp_sdk_name}/rt_sdk.gni")
 declare_args() {
   board_version = "A2"
   deviceBoardName = "RW612"
-  cpu1_cpu2_fw_type = "sb"
 }
 
 if(board_version == "frdm") {
@@ -81,6 +80,7 @@ WIFI_BT_TEMPLATE_PATH = "${COMPONENT_FILES_PATH}/wifi_bt_module/template"
 BOARDS_FILES_PATH ="${nxp_sdk_root}/examples/_boards/${board}"
 
 ELS_PKC_CL_PATH = "${COMPONENT_FILES_PATH}/els_pkc/"
+FW_BINS_PATH = "${COMPONENT_FILES_PATH}/conn_fwloader/fw_bin/rw61x"
 
 template("rw61x_sdk_drivers") {
 
@@ -90,32 +90,7 @@ template("rw61x_sdk_drivers") {
     custom_flash_driver= false
   }
   
-  # Convert the CPU1/CPU2 fw binaries into src files
-  fw_bin_path = "${COMPONENT_FILES_PATH}/conn_fwloader/fw_bin"
-  fw_args = [
-    "-t",
-    cpu1_cpu2_fw_type,
-    rebase_path(fw_bin_path, root_build_dir),
-  ]
-
-  assert(board_version!="A1", "A1 boards are no more supported.")
-
-  if(exec_script(
-            "${COMPONENT_FILES_PATH}/conn_fwloader/script/fw_bin2c_conv.py",
-            fw_args,
-            "list lines") != 0)
-  {
-        fw_args_sb = [
-          "-t",
-          "sb",
-          rebase_path(fw_bin_path, root_build_dir),
-        ]
-        #In case of generation issue always re-try using and "sb" cpu1_cpu2_fw_type
-        exec_script(
-          "${COMPONENT_FILES_PATH}/conn_fwloader/script/fw_bin2c_conv.py",
-          fw_args_sb,
-          "list lines")
-  }
+ 
 
 
   config("${target_name}_config") {
@@ -220,6 +195,11 @@ if(!custom_flash_driver){
 
       # This allows the CPU1/CPU2 fw to be embedded in the application
       "gPlatformMonolithicApp_d=1",
+      "CONFIG_MONOLITHIC_WIFI=1",
+      "CONFIG_MONOLITHIC_BLE_15_4=1",
+      "RW610",
+      "CONFIG_SOC_SERIES_RW6XX_REVISION_A2=1",
+      "BLE_FW_ADDRESS=0"
     ]
 
     defines += ["CONFIG_PRIVATE_ECC_KEY_BLOB_SIZE=48"]
@@ -296,6 +276,8 @@ if(!custom_flash_driver){
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClMemory/inc/internal",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/inc/internal",
         "${nxp_sdk_root}/middleware/mbedtls/port/pkc",
+        # fw binaries for cpu1/cpu2 initialization
+        "${FW_BINS_PATH}/../inc"
       ]
     }
 
@@ -435,9 +417,8 @@ if(!custom_flash_driver){
 
     sources += [
       # fw binaries for cpu1/cpu2
-      "${fw_bin_path}/A2/fw_cpu1.c",
-      "${fw_bin_path}/A2/fw_cpu2_ble.c",
-      "${fw_bin_path}/A2/fw_cpu2_combo.c",
+      "${FW_BINS_PATH}/rw61x_cpu2.c",
+      "${FW_BINS_PATH}/rw61x_cpu1.c",
     ]
 
     sources += [ "${nxp_sdk_root}/components/conn_fwloader/fsl_loader_utils.c" ]
