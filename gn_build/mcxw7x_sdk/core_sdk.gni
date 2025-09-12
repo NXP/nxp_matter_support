@@ -233,27 +233,22 @@ core_sdk = {
     ]
   }
 
+  # Devices files
   if (nxp_device == "MCXW727C") {
     core_sources = [
-      # Devices files
-      # Use this startup file for now. Will switch to an SDK startup file in the future.
-      "${nxp_sdk_matter_support_root}/examples/platform/mcxw72/app/startup.S",
+      "${DEVICES_DIR_PATH}/gcc/startup_${nxp_device}_cm33_core0.S",
       "${DEVICES_DIR_PATH}/system_${nxp_device}_cm33_core0.c",
-      "${ADDITIONAL_DRIVERS_DIR_PATH}/fsl_clock.c",
-      "${COMPONENT_POWER_MGR_DIR_PATH}/devices/KW47B42ZB7/fsl_pm_device.c",
-      # Drivers
     ]
   } else {
-    core_sources = [
-      # Devices files
-      "${DEVICES_DIR_PATH}/gcc/startup_${nxp_device}.S",
+    core_sources = [ "${DEVICES_DIR_PATH}/gcc/startup_${nxp_device}.S",
       "${DEVICES_DIR_PATH}/system_${nxp_device}.c",
-      "${ADDITIONAL_DRIVERS_DIR_PATH}/fsl_clock.c",
-      "${COMPONENT_POWER_MGR_DIR_PATH}/devices/KW45B41Z83/fsl_pm_device.c",
     ]
   }
 
   core_sources += [
+    "${ADDITIONAL_DRIVERS_DIR_PATH}/fsl_clock.c",
+    "${COMPONENT_POWER_MGR_DIR_PATH}/devices/KW45B41Z83/fsl_pm_device.c",
+
     # Drivers files
     "${DRIVER_CCM32K_DIR_PATH}/fsl_ccm32k.c",
     "${DRIVER_CMC_DIR_PATH}/fsl_cmc.c",
