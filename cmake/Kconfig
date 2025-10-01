@@ -87,4 +87,20 @@ config NXP_GENERATE_PREPROCESS_FILES
 	help
 		Enables to generate and keep the preprocessed source files (e.g, .i or .ii files) during the build. Useful for debugging macro expansion and include paths.
 
+choice CHIP_MBEDTLS_VERSION
+	prompt "CHIP mbedtls version selection"
+	default CHIP_MBEDTLS_2X
+
+	config CHIP_MBEDTLS_2X
+		bool "MbedTLS 2.x"
+		help
+			Use MbedTLS version 2.x for cryptographic operations.
+
+	config CHIP_MBEDTLS_3X
+		bool "MbedTLS 3.x"
+		depends on CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+		help
+			Use MbedTLS version 3.x for cryptographic operations.
+endchoice
+
 endif # CHIP

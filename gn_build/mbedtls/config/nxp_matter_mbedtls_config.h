@@ -29,6 +29,8 @@
 #ifndef NXP_MATTER_MBEDTLS_CONFIG_H
 #define NXP_MATTER_MBEDTLS_CONFIG_H
 
+#include "mbedtls/version.h"
+
 /* FreeRTOS is always supported for RW612 and RT platforms so enable threading */
 #define MBEDTLS_MCUX_FREERTOS_THREADING_ALT
 #ifndef MBEDTLS_THREADING_C
@@ -72,13 +74,16 @@
 #define MBEDTLS_ASN1_WRITE_C
 #define MBEDTLS_BIGNUM_C
 #if (MBEDTLS_VERSION_NUMBER >= 0x03050000)
-#define MBEDTLS_BLOCK_CIPHER_NO_DECRYPT
+// Used by OT, for 2.x was enabled by default
+#define MBEDTLS_DEBUG_C
+#else
+// for 3.x we stil want to use mbedtls_pkcs5_pbkdf2_hmac
+#define MBEDTLS_DEPRECATED_REMOVED
 #endif
 #define MBEDTLS_CCM_C
 #define MBEDTLS_CIPHER_C
 #define MBEDTLS_CMAC_C
 #define MBEDTLS_CTR_DRBG_C
-#define MBEDTLS_DEPRECATED_REMOVED
 #define MBEDTLS_DEPRECATED_WARNING
 #define MBEDTLS_ECJPAKE_C
 #define MBEDTLS_ECP_C
@@ -201,10 +206,13 @@ void *pvPortCalloc(size_t num, size_t size); /*Calloc for HEAP3.*/
 #undef MBEDTLS_MPI_MAX_SIZE
 #endif // MBEDTLS_MPI_MAX_SIZE
 #define MBEDTLS_MPI_MAX_SIZE              32 /**< Maximum number of bytes for usable MPIs. */
+/* This config was removed from MBEDTLS 3.x as it's determined automatically based on supported curves */
+#if (MBEDTLS_VERSION_NUMBER < 0x03050000)
 #ifdef MBEDTLS_ECP_MAX_BITS
 #undef MBEDTLS_ECP_MAX_BITS
 #endif // MBEDTLS_ECP_MAX_BITS
 #define MBEDTLS_ECP_MAX_BITS             256 /**< Maximum bit size of groups */
+#endif
 #define MBEDTLS_ECP_WINDOW_SIZE            2 /**< Maximum window size used */
 #define MBEDTLS_ECP_FIXED_POINT_OPTIM      0 /**< Enable fixed-point speed-up */
 #define MBEDTLS_ENTROPY_MAX_SOURCES        1 /**< Maximum number of sources supported */
@@ -228,7 +236,6 @@ For RTs such confis are enabled in KSDK_mbedtls_config,h and for RW it has alrea
 #define MBEDTLS_SSL_CIPHERSUITES         MBEDTLS_TLS_ECJPAKE_WITH_AES_128_CCM_8
 
 
-#include "mbedtls/version.h"
 #if (MBEDTLS_VERSION_NUMBER < 0x03000000)
     // Configuration sanity check. Done automatically in Mbed TLS >= 3.0.
     #include "mbedtls/check_config.h"

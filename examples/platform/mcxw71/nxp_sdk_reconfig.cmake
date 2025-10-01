@@ -135,9 +135,18 @@ mcux_remove_macro(
 )
 # MCXW72 does support, however, accelerating the AES CCM
 if(CONFIG_CHIP_NXP_PLATFORM_MCXW72)
+if(CONFIG_CHIP_MBEDTLS_2X)
     mcux_add_macro(
         MBEDTLS_CCM_ALT
     )
+elseif(CONFIG_CHIP_MBEDTLS_3X)
+    mcux_add_macro(
+        # Needed inside secure-subsystem\port\kw45_k4w1\sss_init.c
+        # to enable CRYPTO_ConfigureThreadingMcux at init. If the
+        # threading support is not enabled the Matter init will fail
+        MBEDTLS_NXP_SSSAPI
+    )
+endif()
 endif()
 
 if(CONFIG_CHIP_LIB_SHELL)
