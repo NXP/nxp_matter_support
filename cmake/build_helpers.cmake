@@ -154,6 +154,11 @@ function(nxp_sign_app_imgtool bin_sections_to_remove)
         --slot-size ${CONFIG_CHIP_MCUBOOT_SLOT_SIZE} --max-sectors ${CONFIG_CHIP_MCUBOOT_MAX_SECTORS} --version ${CONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING} ${CONFIG_MCUBOOT_ADDITIONAL_ARGS} ${APP_OUTPUT_DIR}/${APP_EXECUTABLE_NAME}.bin ${APP_OUTPUT_DIR}/${APP_EXECUTABLE_NAME}_SIGNED.bin
         COMMAND ${Python3_EXECUTABLE} imgtool.py sign --key ${MCUBOOT_OPENSOURCE_DIR}/boot/nxp_mcux_sdk/keys/sign-rsa2048-priv.pem --align 4 --header-size ${CONFIG_CHIP_MCUBOOT_HEADER_SIZE} --pad-header
         --slot-size ${CONFIG_CHIP_MCUBOOT_SLOT_SIZE} --max-sectors ${CONFIG_CHIP_MCUBOOT_MAX_SECTORS} --version ${CONFIG_CHIP_DEVICE_SOFTWARE_VERSION_STRING} ${CONFIG_MCUBOOT_ADDITIONAL_ARGS} ${APP_OUTPUT_DIR}/${APP_EXECUTABLE_NAME}.bin ${APP_OUTPUT_DIR}/${APP_EXECUTABLE_NAME}_SIGNED_RSA.bin
+        # Copy the signed binary as app.bin for compatibility with flashing tools
+        # MCUXpresso for VSCode extension and west flash tools expect to find "app.bin" in the build directory.
+        # When OTA is enabled, the signed binary (app_SIGNED.bin) must be flashed instead of the unsigned one.
+        # This copy ensures flashing tools automatically use the correct signed binary without configuration changes.
+        COMMAND ${CMAKE_COMMAND} -E copy ${APP_OUTPUT_DIR}/${APP_EXECUTABLE_NAME}_SIGNED.bin ${APP_OUTPUT_DIR}/${APP_EXECUTABLE_NAME}.bin
         WORKING_DIRECTORY ${MCUBOOT_OPENSOURCE_DIR}/scripts
         DEPENDS ${APP_OUTPUT_DIR}/${APP_EXECUTABLE_NAME}.bin
         COMMENT "Sign the application binary with imgtool.py"
