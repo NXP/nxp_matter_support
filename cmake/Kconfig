@@ -104,4 +104,10 @@ choice CHIP_MBEDTLS_VERSION
 			Use MbedTLS version 3.x for cryptographic operations.
 endchoice
 
+config NXP_ENABLE_ALIRO
+	bool "Enable Matter ALIRO support"
+	default n
+	help
+	  Enables Matter ALIRO support. Currently supported only on MCXW72
+
 endif # CHIP
