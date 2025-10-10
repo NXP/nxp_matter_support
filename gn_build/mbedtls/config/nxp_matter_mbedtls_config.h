@@ -66,9 +66,6 @@
 
 #if CONFIG_NET_L2_OPENTHREAD
 #define MBEDTLS_AES_C
-#if (MBEDTLS_VERSION_NUMBER >= 0x03050000)
-#define MBEDTLS_AES_ONLY_128_BIT_KEY_LENGTH
-#endif
 #define MBEDTLS_AES_ROM_TABLES
 #define MBEDTLS_ASN1_PARSE_C
 #define MBEDTLS_ASN1_WRITE_C
@@ -76,6 +73,7 @@
 #if (MBEDTLS_VERSION_NUMBER >= 0x03050000)
 // Used by OT, for 2.x was enabled by default
 #define MBEDTLS_DEBUG_C
+#define MBEDTLS_GCM_C // CONFIG_NXP_ENABLE_ALIRO
 #else
 // for 3.x we stil want to use mbedtls_pkcs5_pbkdf2_hmac
 #define MBEDTLS_DEPRECATED_REMOVED

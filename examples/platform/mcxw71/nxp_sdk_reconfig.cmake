@@ -169,11 +169,17 @@ if(CONFIG_CHIP_NXP_PLATFORM_MCXW71)
 endif()
 
 if(CONFIG_CHIP_NXP_PLATFORM_MCXW72)
-    mcux_add_macro(
-        # Temporary workaround, allocate more heap
-        MinimalHeapSize_c=0xC800
-
-    )
+    if(CONFIG_NXP_ENABLE_ALIRO)
+        mcux_add_macro(
+            # ALIRO memory consumtion is not optimized, need to use all available RAM
+            MinimalHeapSize_c=0x20000
+        )
+    else()
+        mcux_add_macro(
+            # Temporary workaround, allocate more heap
+            MinimalHeapSize_c=0xC800
+        )
+    endif()
 endif()
 
 if(CONFIG_NXP_USE_LOW_POWER)
@@ -185,10 +191,17 @@ if(CONFIG_NXP_USE_LOW_POWER)
         gAppLowpowerEnabled_d=1
     )
 else()
-    mcux_add_macro(
-        gAppLedCnt_c=2
-        K32W_LOG_ENABLED
-    )
+    if(CONFIG_NXP_ENABLE_ALIRO)
+        mcux_add_macro(
+            gAppLedCnt_c=0
+            K32W_LOG_ENABLED
+        )    
+    else()
+        mcux_add_macro(
+            gAppLedCnt_c=2
+            K32W_LOG_ENABLED
+        )
+    endif()
     if(CONFIG_CHIP_NXP_PLATFORM_MCXW72)
         mcux_add_macro(
             gDebugConsoleEnable_d=1
