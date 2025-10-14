@@ -220,12 +220,18 @@ if(CONFIG_CHIP_SDK_DEPENDENCIES_BLE_HOST)
             gBLE_ChannelSounding_d=1
             gAppIsPeripheral_d=1
             gRasRREQ_d=1
-            gAppUseRADEAlgorithm_d=0
-            gAppUseCDEAlgorithm_d=1
+            gAppUseRADEAlgorithm_d=1
+            gAppUseCDEAlgorithm_d=0
             gBLE42_d=1
             gBLE50_d=1
             gBLE51_d=1
             gBLE52_d=1
+            LCE_KW47_MCXW72=1
+            gHost_TaskStackSize_c=4096
+        )
+    else()
+        mcux_add_macro(
+            gHost_TaskStackSize_c=2400
         )
     endif()
 
@@ -258,7 +264,6 @@ if(CONFIG_CHIP_SDK_DEPENDENCIES_BLE_HOST)
         gGattUseUpdateDatabaseCopyProc_c=0
         gBleBondIdentityHeaderSize_c=56
         gPasskeyValue_c=999999
-        gHost_TaskStackSize_c=2400
         gBleSetMacAddrFromVendorCommand_d=1
         mAdvertisingDefaultTxPower_c=0 # default advertising TX power
         mConnectionDefaultTxPower_c=0 # default connection TX power
@@ -364,9 +369,10 @@ if (CONFIG_CHIP_SDK_DEPENDENCIES_BLE_HOST_CS)
     )
     mcux_add_library(
         BASE_PATH ${SdkRootDirPath}/middleware/wireless/bluetooth_cs
-        LIBS localization/lib/lib_lcl_algo_cm33_gcc.a
+        LIBS localization/lib/lib_lcl_algo_cm33_lce_gcc.a
         TOOLCHAINS mcux armgcc
     )
+
 endif()
 
 # ========================================================================================

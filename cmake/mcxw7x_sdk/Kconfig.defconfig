@@ -19,6 +19,10 @@ config CHIP_SDK_DEPENDENCIES_BLE_HOST_CS
     select MCUX_COMPONENT_middleware.wireless.ble_gatt_service_discovery
     select MCUX_COMPONENT_middleware.wireless.ble_host_OPT_component_lib
     select MCUX_COMPONENT_middleware.wireless.framework.platform.lcl
+    select MCUX_PRJSEG_module.board.wireless.app_lce
+    select MCUX_COMPONENT_driver.ce
+    select MCUX_COMPONENT_driver.mu1
+    select MCUX_COMPONENT_component.lce
 
 endif # if CHIP_NXP_PLATFORM_MCXW72
 
@@ -60,6 +64,9 @@ config gMainThreadStackSize_c
 
 config gMainThreadPriority_c
     default 5
+
+config ECC_RAM_STCM8_INIT
+    default y if CHIP_NXP_PLATFORM_MCXW72
 
 config FSL_OSA_MAIN_FUNC_ENABLE
     default y
