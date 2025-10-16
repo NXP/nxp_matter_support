@@ -196,11 +196,23 @@ if(!custom_flash_driver){
       # This allows the CPU1/CPU2 fw to be embedded in the application
       "gPlatformMonolithicApp_d=1",
       "CONFIG_MONOLITHIC_WIFI=1",
-      "CONFIG_MONOLITHIC_BLE_15_4=1",
       "RW610",
       "CONFIG_SOC_SERIES_RW6XX_REVISION_A2=1",
-      "BLE_FW_ADDRESS=0"
     ]
+
+    if(!chip_enable_openthread)
+    {
+      defines += [
+        "CONFIG_MONOLITHIC_BLE=1",
+        "COMBO_FW_ADDRESS=0",
+      ]
+    }
+    else{
+      defines += [
+        "CONFIG_MONOLITHIC_BLE_15_4=1",
+        "BLE_FW_ADDRESS=0",
+      ]
+    }
 
     defines += ["CONFIG_PRIVATE_ECC_KEY_BLOB_SIZE=48"]
 
