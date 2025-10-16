@@ -73,6 +73,7 @@ mcux_add_configuration(
     -Wl,--wrap=_realloc_r \
     -Wl,--wrap=_free_r \
     -Wl,--wrap=_calloc_r \
+    -Wl,--wrap=printf \
     -Wl,--defsym=gUseNVMLink_d=1 \
     -Wl,--defsym=lp_ram_lower_limit=0x04000000 \
     -Wl,--defsym=lp_ram_upper_limit=0x2001C000 \
@@ -103,6 +104,7 @@ mcux_add_macro(
 
 # TODO core defines. Check if all are needed
 mcux_add_macro(
+    SDK_DEBUGCONSOLE_UART
     __STARTUP_CLEAR_BSS
     SERIAL_USE_CONFIGURE_STRUCTURE=1
     SDK_OS_FREE_RTOS
@@ -170,8 +172,7 @@ if(CONFIG_CHIP_NXP_PLATFORM_MCXW72)
     mcux_add_macro(
         # Temporary workaround, allocate more heap
         MinimalHeapSize_c=0xC800
-        gMainThreadPriority_c=5
-        gMainThreadStackSize_c=3096
+
     )
 endif()
 
