@@ -23,6 +23,11 @@
      (((uint32_t) BOARD_InitDebugConsole >= 0x18000000U) && ((uint32_t) BOARD_InitDebugConsole < 0x20000000U)))
 
 /*! @brief The UART to use for debug messages. */
+
+#ifndef DEBUG_CONSOLE_UART_INDEX
+#define DEBUG_CONSOLE_UART_INDEX 3
+#endif
+
 #define BOARD_DEBUG_UART_TYPE kSerialPort_Uart
 #if DEBUG_CONSOLE_UART_INDEX == 0
 #define BOARD_DEBUG_UART_BASEADDR (uint32_t) FLEXCOMM0
@@ -30,8 +35,8 @@
 #define BOARD_DEBUG_UART USART0
 #define BOARD_DEBUG_UART_CLK_FREQ CLOCK_GetFlexCommClkFreq(0)
 #define BOARD_DEBUG_UART_FRG_CLK                                                                                                   \
-    (&(const clock_frg_clk_config_t){ 0, kCLOCK_FrgPllDiv, 255, 0 }) /*!< Select FRG0 mux as frg_pll                               \
-                                                                      */
+    (&(const clock_frg_clk_config_t) { 0, kCLOCK_FrgPllDiv, 255, 0 }) /*!< Select FRG0 mux as frg_pll                              \
+                                                                       */
 #define BOARD_DEBUG_UART_CLK_ATTACH kFRG_to_FLEXCOMM0
 #define BOARD_DEBUG_UART_RST kFC0_RST_SHIFT_RSTn
 #define BOARD_DEBUG_UART_CLKSRC kCLOCK_Flexcomm0
@@ -43,8 +48,8 @@
 #define BOARD_DEBUG_UART USART3
 #define BOARD_DEBUG_UART_CLK_FREQ CLOCK_GetFlexCommClkFreq(3)
 #define BOARD_DEBUG_UART_FRG_CLK                                                                                                   \
-    (&(const clock_frg_clk_config_t){ 3, kCLOCK_FrgPllDiv, 255, 0 }) /*!< Select FRG3 mux as frg_pll                               \
-                                                                      */
+    (&(const clock_frg_clk_config_t) { 3, kCLOCK_FrgPllDiv, 255, 0 }) /*!< Select FRG3 mux as frg_pll                              \
+                                                                       */
 #define BOARD_DEBUG_UART_CLK_ATTACH kFRG_to_FLEXCOMM3
 #define BOARD_DEBUG_UART_RST kFC3_RST_SHIFT_RSTn
 #define BOARD_DEBUG_UART_CLKSRC kCLOCK_Flexcomm3
@@ -101,10 +106,9 @@
 #define BOARD_LED_RED_GPIO_PIN 1U
 #endif
 
-
 #define LED_BLUE_INIT(output)                                                                                                      \
     GPIO_PinInit(BOARD_LED_BLUE_GPIO, BOARD_LED_BLUE_GPIO_PORT, BOARD_LED_BLUE_GPIO_PIN,                                           \
-                 &(gpio_pin_config_t){ kGPIO_DigitalOutput, (output) }) /*!< Enable target LED_BLUE */
+                 &(gpio_pin_config_t) { kGPIO_DigitalOutput, (output) }) /*!< Enable target LED_BLUE */
 #define LED_BLUE_ON()                                                                                                              \
     GPIO_PortSet(BOARD_LED_BLUE_GPIO, BOARD_LED_BLUE_GPIO_PORT, 1U << BOARD_LED_BLUE_GPIO_PIN) /*!< Turn on target LED_BLUE */
 #define LED_BLUE_OFF()                                                                                                             \
@@ -134,7 +138,7 @@
 #define BOARD_SMARTCARD_TS_TIMER_IRQ (CTIMER0_IRQn)
 
 /* CLI clock config */
-#define BOARD_CLI_FRG_CLK (&(const clock_frg_clk_config_t){ 3, kCLOCK_FrgPllDiv, 255, 0 }) /*!< Select FRG3 mux as frg_pll */
+#define BOARD_CLI_FRG_CLK (&(const clock_frg_clk_config_t) { 3, kCLOCK_FrgPllDiv, 255, 0 }) /*!< Select FRG3 mux as frg_pll */
 #define BOARD_CLI_CLK_ATTACH kFRG_to_FLEXCOMM3
 
 #if defined(__cplusplus)
