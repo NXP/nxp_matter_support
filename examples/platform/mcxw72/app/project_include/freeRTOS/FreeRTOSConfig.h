@@ -55,7 +55,11 @@ extern uint32_t SystemCoreClock;
 #endif
 
 #define configCPU_CLOCK_HZ (SystemCoreClock)
+#ifdef CONFIG_NXP_ENABLE_ALIRO
+#define configTICK_RATE_HZ ((TickType_t) 1000)
+#else
 #define configTICK_RATE_HZ ((TickType_t) 100)
+#endif
 #define configMAX_PRIORITIES (8)
 
 #if defined(configUSE_TICKLESS_IDLE) && (configUSE_TICKLESS_IDLE == 1)
