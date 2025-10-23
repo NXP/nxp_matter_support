@@ -33,8 +33,8 @@ echo Python installation ...
 for /f %%p in ('where python') do (
     echo.%%p | findstr WindowsApps >NUL 2>&1
     if !ERRORLEVEL! NEQ 0 (
-        "%%p" --version >python_version.tmp 2>&1
-        findstr /C:"Python 3" python_version.tmp >NUL 2>&1
+        %%p --version >"%TEMP%\python_version.tmp" 2>&1
+        findstr /C:"Python 3" "%TEMP%\python_version.tmp" >NUL 2>&1
         if !ERRORLEVEL! EQU 0 (
             endlocal
             echo Python is found at: %%p
