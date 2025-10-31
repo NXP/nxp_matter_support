@@ -99,7 +99,7 @@ choice CHIP_MBEDTLS_VERSION
 
 	config CHIP_MBEDTLS_3X
 		bool "MbedTLS 3.x"
-		depends on CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
+		depends on CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72 || CHIP_NXP_PLATFORM_RW61X
 		help
 			Use MbedTLS version 3.x for cryptographic operations.
 endchoice

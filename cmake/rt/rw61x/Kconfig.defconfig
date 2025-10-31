@@ -11,11 +11,13 @@ config CHIP_SDK_DEPENDENCIES
     select MCUX_COMPONENT_driver.conn_fwloader
     imply MCUX_COMPONENT_component.mflash_offchip
     select MCUX_COMPONENT_middleware.freertos-kernel.cm33_non_trustzone
-    select MCUX_COMPONENT_middleware.mbedtls.els_pkc.config
+	select MCUX_COMPONENT_middleware.mbedtls.els_pkc.config if CHIP_MBEDTLS_2X
     select MCUX_COMPONENT_middleware.wifi.imu if CHIP_WIFI
 	select CHIP_SDK_DEPENDENCIES_ETHERNET if CHIP_ETHERNET
 	select MCUX_COMPONENT_component.phyksz8081 if CHIP_ETHERNET
 	select MCUX_COMPONENT_component.lpc_gpio_adapter if CHIP_ETHERNET
+	select MCUX_COMPONENT_component.psa_crypto_driver.els_pkc if CHIP_MBEDTLS_3X
+	select MCUX_DEPENDENCY_COMPONENT_component.psa_crypto_driver.els_pkc.osal_frtos if CHIP_MBEDTLS_3X
 
 # SDK defaults
 
@@ -23,9 +25,11 @@ choice MCUX_DEPENDENCY_COMPONENT_component.serial_manager_uart_DEPEND_COMPONENT_
 	default MCUX_DEPENDENCY_COMPONENT_component.serial_manager_uart_DEPEND_COMPONENT_driver.flexcomm_usart
 endchoice
 
+if CHIP_MBEDTLS_2X
 choice MCUX_COMPONENT_middleware.mbedtls.port.selection
 	default MCUX_COMPONENT_middleware.mbedtls.port.els_pkc
 endchoice
+endif
 
 choice MCUX_COMPONENT_middleware.wifi.wifidriver.selection
 	default MCUX_DEPENDENCY_COMPONENT_middleware.wifi.wifidriver_DEPEND_ANYOF_OPTION_2
