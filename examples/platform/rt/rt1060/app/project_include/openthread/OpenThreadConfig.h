@@ -73,6 +73,8 @@
 // Temporary workaround till we can enable this via the gn
 #define OPENTHREAD_CONFIG_PLATFORM_RADIO_COEX_ENABLE 1
 
+#define OPENTHREAD_CONFIG_THREAD_VERSION OT_THREAD_VERSION_1_4
+
 // Use the NXP-supplied default platform configuration for remainder
 // of OpenThread config options.
 //

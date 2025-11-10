@@ -78,6 +78,8 @@
 #define OPENTHREAD_CONFIG_MLE_LINK_METRICS_INITIATOR_ENABLE 0
 #define OPENTHREAD_CONFIG_MLE_LINK_METRICS_SUBJECT_ENABLE 0
 
+#define OPENTHREAD_CONFIG_THREAD_VERSION OT_THREAD_VERSION_1_4
+
 // Use the NXP-supplied default platform configuration for remainder
 // of OpenThread config options.
 //
