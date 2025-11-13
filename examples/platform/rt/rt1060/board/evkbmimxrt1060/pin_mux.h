@@ -563,6 +563,12 @@ void BOARD_InitArduinoUARTPins(void);
  */
 void BOARD_InitMurataModulePins(void);
 
+/*!
+ * @brief Configures pin routing and optionally pin electrical features for I2C
+ *
+ */
+void BOARD_InitI2CPins(void);
+
 #if defined(__cplusplus)
 }
 #endif
