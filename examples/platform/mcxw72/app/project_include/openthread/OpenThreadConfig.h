@@ -72,6 +72,8 @@
 #define OPENTHREAD_CONFIG_SRP_SERVER_ENABLE 0
 #define OPENTHREAD_CONFIG_TMF_NETDATA_SERVICE_ENABLE 0
 
+#define OPENTHREAD_CONFIG_THREAD_VERSION OT_THREAD_VERSION_1_4
+
 // #define OPENTHREAD_CONFIG_LOG_LEVEL                            OT_LOG_LEVEL_DEBG
 
 // Use the NXP-supplied default platform configuration for remainder
