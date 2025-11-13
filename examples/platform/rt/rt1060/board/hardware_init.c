@@ -64,6 +64,10 @@ void BOARD_InitHardware(void)
         BOARD_InitM2I2CPins();
 #endif
 
+#if CONFIG_CHIP_SE05X && !defined(WIFI_IW612_BOARD_MURATA_2EL_M2) && !defined(WIFI_IW610_BOARD_MURATA_2LL_M2)
+        BOARD_InitI2CPins();
+#endif
+
 #ifdef BOARD_OTW_K32W0_PIN_INIT
         BOARD_InitOTWPins();
 #endif
