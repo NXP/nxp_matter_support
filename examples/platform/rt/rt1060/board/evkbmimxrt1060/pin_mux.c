@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 NXP
+ * Copyright 2024-2025 NXP
  * All rights reserved.
  *
  * SPDX-License-Identifier: BSD-3-Clause
@@ -479,6 +479,56 @@ void BOARD_InitMurataModulePins(void)
     IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B1_08_GPIO1_IO24, 0U);
     IOMUXC_GPR->GPR26 = ((IOMUXC_GPR->GPR26 & (~(BOARD_INITMURATAMODULEPINS_IOMUXC_GPR_GPR26_GPIO_MUX1_GPIO_SEL_MASK))) |
                          IOMUXC_GPR_GPR26_GPIO_MUX1_GPIO_SEL(0x00U));
+}
+
+/*
+ * TEXT BELOW IS USED AS SETTING FOR TOOLS *************************************
+I2CPins:
+- options: {callFromInitBoot: 'true', coreID: core0, enableClock: 'true'}
+- pin_list:
+  - {pin_num: J11, peripheral: LPI2C1, signal: SCL, pin_signal: GPIO_AD_B1_00, software_input_on: Enable, hysteresis_enable: Disable, pull_up_down_config: Pull_Down_100K_Ohm,
+    open_drain: Enable, speed: MHZ_100, slew_rate: Slow}
+  - {pin_num: K11, peripheral: LPI2C1, signal: SDA, pin_signal: GPIO_AD_B1_01, software_input_on: Enable, open_drain: Enable}
+ * BE CAREFUL MODIFYING THIS COMMENT - IT IS YAML SETTINGS FOR TOOLS ***********
+ */
+
+/* FUNCTION ************************************************************************************************************
+ *
+ * Function Name : I2CPins
+ * Description   : Configures pin routing and optionally pin electrical features for I2C
+ *
+ * END ****************************************************************************************************************/
+void BOARD_InitI2CPins(void)
+{
+    CLOCK_EnableClock(kCLOCK_Iomuxc);           /* iomuxc clock (iomuxc_clk_enable): 0x03u */
+
+    IOMUXC_SetPinMux(
+        IOMUXC_GPIO_AD_B1_00_LPI2C1_SCL,        /* GPIO_AD_B1_00 is configured as LPI2C1_SCL */
+        1U);                                    /* Software Input On Field: Force input path of pad GPIO_AD_B1_00 */
+    IOMUXC_SetPinMux(
+        IOMUXC_GPIO_AD_B1_01_LPI2C1_SDA,        /* GPIO_AD_B1_01 is configured as LPI2C1_SDA */
+        1U);                                    /* Software Input On Field: Force input path of pad GPIO_AD_B1_01 */
+    IOMUXC_SetPinConfig(
+        IOMUXC_GPIO_AD_B1_00_LPI2C1_SCL,        /* GPIO_AD_B1_00 PAD functional properties : */
+        0x18B0U);                               /* Slew Rate Field: Slow Slew Rate
+                                                  Drive Strength Field: R0/6
+                                                  Speed Field: fast(150MHz)
+                                                  Open Drain Enable Field: Open Drain Enabled
+                                                  Pull / Keep Enable Field: Pull/Keeper Enabled
+                                                  Pull / Keep Select Field: Keeper
+                                                  Pull Up / Down Config. Field: 100K Ohm Pull Down
+                                                  Hyst. Enable Field: Hysteresis Disabled */
+
+    IOMUXC_SetPinConfig(
+        IOMUXC_GPIO_AD_B1_01_LPI2C1_SDA,        /* GPIO_AD_B1_01 PAD functional properties : */
+        0x18B0U);                               /* Slew Rate Field: Slow Slew Rate
+                                                  Drive Strength Field: R0/6
+                                                  Speed Field: fast(150MHz)
+                                                  Open Drain Enable Field: Open Drain Enabled
+                                                  Pull / Keep Enable Field: Pull/Keeper Enabled
+                                                  Pull / Keep Select Field: Keeper
+                                                  Pull Up / Down Config. Field: 100K Ohm Pull Down
+                                                  Hyst. Enable Field: Hysteresis Disabled */
 }
 
 /***********************************************************************************************************************
