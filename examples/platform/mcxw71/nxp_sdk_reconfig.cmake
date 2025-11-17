@@ -189,6 +189,7 @@ if(CONFIG_NXP_USE_LOW_POWER)
         gUartDebugConsole_d=0
         cPWR_UsePowerDownMode=1
         gAppLowpowerEnabled_d=1
+        gFro192mDisableTrim_d=1
     )
 else()
     if(CONFIG_NXP_ENABLE_ALIRO)
