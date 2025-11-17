@@ -33,13 +33,31 @@ echo Python installation ...
 for /f %%p in ('where python') do (
     echo.%%p | findstr WindowsApps >NUL 2>&1
     if !ERRORLEVEL! NEQ 0 (
+        set "TEMP_FILE="
+        :: Try TEMP directory first, fallback to current directory if it fails
         %%p --version >"%TEMP%\python_version.tmp" 2>&1
-        findstr /C:"Python 3" "%TEMP%\python_version.tmp" >NUL 2>&1
-        if !ERRORLEVEL! EQU 0 (
-            endlocal
-            echo Python is found at: %%p
-            set "python=%%p"
-            goto env_setup
+        if !ERRORLEVEL! NEQ 0 (
+            echo Warning: TEMP directory not accessible, using current directory for temporary file.
+            %%p --version >"%CD%\python_version.tmp" 2>&1
+            if !ERRORLEVEL! NEQ 0 (
+                echo Warning: Failed to get version for Python at %%p
+            ) else (
+                set "TEMP_FILE=%CD%\python_version.tmp"
+            )
+        ) else (
+            set "TEMP_FILE=%TEMP%\python_version.tmp"
+        )
+        
+        if defined TEMP_FILE (
+            findstr /C:"Python 3" "!TEMP_FILE!" >NUL 2>&1
+            if !ERRORLEVEL! EQU 0 (
+                del "!TEMP_FILE!" 2>NUL
+                endlocal
+                echo Python is found at: %%p
+                set "python=%%p"
+                goto env_setup
+            )
+            del "!TEMP_FILE!" 2>NUL
         )
     )
 )
