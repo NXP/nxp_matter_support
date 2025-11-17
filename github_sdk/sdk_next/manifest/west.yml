@@ -35,7 +35,6 @@ manifest:
                   - wpa_supplicant-rtos
                   - fw_bin
                   - mcu-sdk-components
-                  - mcu-sdk-examples
                   - els_pkc
                   - mcux-devices-rt
                   - mcux-devices-mcx
@@ -49,6 +48,10 @@ manifest:
           revision: 8a9a7449af41406c3af92578629355678dfb7e9e
           path: repo/mcuxsdk/
           west-commands: scripts/west_commands.yml
+        - name: examples
+          url: https://github.com/nxp-mcuxpresso/mcuxsdk-examples
+          path: repo/mcuxsdk/examples/
+          revision: c08e72afeec1e6babd510969ec0923db8a76b38a
         - name: framework
           url: https://github.com/nxp-mcuxpresso/mcux-sdk-middleware-connectivity-framework
           revision: f46bce121c30167ff6c23d7778e04f90713512c1
