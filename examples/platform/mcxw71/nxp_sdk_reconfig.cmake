@@ -191,6 +191,8 @@ if(CONFIG_NXP_USE_LOW_POWER)
         gAppLowpowerEnabled_d=1
         gFro192mDisableTrim_d=1
     )
+
+    mcux_add_linker_symbol(SYMBOLS "gLowpowerPowerDownEnable_d=1")
 else()
     if(CONFIG_NXP_ENABLE_ALIRO)
         mcux_add_macro(
