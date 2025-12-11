@@ -31,6 +31,7 @@ manifest:
                   - usb
                   - rpmsg-lite
                   - secure-subsystem
+                  - secure_storage
                   - wifi_nxp
                   - wpa_supplicant-rtos
                   - fw_bin
