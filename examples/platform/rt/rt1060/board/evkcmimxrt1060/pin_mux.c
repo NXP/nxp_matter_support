@@ -393,6 +393,34 @@ void BOARD_DeinitM2I2CPins(void)
     IOMUXC_SetPinConfig(IOMUXC_GPIO_AD_B1_01_GPIO1_IO17, 0x10B0U);
 }
 
+
+/* FUNCTION ************************************************************************************************************
+ *
+ * Function Name : BOARD_InitSe05xGpioPins
+ * Description   : Configures pin routing and optionally pin electrical features.
+ *
+ * END ****************************************************************************************************************/
+void BOARD_InitSe05xGpioPins(void)
+{
+    CLOCK_EnableClock(kCLOCK_Iomuxc);
+
+    IOMUXC_SetPinMux(IOMUXC_GPIO_AD_B0_03_GPIO1_IO03, 0U);
+    IOMUXC_GPR->GPR26 = ((IOMUXC_GPR->GPR26 &
+      (~(BOARD_INITSE05XPINS_IOMUXC_GPR_GPR26_GPIO_MUX1_GPIO_SEL_MASK)))
+        | IOMUXC_GPR_GPR26_GPIO_MUX1_GPIO_SEL(0x00U)
+      );
+
+    gpio_pin_config_t se05x_gpio_config = {
+        .direction = kGPIO_DigitalOutput,
+        .outputLogic = 0U,
+        .interruptMode = kGPIO_NoIntmode
+    };
+
+    /* Initialize GPIO functionality on pin 3 of GPIO1 port */
+    GPIO_PinInit(GPIO1, 3U, &se05x_gpio_config);
+    GPIO_PinWrite(GPIO1, 3U, 0U);
+}
+
 /***********************************************************************************************************************
  * EOF
  **********************************************************************************************************************/
