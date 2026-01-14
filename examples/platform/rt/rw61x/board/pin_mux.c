@@ -43,7 +43,7 @@ void BOARD_InitPins(void)
 #if CONFIG_CHIP_SE05X
     /* Initialize FC1_I2C_8_9 functionality on pin GPIO_9, GPIO_8 (pin M4_M6) */
     IO_MUX_SetPinMux(IO_MUX_FC1_I2C_8_9);
-#if CONFIG_SE05X_HOST_GPIO_RW61X
+#if CONFIG_SE05X_HOST_GPIO
     /* Initialize GPIO27 functionality on pin GPIO_27 (pin C5) */
     IO_MUX_SetPinMux(IO_MUX_GPIO27);
 #endif

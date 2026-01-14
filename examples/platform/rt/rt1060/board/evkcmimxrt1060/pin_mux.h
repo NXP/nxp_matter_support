@@ -268,6 +268,14 @@ void BOARD_InitM2I2CPins(void);
  */
 void BOARD_DeinitM2I2CPins(void);
 
+/*!
+ * @brief Configures pin routing and optionally pin electrical features for SE05x GPIO
+ *
+ */
+void BOARD_InitSe05xGpioPins(void);
+
+#define BOARD_INITSE05XPINS_IOMUXC_GPR_GPR26_GPIO_MUX1_GPIO_SEL_MASK 0x0CU /*!< GPIO1 and GPIO6 share same IO MUX function, GPIO_MUX1 selects one GPIO function: affected bits mask */
+
 #if defined(__cplusplus)
 }
 #endif

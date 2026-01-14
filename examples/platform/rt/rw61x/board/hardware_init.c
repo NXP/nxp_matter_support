@@ -110,7 +110,7 @@ void BOARD_InitHardware(void)
     g_phy_resource.write = MDIO_Write;
 #endif
 
-#if CONFIG_SE05X_HOST_GPIO_RW61X
+#if CONFIG_SE05X_HOST_GPIO
 #if (!CONFIG_CHIP_ETHERNET)
     GPIO_PortInit(GPIO, 0);
 #endif
