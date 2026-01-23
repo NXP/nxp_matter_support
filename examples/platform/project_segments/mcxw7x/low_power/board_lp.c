@@ -17,6 +17,7 @@
 #include "fsl_component_timer_manager.h"
 #include "fsl_pm_core.h"
 #include "fwk_debug.h"
+#include "sss_crypto.h"
 #include "RNG_Interface.h"
 #include "pin_mux.h"
 #if defined(DBG_SWO_PIN_ENABLE) && (DBG_SWO_PIN_ENABLE != 0)
@@ -160,6 +161,8 @@ static void BOARD_EnterLowPowerCb(void)
 
 static void BOARD_EnterPowerDownCb(void)
 {
+    // Enable crypto hardware reinitialization after wake-up
+    CRYPTO_ReinitHardware();
     return;
 }
 
@@ -219,6 +222,12 @@ static void BOARD_ExitPowerDownCb(void)
 {
     /* Allow the the RNG HW accelerator reinitialization.Required for S200 RNG. */
     (void)RNG_ReInit();
+
+    /* Normally it would be ideal to reinitialize the crypto hardware only when
+     * we actually need to do crypto operations instead of reinitializing it
+     * every time we wake up from PowerDown. So there is room for improvement
+     * here... */
+    CRYPTO_InitHardware();
 
 #if defined(gAppHighSystemClockFrequency_d) && (gAppHighSystemClockFrequency_d > 0)
     /* Set Core frequency to 96Mhz , core voltage to 1.1v */
