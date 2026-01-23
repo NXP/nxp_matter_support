@@ -18,8 +18,20 @@ if(CONFIG_MCUX_PRJSEG_module.board.matter.board)
         components/board_comp.c
         dcdc/board_dcdc.c
         ext_flash/board_extflash.c
-        low_power/board_lp.c
     )
+
+    if("${CHIP_ROOT}" STREQUAL "${SdkRootDirPath}/middleware/matter")
+        mcux_add_source(
+            BASE_PATH ${SdkRootDirPath}/middleware/matter/third_party/nxp/nxp_matter_support
+            SOURCES examples/platform/project_segments/mcxw7x/low_power/board_lp.c
+        )
+    else()
+        # Matter not integrated in MCU SDK
+        mcux_add_source(
+            BASE_PATH ${NXP_MATTER_SUPPORT_DIR}
+            SOURCES examples/platform/project_segments/mcxw7x/low_power/board_lp.c
+        )
+    endif()
 
     mcux_add_source(
         BASE_PATH ${SdkRootDirPath}/examples/_boards/${board}/wireless_examples
