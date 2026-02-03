@@ -120,6 +120,10 @@
 
 #define MBEDTLS_ENTROPY_FORCE_SHA256
 
+#if (MBEDTLS_VERSION_NUMBER >= 0x03050000)
+#define MBEDTLS_PSA_CRYPTO_STORAGE_C 1
+#endif
+
 /* need to be defined to 0, else config_psa.h will define it to 1 and ecp.h will define wrong MBEDTLS_ECP_MAX_BITS_MIN value*/
 #define MBEDTLS_PSA_ACCEL_ECC_SECP_R1_521 0
 #define MBEDTLS_PSA_ACCEL_ECC_BRAINPOOL_P_R1_512 0
@@ -185,6 +189,7 @@ void *pvPortCalloc(size_t num, size_t size); /*Calloc for HEAP3.*/
 #define MBEDTLS_PEM_PARSE_C
 #define MBEDTLS_X509_USE_C
 #define MBEDTLS_X509_CRT_PARSE_C
+#define MBEDTLS_X509_CSR_PARSE_C
 #endif
 
 /*

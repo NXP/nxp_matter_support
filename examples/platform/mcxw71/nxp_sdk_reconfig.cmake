@@ -131,10 +131,14 @@ mcux_add_include(
     INCLUDES
     gn_build/mbedtls/config
 )
-# MCXW71 and MCXW72 platforms do not support full crypto acceleration via mbedtls
+
+if(CONFIG_CHIP_MBEDTLS_2X)
+# MCXW71 and MCXW72 platforms do not support full crypto acceleration via mbedtls 2x
 mcux_remove_macro(
     MBEDTLS_NXP_ELE200
 )
+endif()
+
 # MCXW72 does support, however, accelerating the AES CCM
 if(CONFIG_CHIP_NXP_PLATFORM_MCXW72)
 if(CONFIG_CHIP_MBEDTLS_2X)
