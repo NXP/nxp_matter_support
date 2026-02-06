@@ -62,7 +62,7 @@ choice MCUX_PRJSEG_module.board.clock_sel
 endchoice
 
 config gMainThreadStackSize_c
-	default 3096
+	default 6192
 
 config gMainThreadPriority_c
     default 5

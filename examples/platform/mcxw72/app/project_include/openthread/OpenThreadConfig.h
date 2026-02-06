@@ -24,6 +24,8 @@
 
 #pragma once
 
+#include "mbedtls/version.h"
+
 // Disable the Nxp-supplied OpenThread logging facilities
 // and use the facilities provided by the Device Layer
 #define OPENTHREAD_CONFIG_LOG_OUTPUT OPENTHREAD_CONFIG_LOG_OUTPUT_APP
@@ -73,6 +75,11 @@
 #define OPENTHREAD_CONFIG_TMF_NETDATA_SERVICE_ENABLE 0
 
 #define OPENTHREAD_CONFIG_THREAD_VERSION OT_THREAD_VERSION_1_4
+
+#if (MBEDTLS_VERSION_NUMBER >= 0x03050000)
+// it can be removed once PSA is the default option in OT-NXP config file
+#define OPENTHREAD_CONFIG_CRYPTO_LIB OPENTHREAD_CONFIG_CRYPTO_LIB_PSA
+#endif
 
 // #define OPENTHREAD_CONFIG_LOG_LEVEL                            OT_LOG_LEVEL_DEBG
 

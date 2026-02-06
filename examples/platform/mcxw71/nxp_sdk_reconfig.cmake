@@ -211,6 +211,7 @@ else()
     endif()
     if(CONFIG_CHIP_NXP_PLATFORM_MCXW72)
         mcux_add_macro(
+            gAppLowpowerEnabled_d=0
             gDebugConsoleEnable_d=1
             gUartDebugConsole_d=1
             DebugConsole_c=1
