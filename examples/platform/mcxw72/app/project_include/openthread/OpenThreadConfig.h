@@ -77,8 +77,14 @@
 #define OPENTHREAD_CONFIG_THREAD_VERSION OT_THREAD_VERSION_1_4
 
 #if (MBEDTLS_VERSION_NUMBER >= 0x03050000)
-// it can be removed once PSA is the default option in OT-NXP config file
+// all below defines should be moved to openthread-core-mcxw72-config.h
+// once PSA is fully enabled in ot-nxp
+
 #define OPENTHREAD_CONFIG_CRYPTO_LIB OPENTHREAD_CONFIG_CRYPTO_LIB_PSA
+#define OPENTHREAD_CONFIG_PLATFORM_KEY_REFERENCES_ENABLE 1
+
+// need to add support for key references in NBU
+#define OPENTHREAD_CONFIG_PLATFORM_MAC_KEYS_EXPORTABLE_ENABLE 1
 #endif
 
 // #define OPENTHREAD_CONFIG_LOG_LEVEL                            OT_LOG_LEVEL_DEBG
