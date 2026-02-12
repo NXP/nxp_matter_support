@@ -37,7 +37,12 @@ if(CONFIG_MCUX_PRJSEG_module.board.matter.board)
         BASE_PATH ${SdkRootDirPath}/examples/_boards/${board}/wireless_examples
         SOURCES
         clock_config.c
-        pin_mux.c
+    )
+	
+	mcux_add_source(
+        BASE_PATH ${NXP_MATTER_SUPPORT_DIR}
+        SOURCES
+        examples/platform/project_segments/mcxw7x/pin_mux.c
     )
 
     mcux_add_include(
