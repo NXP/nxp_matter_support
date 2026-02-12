@@ -60,6 +60,7 @@ choice MCUX_PRJSEG_module.board.clock_sel
 endchoice
 
 config gMainThreadStackSize_c
+    default 9000 if CHIP_SE05X
 	default 3096
 
 config gMainThreadPriority_c
