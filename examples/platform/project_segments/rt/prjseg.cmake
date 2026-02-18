@@ -48,7 +48,6 @@ if(CONFIG_MCUX_PRJSEG_module.board.matter.board)
             clock_config.c
             hardware_init.c
             pin_mux.c
-            peripherals.c
             sdmmc_config.c
             wifi_bt_config.c
     )
@@ -75,7 +74,6 @@ if(CONFIG_MCUX_PRJSEG_module.board.matter.board)
             board.c
             clock_config.c
             hardware_init.c
-            peripherals.c
             ${board}/pin_mux.c
             ${board}/sdmmc_config.c
             ${board}/wifi_bt_config.c
