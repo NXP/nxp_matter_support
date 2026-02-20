@@ -190,7 +190,7 @@ if(CONFIG_NXP_USE_LOW_POWER)
     mcux_add_macro(
         nxp_use_low_power=1
         K32W_LOG_ENABLED=0
-        gUartDebugConsole_d=0
+        gDebugConsoleEnable_d=0
         cPWR_UsePowerDownMode=1
         gAppLowpowerEnabled_d=1
         gFro192mDisableTrim_d=1
@@ -213,7 +213,6 @@ else()
         mcux_add_macro(
             gAppLowpowerEnabled_d=0
             gDebugConsoleEnable_d=1
-            gUartDebugConsole_d=1
             DebugConsole_c=1
         )
     endif()
