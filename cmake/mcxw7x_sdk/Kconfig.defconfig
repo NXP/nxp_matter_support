@@ -167,4 +167,21 @@ endchoice
 config MCUX_PRJSEG_middleware.multicore.rpmsg-lite.generated_config
     default n
 
+if NXP_USE_LOW_POWER
+
+config NXP_USE_POWER_DOWN
+    default n
+#   default y if CHIP_NXP_PLATFORM_MCXW72
+
+if NXP_USE_POWER_DOWN
+
+# Use a default value of 2 seconds for the PowerDown threshold as the DC-DC
+# charge/discharge cycle kicks in around 1.6 seconds after falling asleep
+config NXP_POWER_DOWN_POLL_THRESHOLD
+    default 2
+
+endif # NXP_USE_POWER_DOWN
+
+endif # NXP_USE_LOW_POWER
+
 endif # if CHIP_NXP_PLATFORM_MCXW71 || CHIP_NXP_PLATFORM_MCXW72
