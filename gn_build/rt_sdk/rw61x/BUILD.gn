@@ -69,7 +69,7 @@ mbedtls_target("nxp_els_pkc_mbedtls") {
     # els_pkc SDK hook
     "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/els_pkc/ELSFactoryData.c",
   ]
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     public_deps += [ "${openthread_root}/src/core:libopenthread_core_headers" ]
   }
 }

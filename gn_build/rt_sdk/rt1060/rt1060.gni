@@ -300,7 +300,7 @@ template("rt1060_sdk_drivers") {
       ]
     }
 
-    if (chip_enable_openthread) {
+    if (chip_enable_thread) {
       sources += [
         "${nxp_sdk_root}/middleware/wireless/framework/platform/imx_rt/fwk_platform_hdlc.c",
         "${nxp_sdk_root}/middleware/wireless/framework/platform/imx_rt/fwk_platform_ot.c",

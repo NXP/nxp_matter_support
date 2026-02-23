@@ -56,7 +56,7 @@ mbedtls_target("nxp_ksdk_mbedtls") {
     sources += [ "${ksdk_mbedtls_sw_impl}" ]
   }
 
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     public_deps += [ "${openthread_root}/src/core:libopenthread_core_headers" ]
   }
 }

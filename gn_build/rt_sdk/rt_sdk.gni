@@ -474,7 +474,7 @@ template("rt_sdk") {
         # No OSA main task
         "FSL_OSA_MAIN_FUNC_ENABLE=0",
       ]
-      if (chip_enable_openthread) {
+      if (chip_enable_thread) {
         defines += [ "CONFIG_MAX_IPV6_ADDRESSES=8" ]
       } else {
         defines += [ "CONFIG_MAX_IPV6_ADDRESSES=5" ]
@@ -559,7 +559,7 @@ template("rt_sdk") {
       "-Wno-address",
     ]
 
-    if (chip_enable_openthread) {
+    if (chip_enable_thread) {
       defines += [ 
         "CHIP_DEVICE_CONFIG_ENABLE_THREAD=1",
         "CONFIG_NET_L2_OPENTHREAD=1",

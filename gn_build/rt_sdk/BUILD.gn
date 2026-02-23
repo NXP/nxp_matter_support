@@ -46,7 +46,7 @@ group("nxp_sdk") {
   if (chip_enable_wifi) {
     public_deps += [ ":nxp_wifi" ]
   }
-  if (chip_enable_openthread) {
+  if (chip_enable_thread) {
     public_deps += [ "${openthread_root}/src/core:libopenthread_core_headers" ]
   }
 }
@@ -65,9 +65,9 @@ config("lwip_rt_config") {
   ]
   if (chip_enable_ethernet) {
     include_dirs += [ "lwip/ethernet" ]
-  } else if (chip_enable_openthread && chip_enable_wifi) {
+  } else if (chip_enable_thread && chip_enable_wifi) {
     include_dirs += [ "lwip/wifi_openthread" ]
-  } else if (chip_enable_openthread) {
+  } else if (chip_enable_thread) {
     include_dirs += [ "lwip/openthread" ]
   } else if (chip_enable_wifi) {
     include_dirs += [ "lwip/wifi",
