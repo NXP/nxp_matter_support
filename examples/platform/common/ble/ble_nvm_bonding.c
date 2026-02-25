@@ -15,7 +15,6 @@
 #include <nvs_port.h>
 #include <settings.h>
 
-#include <app_preinclude_common.h>
 #include <ble_general.h>
 #include <ble_constants.h>
 
