@@ -116,6 +116,7 @@ m_data1_size                        = m_data1_end - m_data1_start + 1;
 
 __HEAP_start__                      = m_data1_end - HEAP_SIZE;
 __HEAP_end__                        = m_data1_end;
+__EXT_HEAP_end__                    = m_data1_end;
 
 firmware_ram_lower_limit            = DEFINED(lp_ram_lower_limit) ? lp_ram_lower_limit : m_cstack_start;
 firmware_ram_upper_limit            = DEFINED(lp_ram_upper_limit) ? lp_ram_upper_limit : m_data1_end;
@@ -227,11 +228,11 @@ m_ce_image_start                    = m_data1_end + 1;
 m_ce_image_size                     = 0x8000;
 m_ce_image_end                      = m_ce_image_start + m_ce_image_size - 1;
 
-m_ce_data_reserved_start            = m_ce_image_end + 1;
-m_ce_data_reserved_size             = 0x1000;
-m_ce_data_reserved_end              = m_ce_data_reserved_start + m_ce_data_reserved_size -1;
+m_ce_stack_start                    = m_ce_image_end + 1;
+m_ce_stack_size                     = 0x1000;
+m_ce_stack_end                      = m_ce_stack_start + m_ce_stack_size -1;
 
-m_ce_ctrl_start                     = m_ce_data_reserved_end + 1;
+m_ce_ctrl_start                     = m_ce_stack_end + 1;
 m_ce_ctrl_size                      = 0x640;
 m_ce_ctrl_end                       = m_ce_ctrl_start + m_ce_ctrl_size -1;
 
@@ -265,9 +266,9 @@ MEMORY
   m_data0               (RW)  : ORIGIN = m_data0_start, LENGTH = m_data0_size
   m_data1               (RW)  : ORIGIN = m_data1_start, LENGTH = m_data1_size
   m_ce_image            (RW)  : ORIGIN = m_ce_image_start, LENGTH = m_ce_image_size
-  m_ce_data_reserved    (RW)  : ORIGIN = m_ce_data_reserved_start, LENGTH = m_ce_data_reserved_size
   m_ce_ctrl             (RW)  : ORIGIN = m_ce_ctrl_start, LENGTH = m_ce_ctrl_size
   m_ce_heap             (RW)  : ORIGIN = m_ce_heap_start, LENGTH = m_ce_heap_size
+  m_ce_stack            (RW)  : ORIGIN = m_ce_stack_start, LENGTH = m_ce_stack_size
   m_heap                (RW)  : ORIGIN = m_heap_start, LENGTH = m_heap_size
   rpmsg_sh_mem          (RW)  : ORIGIN = rpmsg_sh_mem_start, LENGTH = rpmsg_sh_mem_size
   m_lowpower_flag       (RW)  : ORIGIN = m_lowpower_flag_start, LENGTH = m_lowpower_flag_size
@@ -547,6 +548,12 @@ SECTIONS
     . = ALIGN(4);
     __bss_end__ = .;
     __END_BSS = .;
+  } > m_data1
+
+  .extHeap (NOLOAD) :
+  {
+    . = ALIGN(4);
+    *(.extHeap)
   } > m_data1
 
   .heap (NOLOAD) :
