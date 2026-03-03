@@ -124,7 +124,8 @@ mcux_add_macro(
 
 # MbedTLS configuration
 mcux_add_macro(
-    MBEDTLS_USER_CONFIG_FILE=\\\"nxp_matter_mbedtls_config.h\\\"
+    "-DMBEDTLS_CONFIG_FILE=\\\"nxp_matter_mbedtls_config.h\\\""
+    "-DMBEDTLS_PSA_CRYPTO_CONFIG_FILE=\\\"mcxw72_matter_mbedtls_config.h\\\""
 )
 mcux_add_include(
     BASE_PATH ${NXP_MATTER_SUPPORT_DIR}
