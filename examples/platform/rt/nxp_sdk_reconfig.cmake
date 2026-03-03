@@ -39,7 +39,7 @@ mcux_add_macro(
 )
 
 mcux_add_macro(
-    MBEDTLS_USER_CONFIG_FILE=\\\"nxp_matter_mbedtls_config.h\\\"
+    "-DMBEDTLS_CONFIG_FILE=\\\"nxp_matter_mbedtls_config.h\\\""
 )
 
 if(CONFIG_CHIP_NVM_COMPONENT_LITTLEFS)
@@ -59,10 +59,13 @@ endif()
 
 # RT/RW platform-specific macros
 if(CONFIG_CHIP_NXP_PLATFORM_RW61X)
+
+    mcux_add_macro(
+        "-DMBEDTLS_PSA_CRYPTO_CONFIG_FILE=\\\"rw61x_matter_mbedtls_config.h\\\""
+    )
     mcux_add_macro(
         IMU_TASK_STACK_SIZE=1024
         gPlatformDisableBleLowPower_d=1
-        MBEDTLS_NIST_KW_C
     )
 
     if(CONFIG_BT)
@@ -102,6 +105,10 @@ if(CONFIG_CHIP_NXP_PLATFORM_RT1170)
         CONTROLLER_INIT_ESCAPE=1
     )
 
+    mcux_add_macro(
+        "-DMBEDTLS_PSA_CRYPTO_CONFIG_FILE=\\\"rt1170_matter_mbedtls_config.h\\\""
+    )
+
     if(CONFIG_CHIP_LIB_SHELL)
         mcux_add_macro(
 
@@ -124,6 +131,10 @@ if(CONFIG_CHIP_NXP_PLATFORM_RT1060)
 
         # Disabling BT transceiver initialization as it would be done by the fwk plat coex component
         CONTROLLER_INIT_ESCAPE=1
+    )
+
+    mcux_add_macro(
+        "-DMBEDTLS_PSA_CRYPTO_CONFIG_FILE=\\\"rt1060_matter_mbedtls_config.h\\\""
     )
 
     if(CONFIG_CHIP_LIB_SHELL)
