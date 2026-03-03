@@ -7,6 +7,7 @@
 
 #include "ELSFactoryData.h"
 
+#if !CONFIG_CHIP_CRYPTO_PSA
 #if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
 #include "els_pkc_mbedtls.h"
 
@@ -16,6 +17,10 @@
 #define ELS_MUTEX_UNLOCK()
 #define ELS_MUTEX_LOCK()
 #endif /* defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT) */
+#else
+#define ELS_MUTEX_UNLOCK()
+#define ELS_MUTEX_LOCK()
+#endif /* !CONFIG_CHIP_CRYPTO_PSA */
 
 void write_uint32_msb_first(uint8_t * pos, uint32_t data)
 {
@@ -1255,10 +1260,7 @@ static status_t derive_aes_key(mcuxClEls_KeyIndex_t parent_key_idx, mcuxClEls_Ke
 
 static status_t derive_el2go_die_keys()
 {
-    status_t status                                = STATUS_SUCCESS;
-    mcuxClEls_KeyIndex_t el2gooem_mk_sk_idx        = 4U;
-    mcuxClEls_KeyIndex_t el2goimport_auth_sk_idx   = 16U;
-    mcuxClEls_KeyIndex_t el2goimporttfm_kek_sk_idx = 18U;
+    status_t status = STATUS_SUCCESS;
     PLOG_INFO("#### derive_el2go_die_keys");
 
     mcuxClEls_KeyProp_t el2goimport_kek_sk_prop = { 0 };
@@ -1322,9 +1324,7 @@ exit:
 
 status_t import_el2go_key_in_els(const uint8_t * blob, size_t blob_size, mcuxClEls_KeyIndex_t * key_index)
 {
-    status_t status          = STATUS_SUCCESS;
-    const uint8_t * els_blob = NULL;
-    size_t els_blob_size     = 0U;
+    status_t status = STATUS_SUCCESS;
     PLOG_INFO("#### import_el2go_blob_in_els");
 
     ASSERT_OR_EXIT_MSG(blob != NULL, "blob is NULL");

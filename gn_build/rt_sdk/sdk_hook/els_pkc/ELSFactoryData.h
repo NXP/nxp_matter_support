@@ -27,6 +27,7 @@
 #include "mcuxClHash_Constants.h"
 
 #include "psa/crypto.h"
+#include "mcux_psa_defines.h"
 
 #include "mbedtls/ecdh.h"
 #include "mbedtls/entropy.h"
@@ -191,6 +192,20 @@ const uint8_t ckdf_derivation_data_wrap_in[12] = {
     0xc8, 0xac, 0x48, 0x88, 0xa6, 0x1b, 0x3d, 0x9b, 0x56, 0xa9, 0x75, 0xe7,
 };
 
+#if CONFIG_CHIP_CRYPTO_PSA
+const mcuxClEls_KeyProp_t wrap_out_key_prop = {
+    .word = { .value = MCUXCLELS_KEYPROPERTY_VALUE_KEY_SIZE_256 |
+                       MCUXCLELS_KEYPROPERTY_VALUE_ACTIVE |
+                       MCUXCLELS_KEYPROPERTY_VALUE_KWK |
+                       MCUXCLELS_KEYPROPERTY_VALUE_PRIVILEGED |
+                       MCUXCLELS_KEYPROPERTY_VALUE_SECURE |
+                       MCUXCLELS_KEYPROPERTY_VALUE_BASE_SLOT |
+                       MCUXCLELS_KEYPROPERTY_VALUE_GENERAL_PURPOSE_SLOT }
+};
+const uint8_t ckdf_derivation_data_wrap_out[12] = {
+    0x94, 0xbe, 0x03, 0xac, 0x8b, 0x59, 0x32, 0x45, 0x11, 0x7f, 0xf8, 0x3f,
+};
+#else
 const mcuxClEls_KeyProp_t wrap_out_key_prop = {
     .bits =
         {
@@ -199,14 +214,15 @@ const mcuxClEls_KeyProp_t wrap_out_key_prop = {
             .ukwk        = MCUXCLELS_KEYPROPERTY_KWK_TRUE,
             .upprot_priv = MCUXCLELS_KEYPROPERTY_PRIVILEGED_TRUE,
             .upprot_sec  = MCUXCLELS_KEYPROPERTY_SECURE_TRUE,
-
-
         },
 };
 
 const uint8_t ckdf_derivation_data_wrap_out[12] = {
     0x4e, 0x5f, 0x0a, 0x1c, 0x43, 0x37, 0x2c, 0xd0, 0x54, 0x8e, 0x46, 0xc9,
 };
+#endif
+
+
 
 const mcuxClEls_KeyProp_t mac_key_prop = {
     .bits =
