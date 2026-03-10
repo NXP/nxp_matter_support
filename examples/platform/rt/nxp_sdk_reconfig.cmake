@@ -133,6 +133,45 @@ if(CONFIG_CHIP_NXP_PLATFORM_RT1060)
         CONTROLLER_INIT_ESCAPE=1
     )
 
+if(CONFIG_CHIP_NXP_MBEDTLS_TIME_OPTIM_ENABLE)
+    # Apply -Ofast optimization only for mbedtls3X files
+    # Get all source files from mbedtls3X directory
+    file(GLOB_RECURSE MBEDTLS_SOURCES 
+        "${SdkRootDirPath}/middleware/mbedtls3x/*.c"
+        "${SdkRootDirPath}/middleware/mbedtls3x/*.h"
+    )
+    
+    if(MBEDTLS_SOURCES)
+        foreach(source_file ${MBEDTLS_SOURCES})
+        message(STATUS "Applying -Ofast to mbedtls file: ${source_file}")
+            set_source_files_properties(
+                ${source_file}
+                PROPERTIES
+                COMPILE_FLAGS "-Ofast"
+            )
+        endforeach()
+    endif()
+
+    # Apply -Ofast optimization only for psa files
+    # Get all source files from psa directory
+    file(GLOB_RECURSE PSA_SOURCES 
+        "${SdkRootDirPath}/components/psa_crypto_driver/*.c"
+        "${SdkRootDirPath}/components/psa_crypto_driver/*.h"
+    )
+    
+    if(PSA_SOURCES)
+        foreach(source_file ${PSA_SOURCES})
+        message(STATUS "Applying -Ofast to PSA file: ${source_file}")
+            set_source_files_properties(
+                ${source_file}
+                PROPERTIES
+                COMPILE_FLAGS "-Ofast"
+            )
+        endforeach()
+    endif()
+
+endif()
+
     mcux_add_macro(
         "-DMBEDTLS_PSA_CRYPTO_CONFIG_FILE=\\\"rt1060_matter_mbedtls_config.h\\\""
     )
