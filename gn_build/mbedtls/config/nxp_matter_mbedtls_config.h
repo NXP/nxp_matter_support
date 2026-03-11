@@ -57,6 +57,19 @@
 /* Use HMAC instead as CMAC execute software aes operation */
 //#define PSA_WANT_ALG_CMAC 1
 
+/* should be set to at least the sum of:
+ * - CHIP_CONFIG_SECURE_SESSION_POOL_SIZE * 2
+ *   each CASE/PASE requires 2 key slots: i2r + r2i
+ * - PSA key slots required for the transport layer
+ *   (e.g.: for Thread at least 3 PSA Key Slots: the Network Key, MLE Key and MAC Key)
+ * - additional PSA key slots depending on the app use-case
+ *
+ * On a 32-bit system, psa_key_slot_t requires 64 to 80 bytes of SRAM when
+ * MBEDTLS_PSA_KEY_STORE_DYNAMIC and MBEDTLS_PSA_STATIC_KEY_SLOT_BUFFER_SIZE 
+ * are not defined.
+*/
+#define MBEDTLS_PSA_KEY_SLOT_COUNT 64
+
 #if CONFIG_NET_L2_OPENTHREAD
 #if CONFIG_CHIP_OPENTHREAD_FTD
 #define PSA_WANT_ALG_PBKDF2_AES_CMAC_PRF_128 1
