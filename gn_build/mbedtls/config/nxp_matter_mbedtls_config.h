@@ -57,6 +57,11 @@
 /* Use HMAC instead as CMAC execute software aes operation */
 //#define PSA_WANT_ALG_CMAC 1
 
+/* Use AES CMAC for BLE connections in Matter BLE CS context */
+#if CONFIG_CHIP_SDK_DEPENDENCIES_BLE_HOST_CS
+#define PSA_WANT_ALG_CMAC 1
+#endif
+
 /* should be set to at least the sum of:
  * - CHIP_CONFIG_SECURE_SESSION_POOL_SIZE * 2
  *   each CASE/PASE requires 2 key slots: i2r + r2i
