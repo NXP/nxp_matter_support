@@ -235,6 +235,7 @@ static void BOARD_ExitPowerDownCb(void)
      * every time we wake up from PowerDown. So there is room for improvement
      * here... */
     CRYPTO_InitHardwareUnsafe();
+    ele_s2xx_reinit_all_hash_ops();
 
 #if defined(gAppHighSystemClockFrequency_d) && (gAppHighSystemClockFrequency_d > 0)
     /* Set Core frequency to 96Mhz , core voltage to 1.1v */
