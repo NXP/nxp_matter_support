@@ -179,8 +179,7 @@ config MCUX_PRJSEG_middleware.multicore.rpmsg-lite.generated_config
 if NXP_USE_LOW_POWER
 
 config NXP_USE_POWER_DOWN
-    default n
-#   default y if CHIP_NXP_PLATFORM_MCXW72
+    default y if CHIP_NXP_PLATFORM_MCXW72
 
 if NXP_USE_POWER_DOWN
 
