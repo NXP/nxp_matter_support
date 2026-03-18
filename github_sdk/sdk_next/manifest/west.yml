@@ -7,7 +7,7 @@ manifest:
     projects:
         - name: mcuxsdk_manifest
           url: https://github.com/nxp-mcuxpresso/mcuxsdk-manifests
-          revision: v26.03.00_RC1
+          revision: v26.03.00_RC2
           import:
               name-allowlist:
                   - core
@@ -36,6 +36,7 @@ manifest:
                   - secure_storage
                   - wifi_nxp
                   - wpa_supplicant-rtos
+                  - fw_bin
                   - mcu-sdk-components
                   - els_pkc
                   - mcux-devices-rt
@@ -45,10 +46,6 @@ manifest:
                   - usb
                   - mcuboot_opensource
               path-prefix: repo
-        - name: fw_bin
-          url: https://github.com/NXP/wifi_nb_fw
-          path: repo/mcuxsdk/components/conn_fwloader/fw_bin
-          revision: 395d74a0820094c3b9e53cab8f67948bb5a897a0
         - name: bifrost
           url: https://github.com/nxp-zephyr/bifrost
           revision: main
