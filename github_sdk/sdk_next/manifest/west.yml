@@ -7,10 +7,9 @@ manifest:
     projects:
         - name: mcuxsdk_manifest
           url: https://github.com/nxp-mcuxpresso/mcuxsdk-manifests
-          revision: v26.03.00_RC2
+          revision: v26.03.00_RC2_2
           import:
               name-allowlist:
-                  - core
                   - mcux-sdk-middleware-connectivity-framework
                   - mcu-sdk-examples
                   - freertos-kernel
@@ -21,7 +20,6 @@ manifest:
                   - fatfs
                   - ethermind
                   - mbedtls3x
-                  - psa_crypto_driver
                   - lwip
                   - littlefs
                   - ble_controller
@@ -33,11 +31,9 @@ manifest:
                   - usb
                   - rpmsg-lite
                   - secure-subsystem
-                  - secure_storage
                   - wifi_nxp
                   - wpa_supplicant-rtos
                   - fw_bin
-                  - mcu-sdk-components
                   - els_pkc
                   - mcux-devices-rt
                   - mcux-devices-mcx
@@ -46,6 +42,23 @@ manifest:
                   - usb
                   - mcuboot_opensource
               path-prefix: repo
+        - name: core
+          url: https://github.com/nxp-mcuxpresso/mcuxsdk-core
+          revision: 2656ba11af509b6ab9d8b808f6bfd4f2b95f74c0
+          path: repo/mcuxsdk/
+          west-commands: scripts/west_commands.yml
+        - name: mcu-sdk-components
+          url: https://github.com/nxp-mcuxpresso/mcux-component
+          path: repo/mcuxsdk/components
+          revision: e67b49539b52f6df45d76db4f565da427b007f7b
+        - name: secure_storage
+          url: https://github.com/nxp-mcuxpresso/secure_storage
+          path: repo/mcuxsdk/middleware/secure_storage
+          revision: 8f8c57782fac62cbd6a8695429fb91a5593ee9da
+        - name: psa_crypto_driver
+          url: https://github.com/NXP/psa_crypto_driver
+          path: repo/mcuxsdk/components/psa_crypto_driver
+          revision: 2a4535605dad9b94f9cad1f4d27224d931659a4c
         - name: bifrost
           url: https://github.com/nxp-zephyr/bifrost
           revision: main
