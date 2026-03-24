@@ -76,7 +76,6 @@ mcux_add_configuration(
     -Wl,--wrap=printf \
     -Wl,--defsym=gUseNVMLink_d=1 \
     -Wl,--defsym=lp_ram_lower_limit=0x04000000 \
-    -Wl,--defsym=lp_ram_upper_limit=0x2001C000 \
 ")
 
 # Note: <lp_ram_lower_limit> and <lp_ram_upper_limit> are used by the
@@ -179,11 +178,23 @@ if(CONFIG_CHIP_NXP_PLATFORM_MCXW72)
             # ALIRO memory consumtion is not optimized, need to use all available RAM
             MinimalHeapSize_c=0x20000
         )
+    elseif(CONFIG_CHIP_SE05X)
+        mcux_add_macro(
+            # increase heap size as various stacks need to be increased to support SE05x
+            # 0xC800 + CHIP_TASK_STACK_SIZE (8356) + gMainThreadStackSize_c (2808) = 0xF39C
+            MinimalHeapSize_c=0xF400
+        )
+        # Add lp_ram_upper_limit which contains (.heap) start address + heap size, to make sure the whole RAM is retained in low power mode. 
+        # 0x20014018 (.heap start address) + 0xF400 (heap size) = 0x20023418
+        mcux_add_configuration(LD "\-Wl,--defsym=lp_ram_upper_limit=0x20023418")
     else()
         mcux_add_macro(
             # Temporary workaround, allocate more heap
             MinimalHeapSize_c=0xC800
         )
+        # Add lp_ram_upper_limit which contains (.heap) start address + heap size, to make sure the whole RAM is retained in low power mode. 
+        # 0x20014018 (.heap start address) + 0xC800 (heap size) = 0x20020818
+        mcux_add_configuration(LD "\-Wl,--defsym=lp_ram_upper_limit=0x20020818")
     endif()
 endif()
 

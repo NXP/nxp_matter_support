@@ -44,6 +44,10 @@
 #include "board_debug_nbu_port.h"
 #endif
 
+#if (defined(gAppUseSe05x) && (gAppUseSe05x == 1))
+#include "fsl_wuu.h"
+#endif
+
 /* -------------------------------------------------------------------------- */
 /*                             Private prototypes                             */
 /* -------------------------------------------------------------------------- */
@@ -84,6 +88,17 @@ static uint32_t mSWDCLK_PCR_Save;
 /* -------------------------------------------------------------------------- */
 /*                              Private functions                             */
 /* -------------------------------------------------------------------------- */
+
+#if (defined(gAppUseSe05x) && (gAppUseSe05x == 1))
+static void PWR_vWakeUpConfig(uint8_t u8PinIndex)
+{
+    wuu_external_wakeup_pin_config_t wakeupButtonCnfig;
+    wakeupButtonCnfig.edge  = kWUU_ExternalPinFallingEdge;
+    wakeupButtonCnfig.event = kWUU_ExternalPinInterrupt;
+    wakeupButtonCnfig.mode  = kWUU_ExternalPinActiveDSPD;
+    WUU_SetExternalWakeUpPinsConfig(WUU0, u8PinIndex, &wakeupButtonCnfig);
+}
+#endif
 
 #if defined(gBoard_ManageSwdPinsInLowPower_d) && (gBoard_ManageSwdPinsInLowPower_d > 0)
 static void BOARD_SetSWDPinsLowPower(bool_t isLowPower)
@@ -146,6 +161,14 @@ static void BOARD_EnterLowPowerCb(void)
     BOARD_DeInitSWO();
 #endif
 
+#if (defined(gAppUseSe05x) && (gAppUseSe05x == 1))
+    /* PORTB4 (pin 2) is configured as LPI2C1_SDA */
+    PORT_SetPinMux(PORTB, 4U, kPORT_PinDisabledOrAnalog);
+
+    /* PORTB5 (pin 3) is configured as LPI2C1_SCL */
+    PORT_SetPinMux(PORTB, 5U, kPORT_PinDisabledOrAnalog);
+#endif
+
     /* Notify TimerManager the system is going to low power
      * It will make sure to sync its timebase and program the hardware timers accordingly */
     TM_EnterLowpower();
@@ -158,6 +181,12 @@ static void BOARD_EnterLowPowerCb(void)
      * Do this at the end of the callback to avoid doing another allocation after it */
     bank_mask = PLATFORM_GetDefaultRamBanksRetained();
     PLATFORM_SetRamBanksRetained(bank_mask);
+
+#if (defined(gAppUseSe05x) && (gAppUseSe05x == 1))
+    /*Use PTA19 as SE commission done notification wakeup source*/
+    PWR_vWakeUpConfig(4);
+#endif
+
 }
 
 static void BOARD_EnterPowerDownCb(void)
@@ -217,6 +246,21 @@ static void BOARD_ExitLowPowerCb(void)
     }
 #endif
 #endif
+
+#if (defined(gAppUseSe05x) && (gAppUseSe05x == 1))
+    CLOCK_EnableClock(kCLOCK_GpioB);
+    CLOCK_EnableClock(kCLOCK_PortB);
+    
+    /* PORTB4 (pin 2) is configured as LPI2C1_SDA */
+    PORT_SetPinMux(PORTB, 4U, kPORT_MuxAlt4);
+
+    /* PORTB5 (pin 3) is configured as LPI2C1_SCL */
+    PORT_SetPinMux(PORTB, 5U, kPORT_MuxAlt4);
+    
+    CLOCK_SetIpSrc(kCLOCK_Lpi2c1, kCLOCK_IpSrcFro192M);
+    CLOCK_SetIpSrcDiv(kCLOCK_Lpi2c1, kSCG_SysClkDivBy16);
+#endif
+
     return;
 }
 

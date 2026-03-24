@@ -52,6 +52,14 @@ if(CONFIG_MCUX_PRJSEG_module.board.matter.board)
                 SOURCES examples/platform/project_segments/mcxw7x/pin_mux.c
             )
         endif()
+        mcux_add_macro(
+            gAppUseSe05x=1
+        )
+        if (CONFIG_SE05X_HOST_GPIO)
+            mcux_add_macro(
+                gAppUseSe05xHostGpio=1
+            )
+        endif()
     else()
         mcux_add_source(
         BASE_PATH ${SdkRootDirPath}/examples/_boards/${board}/wireless_examples
