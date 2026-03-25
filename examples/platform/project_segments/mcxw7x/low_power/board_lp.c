@@ -46,6 +46,7 @@
 
 #if (defined(gAppUseSe05x) && (gAppUseSe05x == 1))
 #include "fsl_wuu.h"
+#define SE05X_WAKEUP_PIN_INDEX  4  /* PTA19 - WUU0_P4 */
 #endif
 
 /* -------------------------------------------------------------------------- */
@@ -89,7 +90,7 @@ static uint32_t mSWDCLK_PCR_Save;
 /*                              Private functions                             */
 /* -------------------------------------------------------------------------- */
 
-#if (defined(gAppUseSe05x) && (gAppUseSe05x == 1))
+#if (defined(gAppUseSe05xHostGpio) && (gAppUseSe05xHostGpio == 1))
 static void PWR_vWakeUpConfig(uint8_t u8PinIndex)
 {
     wuu_external_wakeup_pin_config_t wakeupButtonCnfig;
@@ -162,6 +163,7 @@ static void BOARD_EnterLowPowerCb(void)
 #endif
 
 #if (defined(gAppUseSe05x) && (gAppUseSe05x == 1))
+    CLOCK_DisableClock(kCLOCK_Lpi2c1);
     /* PORTB4 (pin 2) is configured as LPI2C1_SDA */
     PORT_SetPinMux(PORTB, 4U, kPORT_PinDisabledOrAnalog);
 
@@ -183,8 +185,15 @@ static void BOARD_EnterLowPowerCb(void)
     PLATFORM_SetRamBanksRetained(bank_mask);
 
 #if (defined(gAppUseSe05x) && (gAppUseSe05x == 1))
+    PORT_SetPinMux(PORTC, 1U, kPORT_PinDisabledOrAnalog);
+#endif
+
+#if (defined(gAppUseSe05xHostGpio) && (gAppUseSe05xHostGpio == 1))
     /*Use PTA19 as SE commission done notification wakeup source*/
-    PWR_vWakeUpConfig(4);
+    if (GPIOA->ICR[19] & GPIO_ICR_IRQC(kGPIO_InterruptFallingEdge))
+    {
+        PWR_vWakeUpConfig(SE05X_WAKEUP_PIN_INDEX);
+    }
 #endif
 
 }
@@ -259,6 +268,9 @@ static void BOARD_ExitLowPowerCb(void)
     
     CLOCK_SetIpSrc(kCLOCK_Lpi2c1, kCLOCK_IpSrcFro192M);
     CLOCK_SetIpSrcDiv(kCLOCK_Lpi2c1, kSCG_SysClkDivBy16);
+    CLOCK_EnableClock(kCLOCK_Lpi2c1);
+
+    PORT_SetPinMux(PORTC, 1U, kPORT_MuxAsGpio);
 #endif
 
     return;
