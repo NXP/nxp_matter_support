@@ -127,8 +127,21 @@ config SETTINGS_NVS_SECTOR_COUNT
 	default "((uint32_t)NV_STORAGE_SIZE / ((8192u) * 1u))"
 
 choice MCUX_COMPONENT_component.mem_manager_selection
-    default MCUX_COMPONENT_component.mem_manager_light
+    default MCUX_COMPONENT_component.mem_manager_freertos
 endchoice
+
+# FreeRTOS
+choice MCUX_MISC_middleware.freertos-kernel.dynamic_allocator.selection
+	default MCUX_COMPONENT_middleware.freertos-kernel.heap_4
+endchoice
+
+config configAPPLICATION_ALLOCATED_HEAP
+	default y
+
+config configTOTAL_HEAP_SIZE
+    default 62464 if CHIP_SE05X #0xF400
+    default 131072 if NXP_ENABLE_ALIRO #0x20000
+    default 51200 #0xC800
 
 choice MCUX_DEPENDENCY_COMPONENT_utility.debug_console_selection
     default MCUX_DEPENDENCY_COMPONENT_utility.debug_console_free_rtos
