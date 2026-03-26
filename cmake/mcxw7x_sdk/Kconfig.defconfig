@@ -58,7 +58,6 @@ config CHIP_SDK_DEPENDENCIES
     select MCUX_COMPONENT_middleware.wireless.ieee_802_15_4
     select MCUX_COMPONENT_component.psa_crypto_driver.ele_s200 if CHIP_NXP_PLATFORM_MCXW72 && CHIP_MBEDTLS_3X
     select MCUX_DEPENDENCY_COMPONENT_component.psa_crypto_driver.ele_s200.osal_frtos if CHIP_NXP_PLATFORM_MCXW72 && CHIP_MBEDTLS_3X
-    select MCUX_COMPONENT_middleware.secure-subsystem.firmware if CHIP_NXP_PLATFORM_MCXW72 && CHIP_MBEDTLS_3X
 
 # SDK defaults
 
