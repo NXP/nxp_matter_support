@@ -165,33 +165,15 @@ else()
     )
 endif()
 
-if(CONFIG_CHIP_NXP_PLATFORM_MCXW71)
-    mcux_add_macro(
-        # Temporary workaround, allocate more heap
-        MinimalHeapSize_c=0x9200
-    )
-endif()
-
 if(CONFIG_CHIP_NXP_PLATFORM_MCXW72)
-    if(CONFIG_NXP_ENABLE_ALIRO)
-        mcux_add_macro(
-            # ALIRO memory consumtion is not optimized, need to use all available RAM
-            MinimalHeapSize_c=0x20000
-        )
-    elseif(CONFIG_CHIP_SE05X)
-        mcux_add_macro(
-            # increase heap size as various stacks need to be increased to support SE05x
-            # 0xC800 + CHIP_TASK_STACK_SIZE (8356) + gMainThreadStackSize_c (2808) = 0xF39C
-            MinimalHeapSize_c=0xF400
-        )
+    # Add lp_ram_lower_limit which contains (.heap) start address to make sure the whole RAM is retained in low power mode.
+    # WARNING This address should be the same as the start address of .heap section in the linker file + heap size, otherwise the RAM retention in low power mode will not work as expected.
+    # The value would need to be updated in case of heap size increase or RAM usage increase.
+    if(CONFIG_CHIP_SE05X)
         # Add lp_ram_upper_limit which contains (.heap) start address + heap size, to make sure the whole RAM is retained in low power mode. 
         # 0x20014018 (.heap start address) + 0xF400 (heap size) = 0x20023418
         mcux_add_configuration(LD "\-Wl,--defsym=lp_ram_upper_limit=0x20023418")
     else()
-        mcux_add_macro(
-            # Temporary workaround, allocate more heap
-            MinimalHeapSize_c=0xC800
-        )
         # Add lp_ram_upper_limit which contains (.heap) start address + heap size, to make sure the whole RAM is retained in low power mode. 
         # 0x20014018 (.heap start address) + 0xC800 (heap size) = 0x20020818
         mcux_add_configuration(LD "\-Wl,--defsym=lp_ram_upper_limit=0x20020818")
