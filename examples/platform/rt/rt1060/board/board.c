@@ -233,8 +233,8 @@ void BOARD_ConfigMPU(void)
     extern uint32_t Image$$RW_m_ncache_unused$$ZI$$Limit[];
     uint32_t nonCacheStart = (uint32_t) Image$$RW_m_ncache$$Base;
     uint32_t size          = ((uint32_t) Image$$RW_m_ncache_unused$$Base == nonCacheStart)
-                 ? 0
-                 : ((uint32_t) Image$$RW_m_ncache_unused$$ZI$$Limit - nonCacheStart);
+        ? 0
+        : ((uint32_t) Image$$RW_m_ncache_unused$$ZI$$Limit - nonCacheStart);
 #elif defined(__MCUXPRESSO)
     extern uint32_t __base_NCACHE_REGION;
     extern uint32_t __top_NCACHE_REGION;
@@ -328,8 +328,10 @@ void BOARD_ConfigMPU(void)
     MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 2, 0, 0, 0, 0, ARM_MPU_REGION_SIZE_1GB);
 
     /* Region 5 setting: Memory with Normal type, not shareable, outer/inner write back */
+    /* The ITCM section is used to load code into RAM; therefore, it should be protected as read-only, since no writes are expected
+     * in this section.*/
     MPU->RBAR = ARM_MPU_RBAR(5, 0x00000000U);
-    MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_128KB);
+    MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_RO, 0, 0, 1, 1, 0, ARM_MPU_REGION_SIZE_128KB);
 
     /* Region 6 setting: Memory with Normal type, not shareable, outer/inner write back */
     MPU->RBAR = ARM_MPU_RBAR(6, 0x20000000U);
@@ -371,6 +373,13 @@ void BOARD_ConfigMPU(void)
     /* Region 12 setting: Memory with Device type, not shareable, non-cacheable */
     MPU->RBAR = ARM_MPU_RBAR(12, 0x42000000);
     MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 2, 0, 0, 0, 0, ARM_MPU_REGION_SIZE_1MB);
+
+#if 0
+    /* Region 13: NULL pointer guard */
+    /* Protect 1024 bytes at address 0x00000000 to catch NULL pointer usage as ITCM start at 0x400 */
+    MPU->RBAR = ARM_MPU_RBAR(13, 0x00000000U);
+    MPU->RASR = ARM_MPU_RASR(1, ARM_MPU_AP_NONE, 0, 0, 0, 0, 0, ARM_MPU_REGION_SIZE_1KB);
+#endif
 
     /* Enable MPU */
     ARM_MPU_Enable(MPU_CTRL_PRIVDEFENA_Msk);
