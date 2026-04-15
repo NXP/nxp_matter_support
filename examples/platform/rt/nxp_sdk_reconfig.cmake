@@ -137,6 +137,12 @@ if(CONFIG_CHIP_NXP_PLATFORM_RT1060)
         "-DMBEDTLS_PSA_CRYPTO_CONFIG_FILE=\\\"rt1060_matter_mbedtls_config.h\\\""
     )
 
+    # mbedtls_hardware_poll is wrapped to another definition to enable retry logic
+    mcux_add_configuration(
+        LD "\
+        -Wl,--wrap=mbedtls_hardware_poll\
+    ")
+
     if(CONFIG_CHIP_LIB_SHELL)
         if(CONFIG_MCUX_HW_BOARD_evkcmimxrt1060)
             mcux_add_macro(
@@ -334,6 +340,7 @@ if(CONFIG_MCUX_COMPONENT_component.wifi_bt_module.K32W061_transceiver)
         -Wl,--wrap=hci_uart_init \
     ")
 endif()
+
 
 if(CONFIG_BOOTLOADER_MCUBOOT)
     # We need to reserve enough space for the bootloader (MCUBoot).

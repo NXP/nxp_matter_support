@@ -25,3 +25,10 @@ if(CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION AND CONFIG_CHIP_NXP_PLATFORM_RW61X)
         CX "-Wno-address"
     )
 endif()
+
+if(CONFIG_CHIP_NXP_PLATFORM_RT1060)
+    mcux_add_source(
+        BASE_PATH ${NXP_MATTER_SUPPORT_DIR}
+        SOURCES gn_build/rt_sdk/sdk_hook/mbedtls/ksdk_mbedtls_hook.c
+    )
+endif()
