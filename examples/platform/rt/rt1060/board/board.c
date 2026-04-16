@@ -374,12 +374,10 @@ void BOARD_ConfigMPU(void)
     MPU->RBAR = ARM_MPU_RBAR(12, 0x42000000);
     MPU->RASR = ARM_MPU_RASR(0, ARM_MPU_AP_FULL, 2, 0, 0, 0, 0, ARM_MPU_REGION_SIZE_1MB);
 
-#if 0
     /* Region 13: NULL pointer guard */
     /* Protect 1024 bytes at address 0x00000000 to catch NULL pointer usage as ITCM start at 0x400 */
     MPU->RBAR = ARM_MPU_RBAR(13, 0x00000000U);
     MPU->RASR = ARM_MPU_RASR(1, ARM_MPU_AP_NONE, 0, 0, 0, 0, 0, ARM_MPU_REGION_SIZE_1KB);
-#endif
 
     /* Enable MPU */
     ARM_MPU_Enable(MPU_CTRL_PRIVDEFENA_Msk);
