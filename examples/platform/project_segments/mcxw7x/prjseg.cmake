@@ -7,7 +7,6 @@
 # - prjseg Kconfig must be evaluated before mcux_add_source/mcux_add_include.
 # - Do not refactor into helper functions or use globbing.
 
-if(CONFIG_CHIP_NXP_PLATFORM_MCXW71 OR CONFIG_CHIP_NXP_PLATFORM_MCXW72)
 if(CONFIG_MCUX_PRJSEG_module.board.matter.board)
     mcux_add_source(
         BASE_PATH ${SdkRootDirPath}/examples/_common/project_segments/wireless/wireless_mcu
@@ -79,5 +78,4 @@ if(CONFIG_MCUX_PRJSEG_module.board.matter.board)
         examples/_common/project_segments/wireless/wireless_mcu/ext_flash
         examples/_common/project_segments/wireless/wireless_mcu/low_power
     )
-endif()
 endif()
