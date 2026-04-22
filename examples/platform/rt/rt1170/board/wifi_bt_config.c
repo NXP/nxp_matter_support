@@ -25,11 +25,11 @@
  ******************************************************************************/
 #ifdef WIFI_BT_USE_M2_INTERFACE
 extern uint32_t BOARD_USDHC1ClockConfiguration(void);
-extern void BOARD_SDCardDAT3PullFunction(uint32_t status);
 #if __CORTEX_M == 7
 extern void BOARD_USDHC_Errata(void);
 #endif
 #endif
+extern void BOARD_SDCardDAT3PullFunction(uint32_t status);
 
 /*******************************************************************************
  * Variables
@@ -43,7 +43,6 @@ AT_NONCACHEABLE_SECTION_ALIGN(static uint32_t s_sdmmcHostDmaBuffer[BOARD_SDMMC_H
 SDK_ALIGN(static uint8_t s_sdmmcCacheLineAlignBuffer[BOARD_SDMMC_DATA_BUFFER_ALIGN_SIZE * 2U], BOARD_SDMMC_DATA_BUFFER_ALIGN_SIZE);
 #endif
 
-static sd_detect_card_t s_cd;
 static sd_io_voltage_t s_ioVoltage = {
     .type = BOARD_SDMMC_SD_IO_VOLTAGE_CONTROL_TYPE,
     .func = NULL,
@@ -52,6 +51,8 @@ static sd_io_voltage_t s_ioVoltage = {
 static sdmmchost_t s_host;
 static sdio_card_int_t s_sdioInt;
 #endif
+
+static sd_detect_card_t s_cd;
 
 /*******************************************************************************
  * Code
