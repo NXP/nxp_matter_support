@@ -7,8 +7,10 @@
 
 #include "ELSFactoryData.h"
 
-#if !CONFIG_CHIP_CRYPTO_PSA
-#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT)
+#include <inttypes.h>
+#include <mbedtls/version.h>
+
+#if defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT) && !defined(__ZEPHYR__) && !defined(CONFIG_CHIP_CRYPTO_PSA)
 #include "els_pkc_mbedtls.h"
 
 #define ELS_MUTEX_UNLOCK() (void) mcux_els_mutex_unlock()
@@ -16,11 +18,13 @@
 #else
 #define ELS_MUTEX_UNLOCK()
 #define ELS_MUTEX_LOCK()
-#endif /* defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT) */
-#else
-#define ELS_MUTEX_UNLOCK()
-#define ELS_MUTEX_LOCK()
-#endif /* !CONFIG_CHIP_CRYPTO_PSA */
+#endif /* defined(MBEDTLS_THREADING_C) && defined(MBEDTLS_THREADING_ALT) && !defined(__ZEPHYR__) &&                                \
+          !defined(CONFIG_CHIP_CRYPTO_PSA) */
+
+#ifdef __ZEPHYR__
+#include <zephyr/kernel.h>
+#define PRINTF(...) printk(__VA_ARGS__)
+#endif /* __ZEPHYR__ */
 
 void write_uint32_msb_first(uint8_t * pos, uint32_t data)
 {
@@ -254,7 +258,7 @@ status_t els_keygen(mcuxClEls_KeyIndex_t key_index, uint8_t * public_key, size_t
 
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_EccKeyGen_Async) != token) || (MCUXCLELS_STATUS_OK_WAIT != result))
     {
-        PRINTF("Css_EccKeyGen_Async failed: 0x%08lx\r\n", result);
+        PRINTF("Css_EccKeyGen_Async failed: 0x%08" PRIx32 "\r\n", result);
         ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
@@ -263,7 +267,7 @@ status_t els_keygen(mcuxClEls_KeyIndex_t key_index, uint8_t * public_key, size_t
     MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(result, token, mcuxClEls_WaitForOperation(MCUXCLELS_ERROR_FLAGS_CLEAR));
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_WaitForOperation) != token) || (MCUXCLELS_STATUS_OK != result))
     {
-        PRINTF("Css_EccKeyGen_Async WaitForOperation failed: 0x%08lx\r\n", result);
+        PRINTF("Css_EccKeyGen_Async WaitForOperation failed: 0x%08" PRIx32 "\r\n", result);
         ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
@@ -419,6 +423,7 @@ static status_t els_generate_keypair(mcuxClEls_KeyIndex_t * dst_key_index, uint8
     return STATUS_SUCCESS;
 }
 
+#if (MBEDTLS_VERSION_NUMBER < 0x04000000)
 static status_t els_get_random(unsigned char * out, size_t out_size)
 {
     ELS_MUTEX_LOCK();
@@ -426,7 +431,7 @@ static status_t els_get_random(unsigned char * out, size_t out_size)
     MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(result, token, mcuxClCss_Rng_DrbgRequest_Async(out, out_size));
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClCss_Rng_DrbgRequest_Async) != token) || (MCUXCLELS_STATUS_OK_WAIT != result))
     {
-        PRINTF("mcuxClCss_Rng_DrbgRequest_Async failed: 0x%08lx\r\n", result);
+        PRINTF("mcuxClCss_Rng_DrbgRequest_Async failed: 0x%08" PRIx32 "\r\n", result);
         ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
@@ -435,7 +440,7 @@ static status_t els_get_random(unsigned char * out, size_t out_size)
     MCUX_CSSL_FP_FUNCTION_CALL_BEGIN(result, token, mcuxClCss_WaitForOperation(MCUXCLCSS_ERROR_FLAGS_CLEAR));
     if ((MCUX_CSSL_FP_FUNCTION_CALLED(mcuxClEls_WaitForOperation) != token) || (MCUXCLELS_STATUS_OK != result))
     {
-        PRINTF("Css_EccKeyGen_Async WaitForOperation failed: 0x%08lx\r\n", result);
+        PRINTF("Css_EccKeyGen_Async WaitForOperation failed: 0x%08" PRIx32 "\r\n", result);
         ELS_MUTEX_UNLOCK();
         return STATUS_ERROR_GENERIC;
     }
@@ -453,6 +458,7 @@ static int get_random_mbedtls_callback(void * ctx, unsigned char * out, size_t o
     }
     return 0;
 }
+#endif /* (MBEDTLS_VERSION_NUMBER < 0x04000000) */
 
 static status_t host_perform_key_agreement(const uint8_t * public_key, size_t public_key_size, uint8_t * shared_secret,
                                            size_t * shared_secret_size)
@@ -464,6 +470,49 @@ static status_t host_perform_key_agreement(const uint8_t * public_key, size_t pu
 
     status_t status = STATUS_SUCCESS;
 
+#if (MBEDTLS_VERSION_NUMBER >= 0x04000000)
+    /* mbedTLS 4.x - Use PSA Crypto API */
+    psa_status_t psa_status;
+    psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
+    psa_key_id_t key_id             = 0;
+    size_t output_length            = 0;
+
+    /* Prepare uncompressed public key (0x04 || X || Y) */
+    uint8_t peer_public_key[65];
+    peer_public_key[0] = 0x04;
+    memcpy(&peer_public_key[1], public_key, public_key_size);
+
+    /* Set up key attributes for ECDH private key */
+    psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_DERIVE);
+    psa_set_key_algorithm(&attributes, PSA_ALG_ECDH);
+    psa_set_key_type(&attributes, PSA_KEY_TYPE_ECC_KEY_PAIR(PSA_ECC_FAMILY_SECP_R1));
+    psa_set_key_bits(&attributes, 256);
+
+    /* Import the private key */
+    psa_status = psa_import_key(&attributes, import_die_int_ecdh_sk, sizeof(import_die_int_ecdh_sk), &key_id);
+    if (psa_status != PSA_SUCCESS)
+    {
+        PLOG_ERROR("psa_import_key failed: 0x%08x", psa_status);
+        return STATUS_ERROR_GENERIC;
+    }
+
+    /* Perform ECDH key agreement */
+    psa_status = psa_raw_key_agreement(PSA_ALG_ECDH, key_id, peer_public_key, sizeof(peer_public_key), shared_secret,
+                                       *shared_secret_size, &output_length);
+
+    psa_destroy_key(key_id);
+
+    if (psa_status != PSA_SUCCESS)
+    {
+        PLOG_ERROR("psa_raw_key_agreement failed: 0x%08x", psa_status);
+        return STATUS_ERROR_GENERIC;
+    }
+
+    *shared_secret_size = output_length;
+    PLOG_DEBUG_BUFFER("shared_secret", shared_secret, *shared_secret_size);
+
+#else
+    /* mbedTLS 3.x - Use legacy API */
     int ret = 0;
     mbedtls_ecp_group grp;
     mbedtls_ecp_point qB;
@@ -499,7 +548,14 @@ static status_t host_perform_key_agreement(const uint8_t * public_key, size_t pu
 
     mbedtls_mpi_write_binary(&zA, shared_secret, *shared_secret_size);
     PLOG_DEBUG_BUFFER("shared_secret", shared_secret, *shared_secret_size);
+
 exit:
+    mbedtls_ecp_group_free(&grp);
+    mbedtls_ecp_point_free(&qB);
+    mbedtls_mpi_free(&dA);
+    mbedtls_mpi_free(&zA);
+#endif
+
     return status;
 }
 
@@ -586,7 +642,47 @@ static status_t host_wrap_key(const uint8_t * data, size_t data_size, const uint
                               size_t * output_size)
 {
     status_t status = STATUS_SUCCESS;
-    int ret         = 0;
+
+#if (MBEDTLS_VERSION_NUMBER >= 0x04000000)
+    /* mbedTLS 4.x uses PSA Crypto API for NIST KW */
+    psa_key_attributes_t attributes = PSA_KEY_ATTRIBUTES_INIT;
+    psa_key_id_t key_id             = 0;
+    psa_status_t psa_status;
+    size_t output_length = 0;
+
+    /* Set up key attributes for AES key wrap */
+    psa_set_key_usage_flags(&attributes, PSA_KEY_USAGE_EXPORT | PSA_KEY_USAGE_ENCRYPT);
+    psa_set_key_algorithm(&attributes, PSA_ALG_ECB_NO_PADDING);
+    psa_set_key_type(&attributes, PSA_KEY_TYPE_AES);
+    psa_set_key_bits(&attributes, key_size * 8);
+
+    /* Import the wrapping key */
+    psa_status = psa_import_key(&attributes, key, key_size, &key_id);
+    if (psa_status != PSA_SUCCESS)
+    {
+        PLOG_ERROR("psa_import_key failed: 0x%08x", psa_status);
+        status = STATUS_ERROR_GENERIC;
+        goto exit;
+    }
+
+    /* Perform NIST KW wrap */
+    psa_status = mbedtls_nist_kw_wrap(key_id, MBEDTLS_KW_MODE_KW, data, data_size, output, *output_size, &output_length);
+    if (psa_status != PSA_SUCCESS)
+    {
+        PLOG_ERROR("mbedtls_nist_kw_wrap failed: 0x%08x", psa_status);
+        psa_destroy_key(key_id);
+        status = STATUS_ERROR_GENERIC;
+        goto exit;
+    }
+
+    *output_size = output_length;
+    PLOG_DEBUG_BUFFER("wrapped buffer", output, *output_size);
+
+    psa_destroy_key(key_id);
+
+#else
+    /* mbedTLS 3.x legacy API */
+    int ret = 0;
     mbedtls_nist_kw_context ctx;
     mbedtls_nist_kw_init(&ctx);
     ret = mbedtls_nist_kw_setkey(&ctx, MBEDTLS_CIPHER_ID_AES, key, key_size * 8, true);
@@ -596,6 +692,11 @@ static status_t host_wrap_key(const uint8_t * data, size_t data_size, const uint
     PLOG_DEBUG_BUFFER("wrapped buffer", output, *output_size);
 exit:
     mbedtls_nist_kw_free(&ctx);
+#endif
+
+#if (MBEDTLS_VERSION_NUMBER >= 0x04000000)
+exit:
+#endif
     return status;
 }
 
@@ -891,13 +992,10 @@ exit:
 static size_t get_len_custom(const unsigned char * p)
 {
     size_t len = 0U;
-    size_t i   = 0U;
 
-    while (i <= MAX_TLV_BYTE_LENGTH)
+    if (p == NULL)
     {
-        if (p + i == NULL)
-            return 0;
-        i++;
+        return 0;
     }
 
     if ((*p & 0x80) == 0U)
@@ -1349,37 +1447,6 @@ status_t import_el2go_key_in_els(const uint8_t * blob, size_t blob_size, mcuxClE
     STATUS_SUCCESS_OR_EXIT_MSG("delete_el2go_die_keys failed: 0x%08x", status);
 
 exit:
-    return status;
-}
-
-static status_t export_public_key_from_cert(const uint8_t * cert, size_t cert_size, uint8_t * public_key, size_t public_key_size,
-                                            size_t * public_key_length)
-{
-    status_t status = STATUS_SUCCESS;
-    int mbedtls_status;
-    mbedtls_x509_crt client_cert                       = { 0 };
-    char outBuf[128]                                   = { '\0' };
-    uint8_t temp_buf[MBEDTLS_PK_ECP_PUB_DER_MAX_BYTES] = { 0U };
-
-    mbedtls_x509_crt_init(&client_cert);
-
-    ASSERT_OR_EXIT_MSG(cert != NULL, "cert is NULL");
-    ASSERT_OR_EXIT_MSG(public_key != NULL, "public_key is NULL");
-    ASSERT_OR_EXIT_MSG(public_key_length != NULL, "public_key_length is NULL");
-
-    mbedtls_status = mbedtls_x509_crt_parse_der(&client_cert, cert, cert_size);
-    ASSERT_OR_EXIT_MSG(mbedtls_status == 0, "Error in parsing the client certificate");
-
-    uint8_t * ptr = temp_buf + sizeof(temp_buf);
-    int len       = mbedtls_pk_write_pubkey(&ptr, temp_buf, &client_cert.pk);
-
-    ASSERT_OR_EXIT_MSG(len >= 0, "Issue in size of extracted public key");
-    *public_key_length = len - 1;
-    ASSERT_OR_EXIT_MSG(*public_key_length <= public_key_size, "Issue in size of extracted public key");
-
-    memcpy(public_key, ptr + 1, *public_key_length);
-exit:
-    mbedtls_x509_crt_free(&client_cert);
     return status;
 }
 

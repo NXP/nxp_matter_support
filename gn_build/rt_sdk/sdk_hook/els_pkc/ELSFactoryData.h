@@ -8,8 +8,14 @@
 #ifndef __ELS_FACTORY_DATA_H__
 #define __ELS_FACTORY_DATA_H__
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+#if !defined(__ZEPHYR__)
 #include <fsl_debug_console.h>
 #include <fsl_device_registers.h>
+#endif /* !defined(__ZEPHYR__) */
 
 #include "fsl_common.h"
 #include "mbedtls/bignum.h"
@@ -26,11 +32,17 @@
 #include "mcuxClHashModes_Constants.h"
 #include "mcuxClHash_Constants.h"
 
-#include "psa/crypto.h"
+#if !defined(__ZEPHYR__)
 #include "mcux_psa_defines.h"
+#endif /* !defined(__ZEPHYR__) */
+#include "psa/crypto.h"
 
 #include "mbedtls/ecdh.h"
+#if defined(__ZEPHYR__)
+#include "mbedtls/private/entropy.h"
+#else
 #include "mbedtls/entropy.h"
+#endif /* defined(__ZEPHYR__) */
 #include "mbedtls/nist_kw.h"
 #include "mbedtls/x509_crt.h"
 
@@ -194,13 +206,9 @@ const uint8_t ckdf_derivation_data_wrap_in[12] = {
 
 #if CONFIG_CHIP_CRYPTO_PSA
 const mcuxClEls_KeyProp_t wrap_out_key_prop = {
-    .word = { .value = MCUXCLELS_KEYPROPERTY_VALUE_KEY_SIZE_256 |
-                       MCUXCLELS_KEYPROPERTY_VALUE_ACTIVE |
-                       MCUXCLELS_KEYPROPERTY_VALUE_KWK |
-                       MCUXCLELS_KEYPROPERTY_VALUE_PRIVILEGED |
-                       MCUXCLELS_KEYPROPERTY_VALUE_SECURE |
-                       MCUXCLELS_KEYPROPERTY_VALUE_BASE_SLOT |
-                       MCUXCLELS_KEYPROPERTY_VALUE_GENERAL_PURPOSE_SLOT }
+    .word = { .value = MCUXCLELS_KEYPROPERTY_VALUE_KEY_SIZE_256 | MCUXCLELS_KEYPROPERTY_VALUE_ACTIVE |
+                  MCUXCLELS_KEYPROPERTY_VALUE_KWK | MCUXCLELS_KEYPROPERTY_VALUE_PRIVILEGED | MCUXCLELS_KEYPROPERTY_VALUE_SECURE |
+                  MCUXCLELS_KEYPROPERTY_VALUE_BASE_SLOT | MCUXCLELS_KEYPROPERTY_VALUE_GENERAL_PURPOSE_SLOT }
 };
 const uint8_t ckdf_derivation_data_wrap_out[12] = {
     0x94, 0xbe, 0x03, 0xac, 0x8b, 0x59, 0x32, 0x45, 0x11, 0x7f, 0xf8, 0x3f,
@@ -221,8 +229,6 @@ const uint8_t ckdf_derivation_data_wrap_out[12] = {
     0x4e, 0x5f, 0x0a, 0x1c, 0x43, 0x37, 0x2c, 0xd0, 0x54, 0x8e, 0x46, 0xc9,
 };
 #endif
-
-
 
 const mcuxClEls_KeyProp_t mac_key_prop = {
     .bits =
@@ -313,4 +319,9 @@ status_t read_el2go_blob(const uint8_t * blob_area, size_t blob_area_size, size_
                          size_t * blob_length);
 status_t import_el2go_key_in_els(const uint8_t * blob, size_t blob_size, mcuxClEls_KeyIndex_t * key_index);
 status_t decrypt_el2go_cert_blob(const uint8_t * blob, size_t blob_size, uint8_t * cert, size_t cert_size, size_t * cert_length);
+
+#ifdef __cplusplus
+}
 #endif
+
+#endif /* ELS_FACTORY_DATA_H */
