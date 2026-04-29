@@ -73,6 +73,10 @@ mcux_add_configuration(
     -Wl,--wrap=_realloc_r \
     -Wl,--wrap=_free_r \
     -Wl,--wrap=_calloc_r \
+    -Wl,--wrap=pvPortMalloc \
+    -Wl,--wrap=vPortFree \
+    -Wl,--wrap=vTaskSuspendAll \
+    -Wl,--wrap=xTaskResumeAll \
     -Wl,--wrap=printf \
     -Wl,--defsym=gUseNVMLink_d=1 \
     -Wl,--defsym=lp_ram_lower_limit=0x04000000 \
