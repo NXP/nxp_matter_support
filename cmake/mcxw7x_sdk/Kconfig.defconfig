@@ -141,7 +141,7 @@ config configAPPLICATION_ALLOCATED_HEAP
 config configTOTAL_HEAP_SIZE
     default 62464 if CHIP_SE05X #0xF400
     default 131072 if NXP_ENABLE_ALIRO #0x20000
-    default 51200 #0xC800
+    default 54200 #0xD3B8
 
 choice MCUX_DEPENDENCY_COMPONENT_utility.debug_console_selection
     default MCUX_DEPENDENCY_COMPONENT_utility.debug_console_free_rtos

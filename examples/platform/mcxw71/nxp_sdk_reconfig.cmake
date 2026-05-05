@@ -179,8 +179,8 @@ if(CONFIG_CHIP_NXP_PLATFORM_MCXW72)
         mcux_add_configuration(LD "\-Wl,--defsym=lp_ram_upper_limit=0x20023418")
     else()
         # Add lp_ram_upper_limit which contains (.heap) start address + heap size, to make sure the whole RAM is retained in low power mode. 
-        # 0x20014018 (.heap start address) + 0xC800 (heap size) = 0x20020818
-        mcux_add_configuration(LD "\-Wl,--defsym=lp_ram_upper_limit=0x20020818")
+        # 0x20014018 (.heap start address) + 0xD3B8 (heap size) = 0x200213D0
+        mcux_add_configuration(LD "\-Wl,--defsym=lp_ram_upper_limit=0x200213D0")
     endif()
 endif()
 
