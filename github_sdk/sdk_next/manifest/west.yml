@@ -33,7 +33,6 @@ manifest:
                   - secure-subsystem
                   - wifi_nxp
                   - wpa_supplicant-rtos
-                  - fw_bin
                   - els_pkc
                   - mcux-devices-rt
                   - mcux-devices-mcx
@@ -63,6 +62,10 @@ manifest:
           url: https://github.com/NXP/nxp_mbedtls
           path: repo/mcuxsdk/middleware/mbedtls3x
           revision: 495d04b4093a8914380d7301c95dcddcc9eb86d2
+        - name: fw_bin
+          url: https://github.com/NXP/wifi_nb_fw
+          revision: ffb1aa7ab4592ad50e0291177c1456ebe2d0bb5d
+          path: repo/mcuxsdk/components/conn_fwloader/fw_bin
         - name: bifrost
           url: https://github.com/nxp-zephyr/bifrost
           revision: main
