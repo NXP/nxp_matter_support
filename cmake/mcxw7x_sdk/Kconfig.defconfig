@@ -138,7 +138,9 @@ endchoice
 config configAPPLICATION_ALLOCATED_HEAP
 	default y
 
+# Type need to be defined here as for now CONFIG_MCUX_COMPONENT_middleware.freertos-kernel.config is set to n for MCXW72, this KCONFIG would not exist and thus the type definition would be missing when building the samples
 config configTOTAL_HEAP_SIZE
+    int "configTOTAL_HEAP_SIZE"
     default 62464 if CHIP_SE05X #0xF400
     default 131072 if NXP_ENABLE_ALIRO #0x20000
     default 54200 #0xD3B8
