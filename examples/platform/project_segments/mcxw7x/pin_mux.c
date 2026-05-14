@@ -1220,16 +1220,16 @@ void BOARD_InitPins(void)
     CLOCK_SetIpSrc(kCLOCK_Lpi2c1, kCLOCK_IpSrcFro192M);
     CLOCK_SetIpSrcDiv(kCLOCK_Lpi2c1, kSCG_SysClkDivBy16);
     
-    /*Init SE ENA pin, use PTC1*/
+    /*Init SE ENA pin, use PTC0*/
     CLOCK_EnableClock(kCLOCK_GpioC);
     CLOCK_EnableClock(kCLOCK_PortC);
 	
-    gpio_pin_config_t PTC1 = {
+    gpio_pin_config_t PTC0 = {
         .pinDirection = kGPIO_DigitalOutput,
         .outputLogic = 0U 
     };
-    /* Initialize GPIO functionality on pin PTC1 (pin 38)  */
-    GPIO_PinInit(GPIOC, 1, &PTC1);
+    /* Initialize GPIO functionality on pin PTC0 (pin 37)  */
+    GPIO_PinInit(GPIOC, 0, &PTC0);
 
     const port_pin_config_t SE_ENA = {/* Internal pull-up/down resistor is disabled */
                                         .pullSelect = (uint16_t)kPORT_PullDisable,
@@ -1242,17 +1242,17 @@ void BOARD_InitPins(void)
                                         /* Open drain output is disabled */
                                         .openDrainEnable = (uint16_t)kPORT_OpenDrainDisable,
                                         /* Low drive strength is configured */
-                                        .driveStrength = (uint16_t)kPORT_LowDriveStrength,
+                                        .driveStrength = (uint16_t)kPORT_HighDriveStrength,
                                         /* Normal drive strength is configured */
-                                        .driveStrength1 = (uint16_t)kPORT_NormalDriveStrength,
-                                        /* Pin is configured as PTC1 */
+                                        .driveStrength1 = (uint16_t)kPORT_DoubleDriveStrength,
+                                        /* Pin is configured as PTC0 */
                                         .mux = (uint16_t)kPORT_MuxAsGpio,
                                         /* Digital input is not inverted */
                                         .invertInput = (uint16_t)kPORT_InputNormal,
                                         /* Pin Control Register fields [15:0] are not locked */
                                         .lockRegister = (uint16_t)kPORT_UnlockRegister};
-    /* PORTC1 (pin 38) is configured as PTC1 */
-    PORT_SetPinConfig(PORTC, 1, &SE_ENA);
+    /* PORTC1 (pin 37) is configured as PTC0 */
+    PORT_SetPinConfig(PORTC, 0, &SE_ENA);
 #endif
 }
 /***********************************************************************************************************************
