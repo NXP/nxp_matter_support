@@ -1241,9 +1241,9 @@ void BOARD_InitPins(void)
                                         .passiveFilterEnable = (uint16_t)kPORT_PassiveFilterDisable,
                                         /* Open drain output is disabled */
                                         .openDrainEnable = (uint16_t)kPORT_OpenDrainDisable,
-                                        /* Low drive strength is configured */
+                                        /* High drive strength is configured */
                                         .driveStrength = (uint16_t)kPORT_HighDriveStrength,
-                                        /* Normal drive strength is configured */
+                                        /* Double drive strength is configured */
                                         .driveStrength1 = (uint16_t)kPORT_DoubleDriveStrength,
                                         /* Pin is configured as PTC0 */
                                         .mux = (uint16_t)kPORT_MuxAsGpio,
@@ -1251,7 +1251,7 @@ void BOARD_InitPins(void)
                                         .invertInput = (uint16_t)kPORT_InputNormal,
                                         /* Pin Control Register fields [15:0] are not locked */
                                         .lockRegister = (uint16_t)kPORT_UnlockRegister};
-    /* PORTC1 (pin 37) is configured as PTC0 */
+    /* PORTC0 (pin 37) is configured as PTC0 */
     PORT_SetPinConfig(PORTC, 0, &SE_ENA);
 #endif
 }
