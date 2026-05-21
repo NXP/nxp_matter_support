@@ -66,7 +66,13 @@ mcux_add_configuration(
     -Wl,--wrap=printf \
     -Wl,--defsym=gUseNVMLink_d=1 \
     -Wl,--defsym=lp_ram_lower_limit=0x04000000 \
+    -Wl,--defsym=gNvmSectors=6 \
 ")
+# Increased from 4 to 6 sectors to fix storage exhaustion on lighting-app (MATTER-4213).
+# The lighting-app enables the Groups cluster (+ GroupKeyManagement), which requires more
+# group key sets per fabric than other apps (e.g. contact-sensor, lock-app). The previous
+# 4-sector allocation (32 KB) was insufficient to store all KVS entries during TC_RR testing.
+# Analysis showed even contact-sensor is close to the limit, so 6 sectors is applied globally.
 
 # Note: <lp_ram_lower_limit> and <lp_ram_upper_limit> are used by the
 #       connectivity framework in order to calculate which RAM banks
