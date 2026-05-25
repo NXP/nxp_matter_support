@@ -80,4 +80,10 @@ config FLASH_LOAD_OFFSET
 	default 0x20000 if CHIP_OTA_REQUESTOR
 	default 0x400
 
+# DAC_EL2GO_BLOB has over 500 bytes (psa_import_key(DAC_EL2GO_BLOB))
+if CHIP_MBEDTLS_3X
+config SECURE_STORAGE_ITS_MAX_DATA_SIZE
+	default 1024
+endif
+
 endif # CHIP_NXP_PLATFORM_RW61X
