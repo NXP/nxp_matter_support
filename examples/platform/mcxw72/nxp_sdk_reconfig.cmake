@@ -95,6 +95,9 @@ mcux_add_macro(
     gUnmirroredFeatureSet_d=1
     gNvFragmentation_Enabled_d=1
     MULTICORE_APP=1
+    # We need a 2MB external flash partition for OTA in order to support
+    # simultaneous update of host application + NBU
+    BOARD_OtaExtStoragePartitionKbSize_c=2048
 )
 
 # TODO core defines. Check if all are needed
