@@ -70,7 +70,7 @@ choice MCUX_PRJSEG_module.board.clock_sel
 endchoice
 
 config gMainThreadStackSize_c
-    default 9000 if CHIP_SE05X # SE05X requires additional stack for crypto operations
+    default 10000 if CHIP_SE05X # SE05X requires additional stack for crypto operations due to additional middleware apdu buffers
     default 6192 # Base stack size for standard operations
 
 config gMainThreadPriority_c
