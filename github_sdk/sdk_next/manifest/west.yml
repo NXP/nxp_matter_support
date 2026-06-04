@@ -11,7 +11,6 @@ manifest:
           import:
               name-allowlist:
                   - mcux-sdk-middleware-connectivity-framework
-                  - mcu-sdk-examples
                   - freertos-kernel
                   - mcux-freertos-drivers
                   - mcux-devices-wireless
@@ -66,6 +65,10 @@ manifest:
           url: https://github.com/NXP/wifi_nb_fw
           revision: ffb1aa7ab4592ad50e0291177c1456ebe2d0bb5d
           path: repo/mcuxsdk/components/conn_fwloader/fw_bin
+        - name: mcu-sdk-examples
+          url: https://github.com/nxp-mcuxpresso/mcuxsdk-examples
+          path: repo/mcuxsdk/examples
+          revision: e0ed3ff4e81a77fc7ce15c1514ca1500df2644f3
         - name: bifrost
           url: https://github.com/nxp-zephyr/bifrost
           revision: main
