@@ -70,7 +70,7 @@ choice MCUX_PRJSEG_module.board.clock_sel
 endchoice
 
 config gMainThreadStackSize_c
-    default 10000 if CHIP_SE05X # SE05X requires additional stack for crypto operations due to additional middleware apdu buffers
+    default 13312 if CHIP_SE05X # SE05X requires additional stack for EC key operations and SCP03 secure sessions, which need extensive APDU and buffer allocations for each transaction
     default 6192 # Base stack size for standard operations
 
 config gMainThreadPriority_c
@@ -141,7 +141,7 @@ config configAPPLICATION_ALLOCATED_HEAP
 # Type need to be defined here as for now CONFIG_MCUX_COMPONENT_middleware.freertos-kernel.config is set to n for MCXW72, this KCONFIG would not exist and thus the type definition would be missing when building the samples
 config configTOTAL_HEAP_SIZE
     int "configTOTAL_HEAP_SIZE"
-    default 62464 if CHIP_SE05X #0xF400
+    default 66560 if CHIP_SE05X #0x10400
     default 131072 if NXP_ENABLE_ALIRO #0x20000
     default 54200 #0xD3B8
 
