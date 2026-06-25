@@ -19,7 +19,6 @@ manifest:
                   - fatfs
                   - ethermind
                   - mbedtls3x
-                  - lwip
                   - littlefs
                   - ble_controller
                   - bluetooth
@@ -81,6 +80,10 @@ manifest:
           url: https://github.com/nxp-mcuxpresso/mcux-sdk-middleware-ieee_802.15.4
           path: repo/mcuxsdk/middleware/wireless/ieee-802.15.4
           revision: 511d1c09302f586da973deaefd43144d30aba762
+        - name: lwip
+          url: https://github.com/nxp-mcuxpresso/lwip
+          path: repo/mcuxsdk/middleware/lwip
+          revision: ddc007e9302d00c7ad026c2384724c2e0d82637d
         - name: bifrost
           url: https://github.com/nxp-zephyr/bifrost
           revision: main
