@@ -153,6 +153,21 @@ template("rw61x_sdk_drivers") {
 
       #SDK hooks
       "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/els_pkc",
+
+      "${nxp_sdk_root}/arch/arm/CMSIS/Core/Include",
+      "${nxp_sdk_root}/arch/arm/CMSIS/Core/Include/m-profile",
+
+      # conn_fwloader fw_bin includes for all chip variants
+      "${nxp_sdk_root}/components/conn_fwloader/fw_bin",
+      "${nxp_sdk_root}/components/conn_fwloader/fw_bin/8987",
+      "${nxp_sdk_root}/components/conn_fwloader/fw_bin/IW416",
+      "${nxp_sdk_root}/components/conn_fwloader/fw_bin/iw610x",
+      "${nxp_sdk_root}/components/conn_fwloader/fw_bin/nw61x",
+      "${nxp_sdk_root}/components/conn_fwloader/fw_bin/script",
+      "${nxp_sdk_root}/components/conn_fwloader/fw_bin/inc/8987",
+      "${nxp_sdk_root}/components/conn_fwloader/fw_bin/inc/IW416",
+      "${nxp_sdk_root}/components/conn_fwloader/fw_bin/inc/iw610x",
+      "${nxp_sdk_root}/components/conn_fwloader/fw_bin/inc/nw61x",
     ]
     
 if(!custom_flash_driver){
@@ -191,14 +206,37 @@ if(!custom_flash_driver){
       "FFU_CNS_TX_PWR_TABLE_CALIBRATION=1",
       "USE_RTOS=1",
       "BOOT_HEADER_ENABLE=1",
-      "WIFI_BOARD_RW610",
 
       # This allows the CPU1/CPU2 fw to be embedded in the application
       "gPlatformMonolithicApp_d=1",
       "CONFIG_MONOLITHIC_WIFI=1",
       "RW610",
+      "RW612_SERIES=1",
       "CONFIG_SOC_SERIES_RW6XX_REVISION_A2=1",
+
+      # MCUXpresso SDK meta-build flag
+      "MCUX_META_BUILD",
+
+      # Flash base address for mflash_file.c
+      "MFLASH_FILE_BASEADDR=7340032",
+
+      # Debug console type
+      "SDK_DEBUGCONSOLE_UART",
+
+      # Timer port type for Matter platform
+      "TIMER_PORT_TYPE_MRT=1",
+
+      # NVS flash config: use external flash only
+      "gAppNvsExternalFlash_c=1",
+      "gAppNvsInternalFlash_c=0",
     ]
+
+    # Board-specific WiFi define
+    if (board == "frdmrw612") {
+      defines += [ "WIFI_BOARD_FRDM_RW61X" ]
+    } else {
+      defines += [ "WIFI_BOARD_RW610" ]
+    }
 
     if(!chip_enable_thread)
     {
@@ -220,8 +258,6 @@ if(!custom_flash_driver){
       defines += [
         # needed to compile els_pkc port for mbedtls
         "MBEDTLS_MCUX_ELS_PKC_API",
-        # needed for S50 secure DAC key implementation
-        "MBEDTLS_NIST_KW_C",
       ]
 
       _rw61x_sdk_drivers_include_dirs += [
@@ -287,9 +323,9 @@ if(!custom_flash_driver){
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClKey/inc/internal",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClMemory/inc/internal",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/inc/internal",
-        "${nxp_sdk_root}/middleware/mbedtls/port/pkc",
+        # port/pkc alt files removed in mbedtls3x - PSA driver handles pkc operations
         # fw binaries for cpu1/cpu2 initialization
-        "${FW_BINS_PATH}/../inc"
+        "${FW_BINS_PATH}/../inc/rw61x"
       ]
     }
 
@@ -337,6 +373,10 @@ if(!custom_flash_driver){
       "-Wno-cpp",
       "-Wno-int-conversion",
       "-Wno-error",
+    ]
+
+    cflags += [
+      "-include" + rebase_path("${nxp_sdk_root}/examples/_boards/${board}/monolithic_config.h", root_build_dir),
     ]
 
     # Now add our "system-header" include dirs
@@ -580,6 +620,7 @@ if(!custom_flash_driver){
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_GenerateProbablePrime.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_KeyGeneration_Crt.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_KeyGeneration_Crt_FUP.c",
+        "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_KeyGeneration_Helper.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_KeyGeneration_Plain.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_Mgf1.c",
         "${ELS_PKC_CL_PATH}/src/comps/mcuxClRsa/src/mcuxClRsa_MillerRabinTest.c",

@@ -107,8 +107,12 @@
 #define MBEDTLS_THREADING_ALT
 #endif
 
+#ifndef MBEDTLS_PSA_CRYPTO_C
 #define MBEDTLS_PSA_CRYPTO_C            1
+#endif
+#ifndef MBEDTLS_PSA_CRYPTO_CONFIG
 #define MBEDTLS_PSA_CRYPTO_CONFIG       1
+#endif
 
 #define MBEDTLS_USE_PSA_CRYPTO
 

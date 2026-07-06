@@ -28,18 +28,53 @@ import(
 import("${nxp_sdk_build_root}/nxp_sdk.gni")
 
 import("${nxp_sdk_build_root}/mbedtls/mbedtls.gni")
-rt_mbedtls_root = "${nxp_sdk_root}/middleware/mbedtls"
+rt_mbedtls_root = "${nxp_sdk_root}/middleware/mbedtls3x"
+
+_psa_driver_root = "${nxp_sdk_root}/components/psa_crypto_driver"
+_els_pkc_root = "${nxp_sdk_root}/components/els_pkc"
 
 config("mbedtls_els_pkc_config") {
   include_dirs = [
-    "${rt_mbedtls_root}/port/els",
-    "${rt_mbedtls_root}/port/pkc",
+    # PSA crypto driver top-level (els_pkc_driver.h lives here)
+    "${_psa_driver_root}/els_pkc",
+    # PSA crypto driver includes
+    "${_psa_driver_root}/els_pkc/include/common",
+    "${_psa_driver_root}/els_pkc/include/transparent",
+    "${_psa_driver_root}/els_pkc/include/opaque",
+    "${_psa_driver_root}/els_pkc/oracle/inc",
+    "${_psa_driver_root}/els_pkc/oracle/platforms/rw61x",
+    "${_psa_driver_root}/osal",
+    "${_psa_driver_root}/osal/frtos",
+    # els_pkc component includes
+    "${_els_pkc_root}",
+    "${_els_pkc_root}/includes/platform/rw61x",
+    "${_els_pkc_root}/src/compiler",
+    "${_els_pkc_root}/src/inc",
+    "${_els_pkc_root}/src/platforms/rw61x",
+    "${_els_pkc_root}/src/platforms/rw61x/inc",
+    "${_els_pkc_root}/src/comps/mcuxClPsaDriver/inc",
+    "${_els_pkc_root}/src/comps/mcuxClPsaDriver/inc/internal",
+    # mbedtls3x port directory (hw_init, rng, psa_its headers)
+    "${rt_mbedtls_root}/port",
+    # GN build config directory
     "${nxp_sdk_build_root}/mbedtls/config",
+    # secure_storage ITS include dirs (provides psa/internal_trusted_storage.h)
+    "${nxp_sdk_root}/middleware/secure_storage/include",
+    "${nxp_sdk_root}/middleware/secure_storage/zephyr/subsys/secure_storage/include",
+    "${nxp_sdk_root}/middleware/secure_storage/zephyr/subsys/secure_storage/include/internal",
   ]
-  defines = [ 
-    "MBEDTLS_PORT_INCLUDE=<els_pkc_mbedtls.h>",
-    "MBEDTLS_CONFIG_FILE=<els_pkc_mbedtls_config.h>",
-    "MBEDTLS_USER_CONFIG_FILE=<nxp_matter_mbedtls_config.h>",
+  defines = [
+    "MBEDTLS_CONFIG_FILE=<nxp_matter_mbedtls_config.h>",
+    "MBEDTLS_PSA_CRYPTO_CONFIG_FILE=<rw61x_matter_mbedtls_config.h>",
+    # Required by psa_crypto_driver/osal/threading_alt.h to select MbedTLS 3.x path
+    "CONFIG_USING_MBEDTLS_3X=1",
+    # Use TRNG path in mcux_psa_els_pkc_entropy.c (avoids ELS PRNG macros)
+    "MBEDTLS_MCUX_USE_TRNG_AS_ENTROPY_SEED=1",
+    # Enable ELS PKC API in mbedtls port
+    "MBEDTLS_MCUX_ELS_PKC_API=1",
+    # PSA threading driver enable
+    "PSA_CRYPTO_DRIVER_THREAD_EN=1",
+    "PSA_CRYPTO_DRIVER_ELS_PKC=1",
   ]
 }
 
@@ -48,26 +83,52 @@ mbedtls_target("nxp_els_pkc_mbedtls") {
   public_configs = [ ":mbedtls_els_pkc_config" ]
   public_deps = [ nxp_sdk_driver_target ]
   sources += [
-    # els port
-    "${rt_mbedtls_root}/port/els/aes_alt.c",
-    "${rt_mbedtls_root}/port/els/cbc_mac_alt.c",
-    "${rt_mbedtls_root}/port/els/cmac_alt.c",
-    "${rt_mbedtls_root}/port/els/ctr_drbg_alt.c",
-    "${rt_mbedtls_root}/port/els/els_mbedtls.c",
-    "${rt_mbedtls_root}/port/els/entropy_poll_alt.c",
-    "${rt_mbedtls_root}/port/els/gcm_alt.c",
-    "${rt_mbedtls_root}/port/els/sha256_alt.c",
-    "${rt_mbedtls_root}/port/els/sha512_alt.c",
+    # PSA crypto driver - oracle
+    "${_psa_driver_root}/els_pkc/oracle/src/mcuxClPsaDriver_Oracle.c",
+    "${_psa_driver_root}/els_pkc/oracle/src/mcuxClPsaDriver_Oracle_ElsUtils.c",
+    "${_psa_driver_root}/els_pkc/oracle/src/mcuxClPsaDriver_Oracle_Utils.c",
 
-    # pkc port
-    "${rt_mbedtls_root}/port/pkc/ecc_alt.c",
-    "${rt_mbedtls_root}/port/pkc/ecdh_alt.c",
-    "${rt_mbedtls_root}/port/pkc/ecdsa_alt.c",
-    "${rt_mbedtls_root}/port/pkc/els_pkc_mbedtls.c",
-    "${rt_mbedtls_root}/port/pkc/rsa_alt.c",
+    # PSA crypto driver - common
+    "${_psa_driver_root}/els_pkc/src/common/mcux_psa_els_pkc_common_init.c",
+    "${_psa_driver_root}/els_pkc/src/common/mcux_psa_els_pkc_entropy.c",
+
+    # PSA crypto driver - opaque
+    "${_psa_driver_root}/els_pkc/src/opaque/mcux_psa_els_pkc_opaque_aead.c",
+    "${_psa_driver_root}/els_pkc/src/opaque/mcux_psa_els_pkc_opaque_asymmetric_signature.c",
+    "${_psa_driver_root}/els_pkc/src/opaque/mcux_psa_els_pkc_opaque_cipher.c",
+    "${_psa_driver_root}/els_pkc/src/opaque/mcux_psa_els_pkc_opaque_init.c",
+    "${_psa_driver_root}/els_pkc/src/opaque/mcux_psa_els_pkc_opaque_key_generation.c",
+    "${_psa_driver_root}/els_pkc/src/opaque/mcux_psa_els_pkc_opaque_mac.c",
+
+    # PSA crypto driver - transparent
+    "${_psa_driver_root}/els_pkc/src/transparent/mcux_psa_els_pkc_aead.c",
+    "${_psa_driver_root}/els_pkc/src/transparent/mcux_psa_els_pkc_asymmetric_signature.c",
+    "${_psa_driver_root}/els_pkc/src/transparent/mcux_psa_els_pkc_cipher.c",
+    "${_psa_driver_root}/els_pkc/src/transparent/mcux_psa_els_pkc_hash.c",
+    "${_psa_driver_root}/els_pkc/src/transparent/mcux_psa_els_pkc_init.c",
+    "${_psa_driver_root}/els_pkc/src/transparent/mcux_psa_els_pkc_key_generation.c",
+    "${_psa_driver_root}/els_pkc/src/transparent/mcux_psa_els_pkc_mac.c",
+
+    # PSA crypto driver - OSAL (FreeRTOS threading)
+    "${_psa_driver_root}/osal/frtos/osal_mutex.c",
+    "${_psa_driver_root}/osal/frtos/threading_alt.c",
 
     # els_pkc SDK hook
-    "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/els_pkc/ELSFactoryData.c",
+    #"${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/els_pkc/ELSFactoryData.c",
+
+    # mcuxClPsaDriver internal implementation files
+    "${_els_pkc_root}/src/comps/mcuxClPsaDriver/src/mcuxClPsaDriver_Aead.c",
+    "${_els_pkc_root}/src/comps/mcuxClPsaDriver/src/mcuxClPsaDriver_Cipher.c",
+    "${_els_pkc_root}/src/comps/mcuxClPsaDriver/src/mcuxClPsaDriver_DER_functions.c",
+    "${_els_pkc_root}/src/comps/mcuxClPsaDriver/src/mcuxClPsaDriver_export_public_key.c",
+    "${_els_pkc_root}/src/comps/mcuxClPsaDriver/src/mcuxClPsaDriver_generate_ecp_key.c",
+    "${_els_pkc_root}/src/comps/mcuxClPsaDriver/src/mcuxClPsaDriver_Hash.c",
+    "${_els_pkc_root}/src/comps/mcuxClPsaDriver/src/mcuxClPsaDriver_Key.c",
+    "${_els_pkc_root}/src/comps/mcuxClPsaDriver/src/mcuxClPsaDriver_Mac.c",
+    "${_els_pkc_root}/src/comps/mcuxClPsaDriver/src/mcuxClPsaDriver_Rsa.c",
+    "${_els_pkc_root}/src/comps/mcuxClPsaDriver/src/mcuxClPsaDriver_Sign.c",
+    "${_els_pkc_root}/src/comps/mcuxClPsaDriver/src/mcuxClPsaDriver_UpdateKeyStatus.c",
+    "${_els_pkc_root}/src/comps/mcuxClPsaDriver/src/mcuxClPsaDriver_Verify.c",
   ]
   if (chip_enable_thread) {
     public_deps += [ "${openthread_root}/src/core:libopenthread_core_headers" ]
@@ -85,6 +146,26 @@ group("nxp_mbedtls") {
 source_set("nxp_sdk_mbedtls_dep") {
   # Add here SDK source files which have a dependency on mbedtls
   # this approach helps avoid circular dependencies between mbedtls and rw61x_sdk_drivers targets
+
+  sources = [
+    "${nxp_sdk_root}/middleware/secure_storage/src/its/implementation_store.c",
+    "${nxp_sdk_root}/middleware/secure_storage/src/its/store/nvs_its.c",
+  ]
+
+  include_dirs = [
+    "${nxp_sdk_root}/middleware/secure_storage/include",
+    "${nxp_sdk_root}/middleware/secure_storage/zephyr/subsys/secure_storage/include",
+    "${nxp_sdk_root}/middleware/secure_storage/zephyr/subsys/secure_storage/include/internal",
+  ]
+
+  defines = [
+    "SECURE_STORAGE",
+    "SECURE_STORAGE_ITS_IMPLEMENTATION_WITH_ONLY_STORE",
+    "SECURE_STORAGE_ITS_STORE_IMPLEMENTATION_NVS",
+    "CONFIG_SECURE_STORAGE_ITS_MAX_DATA_SIZE=1024",
+    "CONFIG_SECURE_STORAGE_ITS_STORE_SETTINGS_PREFIX=\"its/\"",
+    "CONFIG_SECURE_STORAGE_ITS_STORE_SETTINGS_NAME_MAX_LEN=14",
+  ]
 
   deps = [
     "${nxp_sdk_build_root}/${nxp_sdk_name}/${rt_platform}:nxp_mbedtls",

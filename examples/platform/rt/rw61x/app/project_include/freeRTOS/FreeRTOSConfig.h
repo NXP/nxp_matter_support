@@ -46,7 +46,7 @@
 #define configUSE_TICKLESS_IDLE 0
 #define configUSE_DAEMON_TASK_STARTUP_HOOK 0
 #define configCPU_CLOCK_HZ (SystemCoreClock)
-#define configTICK_RATE_HZ ((TickType_t) 1000)
+#define configTICK_RATE_HZ ((TickType_t)1000)
 #define configMAX_PRIORITIES (10)
 
 /* stack size increased for NVM/LITTLE_FS save in idle task */
@@ -59,8 +59,9 @@
 #define configKERNEL_PROVIDED_STATIC_MEMORY 1
 #define configSUPPORT_DYNAMIC_ALLOCATION 1
 #define configFRTOS_MEMORY_SCHEME 4
-#define configMAX_TASK_NAME_LEN (16)
+#define configMAX_TASK_NAME_LEN 16
 #define configUSE_TRACE_FACILITY 1
+#define configUSE_STATS_FORMATTING_FUNCTIONS 1
 #define configUSE_16_BIT_TICKS 0
 #define configIDLE_SHOULD_YIELD 1
 #define configUSE_MUTEXES 1
@@ -151,7 +152,13 @@
 #if defined(__ICCARM__) || defined(__CC_ARM) || defined(__GNUC__)
 /* Clock manager provides in this variable system core clock frequency */
 #include <stdint.h>
+#ifdef __cplusplus
+extern "C" {
+#endif
 extern uint32_t SystemCoreClock;
+#ifdef __cplusplus
+}
+#endif
 #endif
 
 /* Interrupt nesting behaviour configuration. Cortex-M specific. */
