@@ -76,6 +76,15 @@ config("mbedtls_els_pkc_config") {
     "PSA_CRYPTO_DRIVER_THREAD_EN=1",
     "PSA_CRYPTO_DRIVER_ELS_PKC=1",
   ]
+
+  # The secure whole factory data path (ELSFactoryData.c) uses the ELS blob
+  # host helpers (host_wrap_key/host_derive_key/host_perform_key_agreement),
+  # which pull in the mbedtls software NIST_KW/CMAC/ECDH modules. Those modules
+  # are only compiled into the mbedtls port when this macro is defined, so
+  # enable it when the feature is on to avoid undefined references.
+  if (nxp_enable_secure_whole_factory_data) {
+    defines += [ "CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION=1" ]
+  }
 }
 
 mbedtls_target("nxp_els_pkc_mbedtls") {
@@ -113,9 +122,6 @@ mbedtls_target("nxp_els_pkc_mbedtls") {
     "${_psa_driver_root}/osal/frtos/osal_mutex.c",
     "${_psa_driver_root}/osal/frtos/threading_alt.c",
 
-    # els_pkc SDK hook
-    #"${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/els_pkc/ELSFactoryData.c",
-
     # mcuxClPsaDriver internal implementation files
     "${_els_pkc_root}/src/comps/mcuxClPsaDriver/src/mcuxClPsaDriver_Aead.c",
     "${_els_pkc_root}/src/comps/mcuxClPsaDriver/src/mcuxClPsaDriver_Cipher.c",
@@ -130,6 +136,17 @@ mbedtls_target("nxp_els_pkc_mbedtls") {
     "${_els_pkc_root}/src/comps/mcuxClPsaDriver/src/mcuxClPsaDriver_UpdateKeyStatus.c",
     "${_els_pkc_root}/src/comps/mcuxClPsaDriver/src/mcuxClPsaDriver_Verify.c",
   ]
+
+  # els_pkc SDK hook: provides ELS EdgeLock key/AES helpers
+  # (els_enable, ELS_Cipher_Aes_Ecb, import_die_int_wrapped_key_into_els,
+  # import_plain_key_into_els, export_key_from_els, els_delete_key) used by the
+  # secure whole factory data path. Only needed when that feature is enabled,
+  # so gate it to avoid pulling ELS symbols into the pure PSA crypto build.
+  if (nxp_enable_secure_whole_factory_data) {
+    sources += [
+      "${nxp_sdk_build_root}/${nxp_sdk_name}/sdk_hook/els_pkc/ELSFactoryData.c",
+    ]
+  }
   if (chip_enable_thread) {
     public_deps += [ "${openthread_root}/src/core:libopenthread_core_headers" ]
   }
