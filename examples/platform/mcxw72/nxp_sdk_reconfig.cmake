@@ -316,6 +316,14 @@ endif()
 # Add board files
 include(${NXP_MATTER_SUPPORT_DIR}/examples/platform/project_segments/mcxw7x/prjseg.cmake)
 
+# Early inclusion of board files so external modules (e.g. Matter/SE05X) can
+# pick up board-specific sources and includes. This is needed for freestanding
+# apps where the west export_app --bf script appends board_files.cmake too late
+# (after EXTRA_MCUX_MODULES resolution).
+if(EXISTS "${CMAKE_CURRENT_LIST_DIR}/${board}/board_files.cmake")
+    include(${CMAKE_CURRENT_LIST_DIR}/${board}/board_files.cmake)
+endif()
+
 mcux_add_source(
     BASE_PATH ${NXP_MATTER_SUPPORT_DIR}
     SOURCES
