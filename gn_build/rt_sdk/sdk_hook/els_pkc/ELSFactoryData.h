@@ -62,6 +62,10 @@ extern "C" {
 #define MAX_ELS_KEY_SIZE 32
 #define ELS_WRAP_OVERHEAD 8
 
+#ifndef CONFIG_LEGACY_WRAP_KEY_FORMAT_SUPPORT
+#define CONFIG_LEGACY_WRAP_KEY_FORMAT_SUPPORT 0
+#endif
+
 #if FACTORY_DATA_PROVIDER_LOG
 #define PLOG_ERROR(...)                                                                                                            \
     for (;;)                                                                                                                       \
@@ -204,7 +208,7 @@ const uint8_t ckdf_derivation_data_wrap_in[12] = {
     0xc8, 0xac, 0x48, 0x88, 0xa6, 0x1b, 0x3d, 0x9b, 0x56, 0xa9, 0x75, 0xe7,
 };
 
-#if CONFIG_CHIP_CRYPTO_PSA
+#if CONFIG_CHIP_CRYPTO_PSA && !CONFIG_LEGACY_WRAP_KEY_FORMAT_SUPPORT
 const mcuxClEls_KeyProp_t wrap_out_key_prop = {
     .word = { .value = MCUXCLELS_KEYPROPERTY_VALUE_KEY_SIZE_256 | MCUXCLELS_KEYPROPERTY_VALUE_ACTIVE |
                   MCUXCLELS_KEYPROPERTY_VALUE_KWK | MCUXCLELS_KEYPROPERTY_VALUE_PRIVILEGED | MCUXCLELS_KEYPROPERTY_VALUE_SECURE |

@@ -77,14 +77,6 @@ config("mbedtls_els_pkc_config") {
     "PSA_CRYPTO_DRIVER_ELS_PKC=1",
   ]
 
-  # The secure whole factory data path (ELSFactoryData.c) uses the ELS blob
-  # host helpers (host_wrap_key/host_derive_key/host_perform_key_agreement),
-  # which pull in the mbedtls software NIST_KW/CMAC/ECDH modules. Those modules
-  # are only compiled into the mbedtls port when this macro is defined, so
-  # enable it when the feature is on to avoid undefined references.
-  if (nxp_enable_secure_whole_factory_data) {
-    defines += [ "CONFIG_NXP_FACTORY_DAC_BLOB_GENERATION=1" ]
-  }
 }
 
 mbedtls_target("nxp_els_pkc_mbedtls") {
