@@ -12,6 +12,7 @@ manifest:
               name-allowlist:
                   - mcux-sdk-middleware-connectivity-framework
                   - freertos-kernel
+                  - freertos-kernel-upstream
                   - mcux-freertos-drivers
                   - mcux-devices-wireless
                   - CMSIS
@@ -36,14 +37,11 @@ manifest:
                   - mcux-devices-mcx
                   - mcux-mcmgr
                   - erpc
-                  - usb
                   - mcuboot_opensource
                   - mcu-sdk-components
                   - secure_storage
-                  - mbedtls3x
                   - fw_bin
-                  - ble_controller
-                  - ieee-802.15.4
+                  - mcuxsdk-tool-data
               path-prefix: repo
         - name: core
           url: https://github.com/nxp-mcuxpresso/mcuxsdk-core
