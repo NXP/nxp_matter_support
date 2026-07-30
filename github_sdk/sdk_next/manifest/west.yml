@@ -64,6 +64,10 @@ manifest:
           url: https://github.com/nxp-mcuxpresso/lwip
           path: repo/mcuxsdk/middleware/lwip
           revision: a5bc68f1b34f3b407a71e588bbca46091fd506a3
+        - name: zephyr_mbedtls
+          url: https://github.com/NXP/nxp_mbedtls
+          path: repo/mcuxsdk/middleware/mbedtls3x
+          revision: 8bfb34b095ded5a00e383a4c7064f793dd5d5dbf
         - name: bifrost
           url: https://github.com/nxp-zephyr/bifrost
           revision: main
