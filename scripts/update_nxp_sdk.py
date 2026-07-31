@@ -155,6 +155,9 @@ def update_nxp_sdk_next_version(nxp_sdk, force):
     try:
         subprocess.run(['west', 'config', 'commands.allow_extensions', 'true'], cwd=nxp_sdk.sdk_target_location_abspath, check=True)
         subprocess.run(['west', 'update', '--fetch', 'smart'], cwd=nxp_sdk.sdk_target_location_abspath, check=True)
+        # Initialize submodules for all west projects (e.g. mbedtls framework submodule)
+        subprocess.run(['west', 'forall', '-c', 'git submodule update --init', '-a'],
+                       cwd=nxp_sdk.sdk_target_location_abspath, check=True)
         subprocess.run(['west', 'mcuxsdk-export'], cwd=nxp_sdk.sdk_target_location_abspath, check=True)
     except (RuntimeError, subprocess.CalledProcessError) as exception:
         logging.exception(
