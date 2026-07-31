@@ -19,7 +19,6 @@ manifest:
                   - mcux-sdk-middleware-sdmmc
                   - fatfs
                   - ethermind
-                  - mbedtls3x
                   - littlefs
                   - ble_controller
                   - bluetooth
@@ -64,7 +63,7 @@ manifest:
           url: https://github.com/nxp-mcuxpresso/lwip
           path: repo/mcuxsdk/middleware/lwip
           revision: a5bc68f1b34f3b407a71e588bbca46091fd506a3
-        - name: zephyr_mbedtls
+        - name: mbedtls3x
           url: https://github.com/NXP/nxp_mbedtls
           path: repo/mcuxsdk/middleware/mbedtls3x
           revision: 8bfb34b095ded5a00e383a4c7064f793dd5d5dbf
