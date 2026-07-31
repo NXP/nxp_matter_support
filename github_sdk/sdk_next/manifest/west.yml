@@ -67,6 +67,8 @@ manifest:
           url: https://github.com/NXP/nxp_mbedtls
           path: repo/mcuxsdk/middleware/mbedtls3x
           revision: 8bfb34b095ded5a00e383a4c7064f793dd5d5dbf
+          submodules:
+              - path: framework
         - name: bifrost
           url: https://github.com/nxp-zephyr/bifrost
           revision: main
