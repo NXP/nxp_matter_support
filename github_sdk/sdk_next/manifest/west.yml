@@ -7,7 +7,7 @@ manifest:
     projects:
         - name: mcuxsdk_manifest
           url: https://github.com/nxp-mcuxpresso/mcuxsdk-manifests
-          revision: v26.06.00
+          revision: v26.06.00-LTS
           import:
               name-allowlist:
                   - mcux-sdk-middleware-connectivity-framework
