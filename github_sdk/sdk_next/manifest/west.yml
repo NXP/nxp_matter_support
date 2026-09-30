@@ -69,6 +69,10 @@ manifest:
           revision: 8bfb34b095ded5a00e383a4c7064f793dd5d5dbf
           submodules:
               - path: framework
+        - name: ieee-802.15.4
+          url: https://github.com/nxp-mcuxpresso/mcuxsdk-middleware-ieee_802.15.4
+          path: repo/mcuxsdk/middleware/wireless/ieee-802.15.4
+          revision: c8e8067e0388e57577c1cca4e6f9d22d83e587ce
         - name: bifrost
           url: https://github.com/nxp-zephyr/bifrost
           revision: main
